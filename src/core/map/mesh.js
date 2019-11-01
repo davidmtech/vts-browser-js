@@ -499,7 +499,7 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
                                 //}
                             }
      
-                            program = new GpuProgram(gpu, vertexShader, pixelShader.replace('__FILTER__', filter));
+                            program = new GpuProgram(gpu, vertexShader, pixelShader.replace('__FILTER__', filter), gpu.webgl2);
                             renderer.progMap[id] = program;
                         }
                     }

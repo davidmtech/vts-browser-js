@@ -1,7 +1,13 @@
 
-var GpuProgram = function(gpu, vertex, fragment) {
+var GpuProgram = function(gpu, vertex, fragment, convert) {
     this.gpu = gpu;
     this.gl = gpu.gl;
+
+    if (convert) {
+        vertex = this.convertShader(vertex);
+        fragment = this.convertShader(fragment, true);
+    }
+
     this.vertex = vertex;
     this.fragment = fragment;
     this.program = null;
@@ -9,7 +15,41 @@ var GpuProgram = function(gpu, vertex, fragment) {
     this.attributeLocationCache = [];
     this.m = new Float32Array(16);
     this.ready = false;
+
     this.createProgram(vertex, fragment);
+};
+
+
+GpuProgram.prototype.replace = function(shader, key, mutations, value) {
+    for (var i = 0, li = mutations.length; i < li; i++) {
+        shader = shader.replace(new RegExp(key.replace('[a]', mutations[i]), 'g'), value.replace('[a]', mutations[i]));
+    }
+
+    return shader;
+};
+
+
+// convert shader to WebGL 2
+GpuProgram.prototype.convertShader = function(shader, fragment) {
+
+    if (fragment) {
+        shader = shader.replace(new RegExp('varying','g'), 'in');
+        shader = shader.replace('void main', 'out vec4 outputColor;\n void main');
+        shader = shader.replace(new RegExp('gl_FragColor','g'), 'outputColor');
+    } else {
+        shader = this.replace(shader, 'attribute [a] aPosition', ['vec2', 'vec3', 'vec4'], 'layout(location = 0) in [a] aPosition');
+        shader = this.replace(shader, 'attribute [a] aNormal', ['vec2', 'vec3', 'vec4'], 'layout(location = 1) in [a] aNormal');
+        shader = this.replace(shader, 'attribute [a] aTexCoord', ['vec2', 'vec3', 'vec4'], 'layout(location = 2) in [a] aTexCoord');
+        shader = this.replace(shader, 'attribute [a] aTexCoord2', ['vec2'], 'layout(location = 3) in [a] aTexCoord');
+        shader = this.replace(shader, 'attribute [a] aElement', ['float'], 'layout(location = 4) in [a] aElement');
+        shader = this.replace(shader, 'attribute [a] aOrigin', ['vec3'], 'layout(location = 5) in [a] aOrigin');
+
+        shader = shader.replace(new RegExp('varying','g'), 'out');
+    }
+
+    shader = shader.replace(new RegExp('texture2D','g'), 'texture');
+
+    return '#version 300 es\n' + shader;
 };
 
 
