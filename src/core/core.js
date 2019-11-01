@@ -106,6 +106,7 @@ var Core = function(element, config, coreInterface) {
         mapLogGeodataStyles: true,
         mapBenevolentMargins: false,
 
+        rendererWebGL2 : true,
         rendererAnisotropic : 0,
         rendererAntialiasing : true,
         rendererAllowScreenshots : false,
@@ -558,6 +559,7 @@ Core.prototype.getConfigParam = function(key) {
 
 Core.prototype.setRendererConfigParam = function(key, value) {
     switch (key) {
+    case 'rendererWebGL2':             this.config.rendererWebGL2 = utils.validateBool(value, false); break;
     case 'rendererAnisotropic':        this.config.rendererAnisotropic = utils.validateNumber(value, -1, 2048, 0); if (this.rederer) this.rederer.gpu.setAniso(this.config.rendererAnisotropic); break;
     case 'rendererAntialiasing':       this.config.rendererAntialiasing = utils.validateBool(value, true); break;
     case 'rendererAllowScreenshots':   this.config.rendererAllowScreenshots = utils.validateBool(value, false); break;
@@ -567,6 +569,7 @@ Core.prototype.setRendererConfigParam = function(key, value) {
 
 Core.prototype.getRendererConfigParam = function(key) {
     switch (key) {
+    case 'rendererWebGL2':             return this.config.rendererWebGL2;
     case 'rendererAnisotropic':        return this.config.rendererAnisotropic;
     case 'rendererAntialiasing':       return this.config.rendererAntialiasing;
     case 'rendererAllowScreenshots':   return this.config.rendererAllowScreenshots;

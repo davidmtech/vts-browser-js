@@ -1,6 +1,6 @@
 
 
-var GpuDevice = function(renderer, div, size, keepFrameBuffer, antialias, aniso) {
+var GpuDevice = function(renderer, div, size, keepFrameBuffer, antialias, aniso, webgl2) {
     this.renderer = renderer;
     this.div = div;
     this.canvas =  null;
@@ -11,6 +11,7 @@ var GpuDevice = function(renderer, div, size, keepFrameBuffer, antialias, aniso)
     this.enabledAttributes = new Uint8Array(this.maxAttributesCount);
     this.noTextures = false;
     this.barycentricBuffer = null;
+    this.webgl2 = webgl2 || false;
    
     //state of device when first initialized
     this.defaultState = this.createState({blend:false, stencil:false, zequal: false, ztest:false, zwrite: false, culling:false}); 
@@ -45,10 +46,17 @@ GpuDevice.prototype.init = function() {
     canvas.addEventListener("webglcontextlost", this.contextLost.bind(this), false);
     canvas.addEventListener("webglcontextrestored", this.contextRestored.bind(this), false);
 
-    var gl;
+    var gl, options = {preserveDrawingBuffer: this.keepFrameBuffer, antialias: this.antialias, stencil: true};
 
     try {
-        gl = canvas.getContext('webgl', {preserveDrawingBuffer: this.keepFrameBuffer, antialias: this.antialias, stencil: true}) || canvas.getContext('experimental-webgl', {preserveDrawingBuffer: this.keepFrameBuffer});
+        if (this.webgl2) {
+            gl = canvas.getContext('webgl2', options);
+            this.webgl2 = !gl ? false : true;
+        }
+
+        if (!this.webgl2 || !gl) {
+            gl = canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options);
+        }
     } catch(e) {
         //webgl not supported
     }
@@ -60,7 +68,9 @@ GpuDevice.prototype.init = function() {
 
     this.gl = gl;
 
-    if (!gl.getExtension('OES_standard_derivatives')) {
+    if (!this.webgl2) {
+        if (!gl.getExtension('OES_standard_derivatives')) {
+        }
     }
 
     this.anisoExt = (
