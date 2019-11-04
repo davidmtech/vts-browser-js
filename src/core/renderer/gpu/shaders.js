@@ -1239,6 +1239,10 @@ GpuShaders.tileVertexShader =
 
 GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
 
+    '#ifdef GL_OES_standard_derivatives\n'+
+        '#define standard_derivatives;\n'+
+    '#endif\n'+
+
     '#ifdef onlyFog\n'+
         'varying float vFogFactor;\n'+
     '#else\n'+
@@ -1273,7 +1277,7 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
             '#ifdef flatShadeVarFallback\n'+
                 'vec4 flatShadeData = vec4(1.0);\n'+
             '#else\n'+
-                '#ifdef GL_OES_standard_derivatives\n'+
+                '#ifdef standard_derivatives\n'+
                     'vec3 nx = dFdx(vBarycentric);\n'+
                     'vec3 ny = dFdy(vBarycentric);\n'+
                     'vec3 normal=normalize(cross(nx,ny));\n'+

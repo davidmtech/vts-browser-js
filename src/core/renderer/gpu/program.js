@@ -49,7 +49,7 @@ GpuProgram.prototype.convertShader = function(shader, fragment) {
 
     shader = shader.replace(new RegExp('texture2D','g'), 'texture');
 
-    return '#version 300 es\n' + shader;
+    return '#version 300 es\n#define standard_derivatives;\n'+ shader;
 };
 
 
