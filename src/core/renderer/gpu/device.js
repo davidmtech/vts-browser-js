@@ -1,6 +1,6 @@
 
 
-var GpuDevice = function(renderer, div, size, keepFrameBuffer, antialias, aniso, webgl2) {
+var GpuDevice = function(renderer, div, size, options) {
     this.renderer = renderer;
     this.div = div;
     this.canvas =  null;
@@ -11,16 +11,17 @@ var GpuDevice = function(renderer, div, size, keepFrameBuffer, antialias, aniso,
     this.enabledAttributes = new Uint8Array(this.maxAttributesCount);
     this.noTextures = false;
     this.barycentricBuffer = null;
-    this.webgl2 = webgl2 || false;
+    this.webgl2 = options.webgl2 || false;
    
     //state of device when first initialized
     this.defaultState = this.createState({blend:false, stencil:false, zequal: false, ztest:false, zwrite: false, culling:false}); 
     this.currentState = this.defaultState;
     this.currentOffset = 0; //used fot direct offset
 
-    this.keepFrameBuffer = (keepFrameBuffer == null) ? false : keepFrameBuffer;
-    this.antialias = antialias ? true : false;
-    this.anisoLevel = aniso;
+    this.keepFrameBuffer = (options.keepFrameBuffer == null) ? false : options.keepFrameBuffer;
+    this.antialias = options.antialias ? true : false;
+    this.anisoLevel = options.aniso;
+    this.vao = (options.vao && this.webgl2);
 };
 
 
@@ -185,7 +186,7 @@ GpuDevice.prototype.clear = function(clearDepth, clearColor, color) {
 };
 
 
-GpuDevice.prototype.useProgram = function(program, attributes, nextSampler) {
+GpuDevice.prototype.useProgram = function(program, attributes, nextSampler, mesh) {
     if (this.currentProgram != program) {
         this.gl.useProgram(program.program);
         this.currentProgram = program;
@@ -194,6 +195,10 @@ GpuDevice.prototype.useProgram = function(program, attributes, nextSampler) {
         
         if (nextSampler) {
             program.setSampler('uSampler2', 1);
+        }
+
+        if (mesh && mesh.vao) {
+            return;
         }
 
         var newAttributes = this.newAttributes;
@@ -207,7 +212,7 @@ GpuDevice.prototype.useProgram = function(program, attributes, nextSampler) {
         for (i = 0, li = attributes.length; i < li; i++){
             var index = program.getAttribute(attributes[i]);
             
-            if (index != -1){
+            if (index != -1) {
                 newAttributes[index] = 1;
             }
         }
@@ -224,6 +229,16 @@ GpuDevice.prototype.useProgram = function(program, attributes, nextSampler) {
                 }
             }
         }
+    }
+};
+
+
+GpuDevice.prototype.resetAttributes = function() {
+    var enabledAttributes = this.enabledAttributes; 
+   
+    for (var i = 0, li = enabledAttributes.length; i < li; i++){
+        //this.gl.disableVertexAttribArray(i);
+        enabledAttributes[i] = 0;
     }
 };
 

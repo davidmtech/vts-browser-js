@@ -520,7 +520,7 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
         return;
     }
 
-    renderer.gpu.useProgram(program, attributes, gpuMask);
+    renderer.gpu.useProgram(program, attributes, gpuMask, gpuSubmesh);
  
     if (texture) {
         var gpuTexture = texture.getGpuTexture();
@@ -635,13 +635,13 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
         this.stats.gpuRenderUsed += gpuSubmesh.getSize();
     } 
 
-    gpuSubmesh.draw(program, 'aPosition', texcoordsAttr, texcoords2Attr, drawWireframe != 0 ? 'aBarycentric' : null, (drawWireframe == 2));
+    gpuSubmesh.draw(program, 'aPosition', texcoordsAttr, texcoords2Attr, drawWireframe != 0 ? 'aBarycentric' : null, (drawWireframe == 2), true);
 
 
     if (drawWireframe == 1 || drawWireframe == 2) { //very slow debug only
 
         program = useSuperElevation ? renderer.progWireFrameBasicSE : renderer.progWireFrameBasic;
-        renderer.gpu.useProgram(program, attributes, gpuMask);
+        renderer.gpu.useProgram(program, attributes, gpuMask, gpuSubmesh);
 
         if (useSuperElevation) {
             program.setMat4('uParamsSE', m);

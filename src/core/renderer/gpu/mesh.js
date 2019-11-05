@@ -11,6 +11,8 @@ var GpuMesh = function(gpu, meshData, fileSize, core, direct, use16bit, vertices
     this.use16bit = use16bit ? true : false;
     this.verticesUnnormalized = verticesUnnormalized ? true : false;
     this.size = 0;
+    this.vao = null;
+    this.vaoBuff = new Array(16);
 
     var vertices = meshData.vertices;
     var uvs = meshData.uvs;
@@ -97,63 +99,102 @@ GpuMesh.prototype.kill = function() {
         this.gl.deleteBuffer(this.indexBuffer);
     }
     
+    if (this.vao) {
+        this.gl.deleteVertexArray(this.vao);
+    }
+
     this.vertexBuffer = null;
     this.uvBuffer = null;
     this.uv2Buffer = null;
     this.indexBuffer = null;
+    this.vao = null;
 };
 
 // Draws the mesh, given the two vertex shader attributes locations.
-GpuMesh.prototype.draw = function(program, attrVertex, attrUV, attrUV2, attrBarycenteric, skipDraw) {
+GpuMesh.prototype.draw = function(program, attrVertex, attrUV, attrUV2, attrBarycenteric, skipDraw, vao) {
     var gl = this.gl;
-    if (gl == null || !this.valid) {
+    if (!gl || !this.valid) {
         return;
     }
 
-    if (this.use16bit) {
+    var index = 0;
+    if (attrUV) index += 1;
+    if (attrUV2) index += 2;
+
+    this.vao = this.vaoBuff[index];
+
+    if (this.vao) {
+        gl.bindVertexArray(this.vao);
+
+        if (!skipDraw) {
+            if (this.indexBuffer) {
+                gl.drawElements(gl.TRIANGLES, this.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+            }  else {
+                gl.drawArrays(gl.TRIANGLES, 0, this.vertexBuffer.numItems);
+            }
+        }
+
+        gl.bindVertexArray(null);
+        this.gpu.resetAttributes();
+        return;
+
+    } else if (this.gpu.vao && vao) {
+        this.vao = gl.createVertexArray();
+        gl.bindVertexArray(this.vao);
+        this.vaoBuff[index] = this.vao;
+
+        var itemType = this.use16bit ? gl.UNSIGNED_SHORT : gl.FLOAT;
+
         //bind vetex positions
         var vertexAttribute = program.getAttribute(attrVertex);
+        gl.enableVertexAttribArray(vertexAttribute); // NEW
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.vertexAttribPointer(vertexAttribute, this.vertexBuffer.itemSize, gl.UNSIGNED_SHORT, !this.verticesUnnormalized, 0, 0);
+        gl.vertexAttribPointer(vertexAttribute, this.vertexBuffer.itemSize, itemType, (this.use16bit && !this.verticesUnnormalized), 0, 0);
 
         //bind texture coords
         if (this.uvBuffer && attrUV) {
             var uvAttribute = program.getAttribute(attrUV);
+            gl.enableVertexAttribArray(uvAttribute); // NEW
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
-            gl.vertexAttribPointer(uvAttribute, this.uvBuffer.itemSize, gl.UNSIGNED_SHORT, true, 0, 0);
+            gl.vertexAttribPointer(uvAttribute, this.uvBuffer.itemSize, itemType, true, 0, 0);
         }
 
         if (this.uv2Buffer && attrUV2) {
             var uv2Attribute = program.getAttribute(attrUV2);
+            gl.enableVertexAttribArray(uv2Attribute); // NEW
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uv2Buffer);
-            gl.vertexAttribPointer(uv2Attribute, this.uv2Buffer.itemSize, gl.UNSIGNED_SHORT, true, 0, 0);
+            gl.vertexAttribPointer(uv2Attribute, this.uv2Buffer.itemSize, itemType, true, 0, 0);
         }
+
     } else {
+
+        var itemType = this.use16bit ? gl.UNSIGNED_SHORT : gl.FLOAT;
+
         //bind vetex positions
         var vertexAttribute = program.getAttribute(attrVertex);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.vertexAttribPointer(vertexAttribute, this.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(vertexAttribute, this.vertexBuffer.itemSize, itemType, (this.use16bit && !this.verticesUnnormalized), 0, 0);
 
         //bind texture coords
         if (this.uvBuffer && attrUV) {
             var uvAttribute = program.getAttribute(attrUV);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
-            gl.vertexAttribPointer(uvAttribute, this.uvBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(uvAttribute, this.uvBuffer.itemSize, itemType, true, 0, 0);
         }
 
         if (this.uv2Buffer && attrUV2) {
             var uv2Attribute = program.getAttribute(attrUV2);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uv2Buffer);
-            gl.vertexAttribPointer(uv2Attribute, this.uv2Buffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(uv2Attribute, this.uv2Buffer.itemSize, itemType, true, 0, 0);
         }
-    }
 
-    if (attrBarycenteric && attrBarycenteric) {
-        var barycentericAttribute = program.getAttribute(attrBarycenteric);
-        
-        if (barycentericAttribute != -1) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.gpu.barycentricBuffer);
-            gl.vertexAttribPointer(barycentericAttribute, this.gpu.barycentricBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        if (attrBarycenteric && attrBarycenteric) {
+            var barycentericAttribute = program.getAttribute(attrBarycenteric);
+            
+            if (barycentericAttribute != -1) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.gpu.barycentricBuffer);
+                gl.vertexAttribPointer(barycentericAttribute, this.gpu.barycentricBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            }
         }
     }
 
@@ -165,6 +206,11 @@ GpuMesh.prototype.draw = function(program, attrVertex, attrUV, attrUV2, attrBary
     }  else {
         if (!skipDraw) gl.drawArrays(gl.TRIANGLES, 0, this.vertexBuffer.numItems);
     }
+
+    if (this.gpu.vao && vao) {
+        gl.bindVertexArray(null);
+        this.gpu.resetAttributes();
+    }    
 };
 
 

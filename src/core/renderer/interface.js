@@ -136,7 +136,7 @@ RendererInterface.prototype.createShader = function(options) {
     var fragmentShader = options['fragmentShader'];
 
     if (vertexShader != null && fragmentShader) {
-        return new GpuProgram(this.gpu, vertexShader, fragmentShader);
+        return new GpuProgram(this.gpu, vertexShader, fragmentShader, this.gpu.webgl2 && !options['webgl2']);
     }
 };
 

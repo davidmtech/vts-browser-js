@@ -137,7 +137,7 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
         text2 += stats.debugStr + '<br/>';        
     }
 
-    var text3 =  'WebGL: ' + (renderer.gpu.webgl2 ? "2" : "1")  +'<br/>'+
+    var text3 =  'WebGL: ' + (renderer.gpu.webgl2 ? ("2" + (renderer.gpu.vao ? " VAO" : ""))  : "1")  +'<br/>'+
                  'PixelRatio: ' + (window.devicePixelRatio || 1).toFixed(3) +'<br/>'+
                  'BFRate: ' + Math.round(1000 / (stats.frameTime+0.00001)) +'<br/><br/>';
 
