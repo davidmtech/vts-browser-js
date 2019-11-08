@@ -191,6 +191,12 @@ MapDraw.prototype.drawMap = function(skipFreeLayers) {
         renderer.frameTime = this.stats.frameTime;        
     }
 
+
+    if (this.config.mapRenderToTexture > 0) {
+        renderer.checkRenderTextures();
+        renderer.switchToFramebuffer('texture', renderer.renderTexture);
+    }
+
     renderer.hoverFeatureCounter = 0;
     renderer.hoverFeatureList = map.hoverFeatureList;
     renderer.hoverFeature = map.hoverFeature;
@@ -538,6 +544,11 @@ MapDraw.prototype.drawMap = function(skipFreeLayers) {
                 renderer.draw.drawGpuJobs();
             }
         }
+    }
+
+    if (this.config.mapRenderToTexture > 0) {
+        renderer.switchToFramebuffer('base');
+        renderer.draw.drawImage(0, 0, renderer.curSize[0], renderer.curSize[1], renderer.renderTexture, null, null, null, null, false);
     }
 
     if (this.config.mapForceFrameTime) {

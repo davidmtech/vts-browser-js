@@ -90,6 +90,9 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.skydomeMesh = null;
     this.skydomeTexture = null;
 
+    this.renderTexture = null;
+    this.renderTexture2 = null;
+
     this.hitmapTexture = null;
     this.geoHitmapTexture = null;
     this.hitmapSize = this.config.mapDMapSize;
@@ -200,6 +203,7 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
 };
 
+
 Renderer.prototype.initProceduralShaders = function() {
     this.init.initProceduralShaders();
 };
@@ -248,6 +252,15 @@ Renderer.prototype.kill = function() {
 };
 
 
+Renderer.prototype.checkRenderTextures = function() {
+    if (this.config.mapRenderToTexture > 0 && !this.renderTexture) {
+        this.renderTexture = new GpuTexture(this.gpu);
+        this.renderTexture.createFromData(this.curSize[0], this.curSize[1], null /*data*/);
+        this.renderTexture.createFramebuffer(this.curSize[0], this.curSize[1]);
+    }
+};
+
+
 Renderer.prototype.resizeGL = function(width, height, skipCanvas, skipPaint) {
     this.camera.setAspect(width / height);
     this.curSize = [width, height];
@@ -265,6 +278,8 @@ Renderer.prototype.resizeGL = function(width, height, skipCanvas, skipPaint) {
     m[12] = -width*0.5*m[0]; m[13] = -height*0.5*m[5]; m[14] = 0; m[15] = 1;
 
     this.imageProjectionMatrix = m;
+
+    this.checkRenderTextures();
 };
 
 
@@ -579,9 +594,13 @@ Renderer.prototype.switchToFramebuffer = function(type, texture) {
         height = this.oldSize[1];
     
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    
         gl.viewport(0, 0, width, height);
-        this.gpu.setFramebuffer(null);
+        
+        if (type == 'base') {
+            this.gpu.setFramebuffer(null);
+        } else if (type == 'texture') {
+            this.gpu.setFramebuffer(this.renderTexture);
+        }
     
         this.camera.setAspect(width / height);
         this.curSize = [width, height];

@@ -105,6 +105,7 @@ var Core = function(element, config, coreInterface) {
         mapForcePipeline: 0,
         mapLogGeodataStyles: true,
         mapBenevolentMargins: false,
+        mapRenderToTexture: 1,
 
         rendererWebGL2 : true,
         rendererVAO : true,

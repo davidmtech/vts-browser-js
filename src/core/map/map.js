@@ -907,6 +907,7 @@ Map.prototype.setConfigParam = function(key, value) {
     case 'mapBenevolentMargins':          this.config.mapBenevolentMargins = utils.validateBool(value, false); break;
     case 'mapDMapSize':                   this.config.mapDMapSize = utils.validateNumber(value, 16, Number.MAXINTEGER, 512); break; 
     case 'mapDMapMode':                   this.config.mapDMapMode = utils.validateNumber(value, 1, Number.MAXINTEGER, 1); break;
+    case 'mapRenderToTexture':            this.config.mapRenderToTexture = utils.validateNumber(value, 0, Number.MAXINTEGER, 0); break;
     case 'mario':                         this.config.mario = utils.validateBool(value, true); break;
     case 'mapFeaturesReduceMode':         
         value = utils.validateString(value, 'scr-count4');
@@ -994,6 +995,7 @@ Map.prototype.getConfigParam = function(key) {
     case 'mapBenevolentMargins':          return this.config.mapBenevolentMargins;
     case 'mapDMapSize':                   return this.config.mapDMapSize; 
     case 'mapDMapMode':                   return this.config.mapDMapMode;
+    case 'mapRenderToTexture':            return this.config.mapRenderToTexture;
     case 'mario':                         return this.config.mario;
     }
 };
