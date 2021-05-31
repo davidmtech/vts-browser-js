@@ -25,8 +25,8 @@ var Browser = function(element, config) {
     this.initConfig();
     this.setConfigParams(config, true);
     this.originalConfig = JSON.parse(JSON.stringify(config));
-    
-    this.element = (typeof element === 'string') ? document.getElementById(element) : element; 
+
+    this.element = (typeof element === 'string') ? document.getElementById(element) : element;
     this.ui = new UI(this, this.element);
 
     element = (typeof element !== 'string') ? element : document.getElementById(element);
@@ -42,7 +42,7 @@ var Browser = function(element, config) {
         this.ui.setControlVisible('fallback', true);
         return;
     }
-    
+
     this.updatePosInUrl = false;
     this.lastUrlUpdateTime = false;
     this.mapLoaded = false;
@@ -61,7 +61,7 @@ var Browser = function(element, config) {
     this.on('map-position-panned', this.onMapPositionPanned.bind(this));
     this.on('map-position-rotated', this.onMapPositionRotated.bind(this));
     this.on('map-position-zoomed', this.onMapPositionZoomed.bind(this));
-        
+
     this.on('tick', this.onTick.bind(this));
 };
 
@@ -125,10 +125,10 @@ Browser.prototype.onMapLoaded = function(event) {
     var originalOptions = this.originalConfig;
     for (var key in originalOptions) {
         if (typeof options[key] !== 'undefined') {
-            options[key] = originalOptions[key]; 
-        } 
-    }    
-    
+            options[key] = originalOptions[key];
+        }
+    }
+
     this.setConfigParams(options);
 
     if (this.config.geojson || this.config.geodata) {
@@ -136,7 +136,7 @@ Browser.prototype.onMapLoaded = function(event) {
 
         if (typeof data === 'string') {
             data = data.trim();
-           
+
             if (data.charAt(0) == '{') {
                 try {
                     data = JSON.parse(data);
@@ -170,11 +170,11 @@ Browser.prototype.getLinkWithCurrentPos = function() {
 
     //get url params
     var params = utils.getParamsFromUrl(window.location.href);
-    
+
     //get position string
     var p = map.getPosition();
     p = map.convertPositionHeightMode(p, 'fix', true);
-    
+
     var s = '';
     s += p.getViewMode() + ',';
     var c = p.getCoords();
@@ -183,20 +183,20 @@ Browser.prototype.getLinkWithCurrentPos = function() {
     s += o[0].toFixed(2) + ',' + o[1].toFixed(2) + ',' + o[2].toFixed(2) + ',';
     s += p.getViewExtent().toFixed(2) + ',' + p.getFov().toFixed(2);
 
-    //replace old value with new one    
+    //replace old value with new one
     params['pos'] = s;
 
     if (this.mapInteracted) {
         if (params['rotate'] || this.getConfigParam('rotate')) {
             params['rotate'] = '0';
         }
-        
+
         var pan = this.getConfigParam('pan');
         if (params['pan'] || (pan && (pan[0] || pan[1]))) {
             params['pan'] = '0,0';
         }
     }
-    
+
     //convert prameters to url parameters string
     s = '';
     for (var key in params) {
@@ -205,12 +205,12 @@ Browser.prototype.getLinkWithCurrentPos = function() {
 
     //separete base url and url params
     var urlParts = window.location.href.split('?');
-    
+
     if (urlParts.length > 1) {
         var extraParts = urlParts[1].split('#'); //is there anchor?
-        return urlParts[0] + '?' + s + (extraParts[1] || ''); 
+        return urlParts[0] + '?' + s + (extraParts[1] || '');
     } else {
-        return urlParts[0] + '?' + s; 
+        return urlParts[0] + '?' + s;
     }
 };
 
@@ -293,13 +293,13 @@ Browser.prototype.onTick = function() {
     this.autopilot.tick();
     this.ui.tick(this.dirty);
     this.dirty = false;
-    
+
     if (this.updatePosInUrl) {
-        var timer = performance.now(); 
+        var timer = performance.now();
         if ((timer - this.lastUrlUpdateTime) > 1000) {
             if (window.history.replaceState) {
                 window.history.replaceState({}, null, this.getLinkWithCurrentPos());
-            }        
+            }
             this.updatePosInUrl = false;
             this.lastUrlUpdateTime = timer;
         }
@@ -340,6 +340,7 @@ Browser.prototype.initConfig = function() {
         searchElement : null,
         searchValue : null,
         walkMode : false,
+        wheelInputLag : 100,
         fixedHeight : 0,
         geojson : null,
         tiltConstrainThreshold : [0.5,1],
@@ -379,14 +380,14 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     var map = this.getMap();
 
     switch (key) {
-    case 'pos':                
+    case 'pos':
     case 'position':
         this.config.position = value;
         if (map) {
             map.setPosition(this.config.position);
         }
         break;
-            
+
     case 'view':
         this.config.view = value;
         if (map) {
@@ -436,7 +437,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'tiles3d':                this.config.tiles3d = value; break;
     case 'geojson':                this.config.geojson = value; break;
     case 'geojsonStyle':           this.config.geojsonStyle =  JSON.parse(value); break;
-    case 'rotate':             
+    case 'rotate':
         this.config.autoRotate = utils.validateNumber(value, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 0);
         if (map && this.autopilot) {
             this.autopilot.setAutorotate(this.config.autoRotate);
@@ -479,23 +480,23 @@ Browser.prototype.getConfigParam = function(key) {
     switch (key) {
     case 'pos':
     case 'position':
-        
+
         if (map) {
             map.getPosition();
         } else {
             return this.config.position;
         }
-            
+
         break;
-        
-    case 'view':               
+
+    case 'view':
 
         if (map) {
             return map.getView();
         } else {
             return this.config.view;
         }
-            
+
     case 'panAllowed':             return this.config.panAllowed;
     case 'rotationAllowed':        return this.config.rotationAllowed;
     case 'zoomAllowed':            return this.config.zoomAllowed;

@@ -12,6 +12,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    overscroll-behavior-y: none;
 }
 
 /*
@@ -35,10 +36,9 @@
     text-shadow: 0 0 2px #000;
     text-decoration: none;
     border-bottom: 1px solid rgba(255,255,255,0.5);
-    padding-bottom: 0px;    
-    margin-right: 10px;    
+    padding-bottom: 0px;
+    margin-right: 10px;
 }
-
 
 /*
  * POPUP
@@ -52,7 +52,7 @@
     height:100%;
     z-index: 5;
     position:absolute;
-    background-color: rgba(0,0,0,0.5);    
+    background-color: rgba(0,0,0,0.5);
 }
 
 #vts-popup {
@@ -83,7 +83,7 @@
     font-family: Verdana, Tahoma, Geneva, Arial, Sans-serif;
     font-size: 11px;
     left: 120px;
-    overflow: hidden;    
+    overflow: hidden;
 }
 
 .vts-credits-supercell {
@@ -228,7 +228,7 @@
     cursor: default;
     position: relative;
     top: 33px;
-    color: #000;    
+    color: #000;
 }
 
 .vts-search-listitem {
@@ -262,7 +262,7 @@
     background-color: rgba(255,255,255,0.75);
     font-family: Verdana, Tahoma, Geneva, Arial, Sans-serif;
     color:#ddd;
-    z-index: 5;    
+    z-index: 5;
 }
 
 .vts-loading-progress {
@@ -305,8 +305,8 @@
     z-index: 0;
     max-width:120px;
     max-height:120px;
-    
-    transform: scale(0.9);    
+
+    transform: scale(0.9);
 }
 
 #vts-compass-frame {

@@ -20,6 +20,7 @@ var UIElement = function(control, element) {
     this.dragEndCallTouch = this.onDragEnd.bind(this, true);
     this.firstDragDistance = 0;
     this.lastDragDistance = 0;
+    this.lastWheelTimer = 0;
     this.dragStartPos = [0,0];
     this.dragCurrentPos = [0,0];
     this.dragLastPos = [0,0];
@@ -73,12 +74,12 @@ UIElement.prototype.getRect = function() {
     var offsetX = window.pageXOffset || 0;
     var offsetY = window.pageYOffset || 0;
     return {
-        'left' : (rect.left + offsetX) - (rect2.left + offsetX), 
-        'top' : (rect.top + offsetY) - (rect2.top + offsetY), 
-        'fromRight' : rect2.right - ((rect.left + offsetX) - (rect2.left + offsetX)), 
+        'left' : (rect.left + offsetX) - (rect2.left + offsetX),
+        'top' : (rect.top + offsetY) - (rect2.top + offsetY),
+        'fromRight' : rect2.right - ((rect.left + offsetX) - (rect2.left + offsetX)),
         'fromBottom' : rect2.height - ((rect.top + offsetY) - (rect2.top + offsetY)),
-        'width' : rect.width, 
-        'height' : rect.height 
+        'width' : rect.width,
+        'height' : rect.height
     };
 };
 
@@ -88,17 +89,17 @@ UIElement.prototype.getPageRect = function() {
     var offsetX = window.pageXOffset || 0;
     var offsetY = window.pageYOffset || 0;
     return {
-        'left' : (rect.left + offsetX), 
-        'top' : (rect.top + offsetY), 
-        'width' : rect.width, 
-        'height' : rect.height 
+        'left' : (rect.left + offsetX),
+        'top' : (rect.top + offsetY),
+        'width' : rect.width,
+        'height' : rect.height
     };
 };
 
 
 UIElement.prototype.setHtml = function(html) {
     this.element.innerHTML = html;
-    
+
     var allElements = this.element.getElementsByTagName('*');
 
     //store all elements with id attribute to the table
@@ -109,7 +110,7 @@ UIElement.prototype.setHtml = function(html) {
             //store element to the table
             this.control.elementsById[id] = new UIElement(this, allElements[i]);
         }
-    }    
+    }
 };
 
 
@@ -167,6 +168,17 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
             return; //todo remove event
         }
 
+        if (type == 'mousewheel') {
+          var timer = Date.now();
+
+          if ((timer - this.lastWheelTimer) < this.ui.browser.config.wheelInputLag) {
+            return;
+          }
+
+          this.lastWheelTimer = timer;
+          //console.log('mousewheel ' + timer);
+        }
+
 //        function.call(new UIEvent(type, this, e || window.event));
         call(new UIEvent(type, this, e || window.event));
     }).bind(this);
@@ -212,14 +224,14 @@ UIElement.prototype.setDraggableState = function(state) {
         this.off('mousemove', this.dragMoveCall, document);
         //this.off("mouseup", this.onDragEnd.bind(this));
         this.off('mouseup', this.dragEndCall, document);
-        
+
         this.off('touchstart', this.dragBeginCallTouch);
         this.off('touchmove', this.dragMoveCallTouch, document);
         this.off('touchend', this.dragEndCallTouch, document);
-        
+
         this.dragging = false;
     }
-    
+
     this.dragStartPos = [0,0];
     this.dragCurrentPos = [0,0];
     this.dragLastPos = [0,0];
@@ -228,7 +240,7 @@ UIElement.prototype.setDraggableState = function(state) {
     this.dragTouches = [];
     this.dragTouches2 = [];
     this.resetPos = false;
-    
+
     this.dragable = state;
     this.dragButtons = {
         'left' : false,
@@ -249,10 +261,10 @@ UIElement.prototype.getDraggingState = function() {
         'buttonLeft' : this.dragButtons['left'],
         'buttonRight' : this.dragButtons['right'],
         'buttonMiddle' : this.dragButtons['middle'],
-        'startPos' : this.dragStartPos.slice(), 
-        'lastPos' : this.dragLastPos.slice(), 
-        'currentPos' : this.dragCurrentPos.slice(), 
-        'absMoved' : this.dragAbsMoved.slice() 
+        'startPos' : this.dragStartPos.slice(),
+        'lastPos' : this.dragLastPos.slice(),
+        'currentPos' : this.dragCurrentPos.slice(),
+        'absMoved' : this.dragAbsMoved.slice()
     };
 };
 
@@ -267,8 +279,8 @@ UIElement.prototype.onDragBegin = function(touchUsed, event) {
     //if (event.getTouchesCount() == 2) {
     this.dragTouches = [];
     this.dragTouches2 = [];
-    this.dragTouches.push(event.getTouchCoords(0));            
-    this.dragTouches2.push(event.getTouchCoords(1));            
+    this.dragTouches.push(event.getTouchCoords(0));
+    this.dragTouches2.push(event.getTouchCoords(1));
     //}
 
     if (touchUsed) {
@@ -336,7 +348,7 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
         if (touchCount != this.dragTouchCount) {
             this.dragLastPos[0] = pos[0];
             this.dragLastPos[1] = pos[1];
-            this.dragTouchCount = touchCount; 
+            this.dragTouchCount = touchCount;
         }
 
         if (this.resetPos) {
@@ -347,8 +359,8 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
         }
 
         if (touchCount == 2) {
-            this.dragTouches.push(event.getTouchCoords(0));            
-            this.dragTouches2.push(event.getTouchCoords(1));            
+            this.dragTouches.push(event.getTouchCoords(0));
+            this.dragTouches2.push(event.getTouchCoords(1));
 
             if (this.dragTouches.length >= 7) {
                 this.dragTouches.shift();
@@ -366,18 +378,18 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                 var t2 = this.dragTouches2;
                 var v2x = (t2[5][0] - t2[4][0]) + (t2[4][0] - t2[3][0]) + (t2[3][0] - t2[2][0]) + (t2[2][0] - t2[1][0]) + (t2[1][0] - t2[0][0]);
                 var v2y = (t2[5][1] - t2[4][1]) + (t2[4][1] - t2[3][1]) + (t2[3][1] - t2[2][1]) + (t2[2][1] - t2[1][1]) + (t2[1][1] - t2[0][1]);
-                
+
                 //get distance of each vector
                 var d1 = Math.sqrt(v1x * v1x + v1y * v1y);
                 var d2 = Math.sqrt(v2x * v2x + v2y * v2y);
-                var cosAngle, cosAngle2; 
+                var cosAngle, cosAngle2;
 
                 mode = 'pan';
 
                 if (d1 > d2 * 5 || d2 > d1 * 5) { //dectec situation where only one finger is closing to another
 
                     var p1, p2, p3;
-                    
+
                     //make first vector from non moving point to beginnig position of moving point
                     //make seconf vector from non moving point to ending position of moving point
                     if (d1 > d2 * 5) {
@@ -389,15 +401,15 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                         p2 = t2[0];
                         p3 = t2[5];
                     }
-                    
+
                     var v1 = [p2[0] - p1[0], p2[1] - p1[1]];
                     var v2 = [p3[0] - p1[0], p3[1] - p1[1]];
 
-                    //normalize vectors                
+                    //normalize vectors
                     var d =  Math.sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
                     v1[0] /= d;
                     v1[1] /= d;
-                    
+
                     d =  Math.sqrt(v2[0] * v2[0] + v2[1] * v2[1]);
                     v2[0] /= d;
                     v2[1] /= d;
@@ -405,7 +417,7 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                     //measure angle between vectors
                     cosAngle = v1[0] * v2[0] + v1[1] * v2[1];
                     cosAngle2 = -v1[1] * v2[0] + v1[0] * v2[1]; //v1 is rotated by 90deg
-                    
+
                     rotateDelta = (Math.acos(cosAngle2) * (180.0/Math.PI)) - 90;
 
                     if (cosAngle > 0.9999) { //are vectors in same line?
@@ -422,17 +434,17 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
 
                     var nv2x = v2x / d2;
                     var nv2y = v2y / d2;
-                    
+
                     //do vectors move in same direction
                     cosAngle = nv1x * nv2x + nv1y * nv2y;
-                    
+
                     if (cosAngle < 0.2) {
                         mode = 'zoom';
                     } else {
                         panDelta = [(v1x + v2x) *0.5, (v1y + v2y) *0.5];
-                    } 
+                    }
                 }
-                
+
                 //if (mode == "zoom") {
                 t = this.dragTouches;
                 t2 = this.dragTouches2;
@@ -447,12 +459,12 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                 dx = (t2[5][0] - t[5][0]);
                 dy = (t2[5][1] - t[5][1]);
                 d2 = Math.sqrt(dx * dx + dy * dy);
-                
+
                 //get delta betwwen distances
-                distanceDelta = d2 - d1;   
+                distanceDelta = d2 - d1;
                 */
 
-                distanceDelta = 0;   
+                distanceDelta = 0;
 
                 for (var i = 1; i < 6; i++) {
 
@@ -460,13 +472,13 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                     dx = (t2[i][0] - t[i][0]);
                     dy = (t2[i][1] - t[i][1]);
                     d2 = Math.sqrt(dx * dx + dy * dy);
-                    
+
                     //get delta between distances
                     distanceDelta += d2 - d1;
                     d1 = d2;
                 }
 
-                //}  
+                //}
             }
         }
     }
@@ -513,8 +525,8 @@ UIElement.prototype.onDragEnd = function(touchUsed, event) {
     //if (event.getTouchesCount() == 2) {
     this.dragTouches = [];
     this.dragTouches2 = [];
-    this.dragTouches.push(event.getTouchCoords(0));            
-    this.dragTouches2.push(event.getTouchCoords(1));            
+    this.dragTouches.push(event.getTouchCoords(0));
+    this.dragTouches2.push(event.getTouchCoords(1));
     //}
 
     //console.log("end: 2#:  " + JSON.stringify(this.dragButtons));
@@ -569,10 +581,9 @@ UIElement.prototype.updateDragButtonsState = function(event, state) {
     case 1: this.dragButtons = { 'left' : true, 'right' : false, 'middle' : false }; break;
     case 2: this.dragButtons = { 'left' : false, 'right' : true, 'middle' : false }; break;
     case 3: this.dragButtons = { 'left' : false, 'right' : false, 'middle' : true }; break;
-    }        
+    }
 };
 
 
 
 export default UIElement;
-

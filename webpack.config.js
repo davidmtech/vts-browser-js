@@ -25,7 +25,7 @@ var plugins = [
         { from: './LICENSE', to: 'vts-browser.js' + (PROD ? '.min' : '') + '.LICENSE' },
         { from: './LICENSE', to: 'vts-core.js' + (PROD ? '.min' : '') + '.LICENSE' }
       ],
-    }),    
+    }),
     new webpack.DefinePlugin({
       'VTS_MATERIAL_DEPTH':           1,
       'VTS_MATERIAL_FLAT':            2,
@@ -150,12 +150,15 @@ module.exports = {
 
   devtool: 'source-map',
 
+
+
+
   devServer: {
-    inline: true
+    inline: true,
+    port: 9000
   },
 
   mode: (PROD) ? 'production' : 'development',
 
-  plugins: plugins  
+  plugins: plugins
 };
-
