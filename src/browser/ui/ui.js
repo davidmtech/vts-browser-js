@@ -58,19 +58,20 @@ var UI = function(browser, element) {
             if (this.killed) return;
             return dom;
         }
-    });    
+    });
 };
 
 
 UI.prototype.init = function() {
     //create browser wrapper
+    this.elementIdCounter = 1;
     this.element = document.createElement('div');
     this.element.className = 'vts-browser';
     this.rootElement.appendChild(this.element);
 
     //create map cotrol
     this.map = new UIControlMap(this);
-   
+
     //create other ui controls
     var loading = this.config.controlLoading;
     this.compass = new UIControlCompass(this, (!loading && this.config.controlCompass), loading);
@@ -141,11 +142,11 @@ UI.prototype.setControlVisible = function(id, state, lockState) {
         if (id == 'search') flags |= 2;
 
         if (this.config.bigScreenMargins) {
-            flags |= 4096;            
+            flags |= 4096;
         }
 
         renderer.setMarginFlags(flags);
-       
+
         this.controls[id].setVisible(state);
     }
 };
@@ -197,7 +198,7 @@ UI.prototype.tick = function(dirty) {
         this.compass.update();
         this.space.update();
         this.credits.update();
-        this.link.updateLink();                
+        this.link.updateLink();
         this.search.update();
     }
 
@@ -208,5 +209,3 @@ UI.prototype.tick = function(dirty) {
 
 
 export default UI;
-
-

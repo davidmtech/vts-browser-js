@@ -28,14 +28,14 @@ var platform = {
 
     getOS : function() {
         if(!platform.initialized) { platform.init(); }
-        return platform.browser;
+        return platform.OS;
     },
 
     isMobile : function() {
         if(!platform.initialized) { platform.init(); }
         return platform.mobile;
     },
-    
+
     isAndroid : function() {
         if(!platform.initialized) { platform.init(); }
         return platform.mobileAndroid;
@@ -216,4 +216,3 @@ var platform = {
 };
 
 export {platform};
-

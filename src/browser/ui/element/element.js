@@ -1,10 +1,12 @@
 
 import UIEvent_ from './event';
 import Dom_ from '../../utility/dom';
+import {platform as platform_} from '../../../core/utils/platform';
 
 //get rid of compiler mess
 var UIEvent = UIEvent_;
 var dom = Dom_;
+var platform = platform_;
 
 
 var UIElement = function(control, element) {
@@ -21,11 +23,14 @@ var UIElement = function(control, element) {
     this.firstDragDistance = 0;
     this.lastDragDistance = 0;
     this.lastWheelTimer = 0;
+    this.lastWheelTimer2 = 0;
     this.dragStartPos = [0,0];
     this.dragCurrentPos = [0,0];
     this.dragLastPos = [0,0];
     this.dragAbsMoved = [0,0];
     this.zoomDrag = false;
+    this.wheelTimes = [];
+    this.id = this.ui.elementIdCounter++;
 };
 
 
@@ -168,18 +173,63 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
             return; //todo remove event
         }
 
-        if (type == 'mousewheel') {
-          var timer = Date.now();
+        if (type == 'mousewheel' && platform.getOS().toLowerCase().indexOf('mac') != -1) {
 
-          if ((timer - this.lastWheelTimer) < this.ui.browser.config.wheelInputLag) {
-            return;
-          }
+            var timer = Date.now();
 
-          this.lastWheelTimer = timer;
-          //console.log('mousewheel ' + timer);
+            //console.log('wheel: ');
+
+            var bigInterval = 500;
+            var bigInterval2 = 500;
+            var time = timer - this.lastWheelTimer2;
+
+            this.wheelTimes.push(timer);
+
+            var avrg = 0;
+
+            for (var i = 0; i < this.wheelTimes.length;) {
+                if (timer - this.wheelTimes[i] > bigInterval2) {
+                    this.wheelTimes.splice(i, 1);
+                } else {
+                    avrg += (timer - this.wheelTimes[i]);
+                    i++;
+                }
+            }
+
+            avrg = this.wheelTimes.length ? avrg / this.wheelTimes.length : 0;
+
+            //console.log('wheel count: ' + this.wheelTimes.length);
+            //console.log('wheel avrg: ' + avrg);
+
+            if (time > bigInterval) {
+                this.lastWheelTimer2 = timer;
+                time = 0;
+            }
+
+            var x = time / (bigInterval);
+            //var lag = Math.min((x * x * x) * this.ui.browser.config.wheelInputLag, this.ui.browser.config.wheelInputLag);
+            //var lag = Math.min((x * x * x) * this.wheelTimes.length, this.ui.browser.config.wheelInputLag);
+            //var lag = Math.min((x) * this.wheelTimes.length*2, this.ui.browser.config.wheelInputLag);
+            var lag = Math.min(this.wheelTimes.length * this.ui.browser.config.wheelInputLag[1], this.ui.browser.config.wheelInputLag[0]);
+            //var lag = Math.max(0,Math.min(avrg - (0.5-(1-x)*0.5) * this.wheelTimes.length*2, this.ui.browser.config.wheelInputLag));
+            //var lag = Math.min(avrg, this.ui.browser.config.wheelInputLag);
+            //lag = this.wheelTimes.length; //this.ui.browser.config.wheelInputLag;
+            //console.log('lag: ' + lag + '  ' +x);
+
+            if ((timer - this.lastWheelTimer) < lag) {
+              //this.ui.fireWheel[this.id] = { element: this, event: e || window.event, call: call};
+                return;
+            }
+
+            //console.log('interval: ' + (timer - this.lastWheelTimer));
+
+            this.lastWheelTimer = timer;
+
+            //console.log('mousewheel ' + timer);
+            //console.log('',e);
+            //console.log('type: ' + e.type + '  phase: ' + e.eventPhase);
         }
 
-//        function.call(new UIEvent(type, this, e || window.event));
         call(new UIEvent(type, this, e || window.event));
     }).bind(this);
 

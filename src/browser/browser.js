@@ -7,6 +7,8 @@ import Autopilot_ from './autopilot/autopilot';
 import ControlMode_ from './control-mode/control-mode';
 import Presenter_ from './presenter/presenter';
 import Rois_ from './rois/rois';
+import UIEvent_ from './ui/element/event';
+
 
 //get rid of compiler mess
 var CoreInterface = CoreInterface_;
@@ -340,7 +342,7 @@ Browser.prototype.initConfig = function() {
         searchElement : null,
         searchValue : null,
         walkMode : false,
-        wheelInputLag : 100,
+        wheelInputLag : [70,1],
         fixedHeight : 0,
         geojson : null,
         tiltConstrainThreshold : [0.5,1],
@@ -425,6 +427,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'controlLoading':         this.config.controlLoading = utils.validateBool(value, true); this.updateUI(key);      break;
     case 'minViewExtent':          this.config.minViewExtent = utils.validateNumber(value, 0.01, Number.MAXINTEGER, 100); break;
     case 'maxViewExtent':          this.config.maxViewExtent = utils.validateNumber(value, 0.01, Number.MAXINTEGER, Number.MAXINTEGER); break;
+    case 'wheelInputLag':          this.config.wheelInputLag = utils.validateNumberArray(value, 2, [0,0], [999, 999], [70, 1]); break;
     case 'sensitivity':            this.config.sensitivity = utils.validateNumberArray(value, 3, [0,0,0], [10, 10, 10], [1, 0.12, 0.05]); break;
     case 'inertia':                this.config.inertia = utils.validateNumberArray(value, 3, [0,0,0], [0.99, 0.99, 0.99], [0.85, 0.9, 0.7]); break;
     case 'legacyInertia':          this.config.legacyInertia = utils.validateBool(value, false); break;
