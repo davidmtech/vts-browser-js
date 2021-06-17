@@ -54,6 +54,12 @@ var Browser = function(element, config) {
     this.rois = new Rois(this);
     this.controlMode = new ControlMode(this, this.ui);
     this.presenter = new Presenter(this, config);
+    this.lastWsPos = null;
+    this.lastWSConnectTime = 0;
+
+    if (this.config.sync) {
+        this.setupWS();
+    }
 
     this.on('map-loaded', this.onMapLoaded.bind(this));
     this.on('map-unloaded', this.onMapUnloaded.bind(this));
@@ -71,6 +77,10 @@ var Browser = function(element, config) {
 Browser.prototype.kill = function() {
     this.ui.kill();
     this.killed = true;
+
+    if (this.ws) {
+        this.ws.close();
+    }
 };
 
 
@@ -116,6 +126,65 @@ Browser.prototype.on = function(name, listener) {
 
 Browser.prototype.callListener = function(name, event) {
     this.core.callListener(name, event);
+};
+
+
+Browser.prototype.setupWS = function() {
+
+    this.ws = new WebSocket(this.config.syncServer);
+
+    this.ws.onopen = () => {
+      this.ws.send('{ "command": "client", "channel": "' + this.config.sync + '" }');
+    }
+
+    this.ws.onerror = (error) => {
+      console.log(`WebSocket error: ${error}`)
+    }
+
+    this.ws.onmessage = (e) => {
+
+        var map = this.getMap();
+        if (!map) {
+            return ;
+        }
+
+        try {
+
+            var json = JSON.parse(e.data);
+
+            switch(json.command) {
+
+                case 'pos':
+
+                    var pos = json.pos;
+                    var pos2 = map.getPosition().toArray();
+
+                    this.lastWsPos = pos;
+
+                    if (Math.abs(pos[1] - pos2[1]) > 0.00001 ||
+                        Math.abs(pos[2] - pos2[2]) > 0.00001 ||
+                        Math.abs(pos[4] - pos2[4]) > 0.001 ||
+                        Math.abs(pos[5] - pos2[5]) > 0.01 ||
+                        Math.abs(pos[6] - pos2[6]) > 0.01 ||
+                        Math.abs(pos[7] - pos2[7]) > 0.01 ||
+                        Math.abs(pos[8] - pos2[8]) > 0.01 ||
+                        Math.abs(pos[9] - pos2[9]) > 0.01) {
+
+                            map.setPosition(json.pos);
+                        }
+
+                    break;
+
+                default:
+            }
+
+        } catch(ee) {
+            console.log(ee);
+        }
+
+      //console.log(e.data)
+    }
+
 };
 
 
@@ -217,9 +286,23 @@ Browser.prototype.getLinkWithCurrentPos = function() {
 };
 
 
-Browser.prototype.onMapPositionChanged = function() {
+Browser.prototype.onMapPositionChanged = function(event) {
     if (this.config.positionInUrl) {
         this.updatePosInUrl = true;
+    }
+
+    if (this.ws) {
+
+        var pos = this.getPositionString(event.position);
+        var pos2 = this.lastWsPos ? this.getPositionString(this.lastWsPos) : "";
+
+        if (pos != pos2) {
+
+            if (this.ws.readyState == 1) {
+                this.ws.send('{ "command":"pos", "pos": ' + pos + ' }')
+            }
+
+        }
     }
 };
 
@@ -296,6 +379,16 @@ Browser.prototype.onTick = function() {
     this.ui.tick(this.dirty);
     this.dirty = false;
 
+    if (this.ws) {
+        if (this.ws.readyState > 1) {
+            var timer = performance.now();
+            if ((timer - this.lastWSConnectTime) > 1000) {
+                this.setupWS();
+                this.lastWSConnectTime = timer;
+            }
+        }
+    }
+
     if (this.updatePosInUrl) {
         var timer = performance.now();
         if ((timer - this.lastUrlUpdateTime) > 1000) {
@@ -345,6 +438,8 @@ Browser.prototype.initConfig = function() {
         wheelInputLag : [70,1],
         fixedHeight : 0,
         geojson : null,
+        sync: null,
+        syncServer: 'ws://localhost:9080',
         tiltConstrainThreshold : [0.5,1],
         bigScreenMargins : false, //75,
         minViewExtent : 20, //75,
@@ -367,6 +462,19 @@ Browser.prototype.setConfigParams = function(params, ignoreCore) {
         }
     }
 };
+
+
+Browser.prototype.getPositionString = function(p) {
+
+    var s = '[';
+    s += '"' + p[0] + '",';
+    s += p[1].toFixed(6) + ',' + p[2].toFixed(6) + ',"' + p[3] + '",' + p[4].toFixed(2) + ',';
+    s += p[5].toFixed(2) + ',' + p[6].toFixed(2) + ',' + p[7].toFixed(2) + ',';
+    s += p[8].toFixed(2) + ',' + p[9].toFixed(2) +  ']';
+
+    return s;
+}
+
 
 
 Browser.prototype.updateUI = function(key) {
@@ -436,6 +544,8 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'tiltConstrainThreshold': this.config.tiltConstrainThreshold = utils.validateNumberArray(value, 2, [0.5,1], [-Number.MAXINTEGER, -Number.MAXINTEGER], [Number.MAXINTEGER, Number.MAXINTEGER]); break;
     case 'walkMode':               this.config.walkMode = utils.validateBool(value, false); break;
     case 'fixedHeight':            this.config.fixedHeight = utils.validateNumber(value, -Number.MAXINTEGER, Number.MAXINTEGER, 0); break;
+    case 'sync':                   this.config.sync = value; break;
+    case 'syncServer':             this.config.syncServer = value; break;
     case 'geodata':                this.config.geodata = value; break;
     case 'tiles3d':                this.config.tiles3d = value; break;
     case 'geojson':                this.config.geojson = value; break;
