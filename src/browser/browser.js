@@ -54,6 +54,7 @@ var Browser = function(element, config) {
     this.rois = new Rois(this);
     this.controlMode = new ControlMode(this, this.ui);
     this.presenter = new Presenter(this, config);
+    this.wsId = Date.now();
     this.lastWsPos = null;
     this.lastWSConnectTime = 0;
 
@@ -133,14 +134,6 @@ Browser.prototype.setupWS = function() {
 
     this.ws = new WebSocket(this.config.syncServer);
 
-    this.ws.onopen = () => {
-      this.ws.send('{ "command": "client", "channel": "' + this.config.sync + '" }');
-    }
-
-    this.ws.onerror = (error) => {
-      console.log(`WebSocket error: ${error}`)
-    }
-
     this.ws.onmessage = (e) => {
 
         var map = this.getMap();
@@ -152,7 +145,22 @@ Browser.prototype.setupWS = function() {
 
             var json = JSON.parse(e.data);
 
+            //console.log(e.data);
+
             switch(json.command) {
+
+                //case 'id':
+                    //this.wsId = json.id;
+                    //break;
+
+                case 'cursor':
+                case 'hide-cursor':
+                    //this.wsId = json.id;
+                        if (this.ui && this.ui.sync) {
+                            this.ui.sync.updateCursor(json);
+                        }
+
+                    break;
 
                 case 'pos':
 
@@ -183,6 +191,14 @@ Browser.prototype.setupWS = function() {
         }
 
       //console.log(e.data)
+    }
+
+    this.ws.onopen = () => {
+      this.ws.send('{ "command": "client", "channel": "' + this.config.sync + '", "id":' + this.wsId + '  }');
+    }
+
+    this.ws.onerror = (error) => {
+      console.log(`WebSocket error: ${error}`)
     }
 
 };
@@ -440,6 +456,7 @@ Browser.prototype.initConfig = function() {
         geojson : null,
         sync: null,
         syncServer: 'ws://localhost:9080',
+        syncCursor: false,
         tiltConstrainThreshold : [0.5,1],
         bigScreenMargins : false, //75,
         minViewExtent : 20, //75,
@@ -545,6 +562,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'walkMode':               this.config.walkMode = utils.validateBool(value, false); break;
     case 'fixedHeight':            this.config.fixedHeight = utils.validateNumber(value, -Number.MAXINTEGER, Number.MAXINTEGER, 0); break;
     case 'sync':                   this.config.sync = value; break;
+    case 'syncCursor':             this.config.syncCursor = utils.validateBool(value, false); break;
     case 'syncServer':             this.config.syncServer = value; break;
     case 'geodata':                this.config.geodata = value; break;
     case 'tiles3d':                this.config.tiles3d = value; break;

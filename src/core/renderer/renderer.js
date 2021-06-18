@@ -117,7 +117,7 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
     this.jobZBuffer2 = new Array(512);
     this.jobZBuffer2Size = new Array(512);
-    
+
     this.jobHBuffer = {};
     this.jobHBufferSize = 0;
     this.jobHSortBuffer = new Array(2048);
@@ -145,7 +145,7 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
     this.layerGroupVisible = [];
     this.bitmaps = {};
-    
+
     this.cameraPosition = [0,0,0];
     this.cameraOrientation = [0,0,0];
     this.cameraTiltFator = 1;
@@ -205,7 +205,7 @@ Renderer.prototype.onResize = function() {
 
     var rect = this.div.getBoundingClientRect();
     this.resizeGL(Math.floor(rect.width), Math.floor(rect.height));
-    
+
     if (this.onResizeCall) {
         this.onResizeCall();
     }
@@ -235,7 +235,7 @@ Renderer.prototype.kill = function() {
     if (this.font) this.font.kill();
     if (this.plines) this.plines.kill();
     if (this.plineJoints) this.plineJoints.kill();
- 
+
     this.gpu.kill();
     //this.div.removeChild(this.gpu.getCanvas());
 };
@@ -495,7 +495,7 @@ Renderer.prototype.getScreenRay = function(screenX, screenY) {
     //convert screen coords
     var x = (2.0 * screenX) / this.curSize[0] - 1.0;
     var y = 1.0 - (2.0 * screenY) / this.curSize[1];
-    
+
     var rayNormalizeDeviceSpace = [x, y, 1.0];
 
     var rayClipCoords = [rayNormalizeDeviceSpace[0], rayNormalizeDeviceSpace[1], -1.0, 1.0];
@@ -557,7 +557,7 @@ Renderer.prototype.hitTestGeoLayers = function(screenX, screenY, secondTexture) 
 
     if (surfaceHit) {
         return [true, pixel[0], pixel[1], pixel[2], pixel[3]];
-    } 
+    }
 
     return [false, 0,0,0,0];
 };
@@ -565,17 +565,17 @@ Renderer.prototype.hitTestGeoLayers = function(screenX, screenY, secondTexture) 
 
 Renderer.prototype.switchToFramebuffer = function(type, texture) {
     var gl = this.gpu.gl, size, width, height;
-    
+
     switch(type) {
     case 'base':
         width = this.oldSize[0];
         height = this.oldSize[1];
-    
+
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    
+
         gl.viewport(0, 0, width, height);
         this.gpu.setFramebuffer(null);
-    
+
         this.camera.setAspect(width / height);
         this.curSize = [width, height];
         this.gpu.resize(this.curSize, true);
@@ -592,16 +592,16 @@ Renderer.prototype.switchToFramebuffer = function(type, texture) {
         this.gpu.setFramebuffer(this.hitmapTexture);
 
         this.oldSize = [ this.curSize[0], this.curSize[1] ];
-   
+
         gl.clearColor(1.0,1.0, 1.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 
         size = this.hitmapSize;
-    
+
         //clear screen
         gl.viewport(0, 0, size, size);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+
         this.curSize = [size, size];
 
         //this.gpu.clear();
@@ -617,27 +617,27 @@ Renderer.prototype.switchToFramebuffer = function(type, texture) {
 
         this.hoverFeatureCounter = 0;
         size = this.hitmapSize;
-            
+
         //set texture framebuffer
         this.gpu.setFramebuffer(type == 'geo' ? this.geoHitmapTexture : this.geoHitmapTexture2);
-            
+
         width = size;
         height = size;
-            
+
         gl.clearColor(1.0,1.0, 1.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
-            
+
         //clear screen
         gl.viewport(0, 0, size, size);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            
+
         this.curSize = [width, height];
-            
+
         //render scene
         this.onlyHitLayers = true;
         this.advancedPassNeeded = false;
         this.onlyAdvancedHitLayers = (type == 'geo2');
-            
+
         //this.gpu.clear();
         this.camera.update();
         break;
@@ -647,14 +647,14 @@ Renderer.prototype.switchToFramebuffer = function(type, texture) {
         this.gpu.setFramebuffer(texture);
 
         this.oldSize = [ this.curSize[0], this.curSize[1] ];
-   
+
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 
         //clear screen
         gl.viewport(0, 0, this.gpu.canvas.width, this.gpu.canvas.height);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+
         this.curSize = [this.gpu.canvas.width, this.gpu.canvas.height];
 
         //this.gpu.clear();
@@ -663,7 +663,7 @@ Renderer.prototype.switchToFramebuffer = function(type, texture) {
         this.onlyHitLayers = false;
         this.onlyAdvancedHitLayers = false;
         this.advancedPassNeeded = false;
-        break;        
+        break;
     }
 };
 
@@ -676,7 +676,7 @@ Renderer.prototype.hitTest = function(screenX, screenY) {
     var cameraPos = this.camera.getPosition();
 
     //probably not needed
-    //if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {  
+    //if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
       //  return [0, 0, 0, null, screenRay, Number.MAX_VALUE, cameraPos];
     //}
 
@@ -778,22 +778,22 @@ Renderer.prototype.saveScreenshot = function(output, filename, filetype) {
     imageData.data.set(data);
     context.putImageData(imageData, 0, 0);
 
-    filetype = filetype || 'jpg'; 
-   
+    filetype = filetype || 'jpg';
+
     if (output == 'file') {
         var a = document.createElement('a');
 
         var dataURI= canvas.toDataURL('image/' + filetype);
 
         var byteString = atob(dataURI.split(',')[1]);
-        
+
         // write the bytes of the string to an ArrayBuffer
         var ab = new ArrayBuffer(byteString.length);
         var ia = new Uint8Array(ab);
         for (var i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
         }
-      
+
         var file = new Blob([ab], {type: filetype});
 
         var url = URL.createObjectURL(file);
@@ -803,13 +803,13 @@ Renderer.prototype.saveScreenshot = function(output, filename, filetype) {
         a.click();
         setTimeout(function() {
             document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);  
-        }, 0); 
+            window.URL.revokeObjectURL(url);
+        }, 0);
     } if (output == 'tab') {
         //open image in new window
         window.open(canvas.toDataURL('image/' + filetype));
     }
-    
+
     return imageData;
 };
 

@@ -25,6 +25,7 @@ import UIControlPopup_ from './control/popup';
 import UIControlLoading_ from './control/loading';
 import { UIControlMeasure as UIControlMeasure_ }  from './control/measure';
 import UIControlMeasureLite_ from './control/measure-lite';
+import UIControlSync_ from './control/sync';
 
 //get rid of compiler mess
 var UIControlCompass = UIControlCompass_;
@@ -41,6 +42,7 @@ var UIControlLayers = UIControlLayers_;
 var UIControlFallback = UIControlFallback_;
 var UIControlPopup = UIControlPopup_;
 var UIControlLoading = UIControlLoading_;
+var UIControlSync = UIControlSync_;
 
 
 var UI = function(browser, element) {
@@ -90,6 +92,10 @@ UI.prototype.init = function() {
     this.fallback = new UIControlFallback(this);
     this.popup = new UIControlPopup(this, false);
     this.loading = new UIControlLoading(this, this.config.controlLoading);
+
+    if (this.config.syncCursor) {
+        this.sync = new UIControlSync(this, this.config.syncCursor);
+    }
 
     dom.disableContexMenu(this.element);
 };
