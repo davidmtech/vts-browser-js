@@ -424,6 +424,7 @@ Browser.prototype.initConfig = function() {
         rotationAllowed : true,
         zoomAllowed : true,
         jumpAllowed : false,
+        separatePanAndZoom : true,
         sensitivity : [1, 0.06, 0.05],
         inertia : [0.81, 0.9, 0.7],
         timeNormalizedInertia : false, // legacy inertia [0.8,0.8,0.8] sensitivity [0.5,0.4]
@@ -457,6 +458,7 @@ Browser.prototype.initConfig = function() {
         sync: null,
         syncServer: 'ws://localhost:9080',
         syncCursor: false,
+        syncId: '',
         tiltConstrainThreshold : [0.5,1],
         bigScreenMargins : false, //75,
         minViewExtent : 20, //75,
@@ -526,6 +528,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'rotationAllowed':        this.config.rotationAllowed = utils.validateBool(value, true);      break;
     case 'zoomAllowed':            this.config.zoomAllowed = utils.validateBool(value, true);          break;
     case 'jumpAllowed':            this.config.jumpAllowed = utils.validateBool(value, false);         break;
+    case 'separatePanAndZoom':     this.config.separatePanAndZoom = utils.validateBool(value, false);  break;
     case 'constrainCamera':        this.config.constrainCamera = utils.validateBool(value, true);      break;
     case 'navigationMode':         this.config.navigationMode = value;                                 break;
     case 'positionInUrl':          this.config.positionInUrl = utils.validateBool(value, false);       break;
@@ -564,6 +567,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'sync':                   this.config.sync = value; break;
     case 'syncCursor':             this.config.syncCursor = utils.validateBool(value, false); break;
     case 'syncServer':             this.config.syncServer = value; break;
+    case 'syncId':                  this.config.syncId = value; break;
     case 'geodata':                this.config.geodata = value; break;
     case 'tiles3d':                this.config.tiles3d = value; break;
     case 'geojson':                this.config.geojson = value; break;

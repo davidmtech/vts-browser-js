@@ -175,6 +175,11 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
 
         if (type == 'mousewheel' && platform.getOS().toLowerCase().indexOf('mac') != -1) {
 
+            if (this.ui.browser.config.separatePanAndZoom &&
+                (this.dragAbsMoved[0] * this.dragAbsMoved[0] + this.dragAbsMoved[1] * this.dragAbsMoved[1]) > 20 ) {
+                return;
+            }
+
             var timer = Date.now();
 
             //console.log('wheel: ');
@@ -577,6 +582,8 @@ UIElement.prototype.onDragEnd = function(touchUsed, event) {
     this.dragTouches2 = [];
     this.dragTouches.push(event.getTouchCoords(0));
     this.dragTouches2.push(event.getTouchCoords(1));
+    this.dragAbsMoved = [0,0];
+
     //}
 
     //console.log("end: 2#:  " + JSON.stringify(this.dragButtons));
