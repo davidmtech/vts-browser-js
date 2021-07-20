@@ -179,17 +179,19 @@ ControlModeMapObserver.prototype.wheel = function(event) {
 ControlModeMapObserver.prototype.doubleclick = function(event) {
     dom.preventDefault(event);
 
-    var map = this.browser.getMap();
-    if (!map || !this.config.jumpAllowed) {
-        return;
-    }
-
     if (this.browser.controlMode.altKey &&
         this.browser.controlMode.shiftKey &&
-        this.browser.controlMode.ctrlKey) {
+        this.browser.controlMode.ctrlKey &&
+        this.browser.config.minViewExtent > 0.5) {
         this.browser.config.minViewExtent = 0.5;
         return;
     }
+
+    var map = this.browser.getMap();
+    if (!map || (!this.config.jumpAllowed && !this.browser.controlMode.altKey)) {
+        return;
+    }
+
 
     var coords = event.getMouseCoords();
     var canvasSize = this.browser.getRenderer().getCanvasSize();
@@ -208,12 +210,25 @@ ControlModeMapObserver.prototype.doubleclick = function(event) {
         pos.setHeight(mapCoords[2]);
         //pos = map.convertPositionHeightMode(pos, "fix");
         //pos.setPositionHeight(0);
+        if (this.browser.controlMode.altKey) {
 
-        if (this.browser.controlMode.shiftKey) {
-            map.setPosition(pos);
-        } else {        
-            this.browser.autopilot.flyTo(pos, {'mode' : 'direct', 'maxDuration' : 2000 });
+            var pos = map.getPosition();
+            pos.setCoords(mapCoords);
+            pos = map.convertPositionHeightMode(pos, 'fix');
+            var h = mapCoords[2] + 1.6;
+            this.config.fixedHeight = (h == 0) ? 0.001 : h;
+            this.setPosition(map.getPosition());
+
+        } else {
+
+            if (this.browser.controlMode.shiftKey) {
+                map.setPosition(pos);
+            } else {
+                this.browser.autopilot.flyTo(pos, {'mode' : 'direct', 'maxDuration' : 2000 });
+            }
+
         }
+
     }
 };
 

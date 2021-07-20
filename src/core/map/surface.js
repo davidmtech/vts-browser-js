@@ -51,25 +51,25 @@ var MapSurface = function(map, json, type) {
     this.originalStyle = null;
     this.originalStylesheet = null;
     this.styleChanged = true;
-    
+
     if (this.free) { //each free layer has its own data tree
         this.tree = new MapSurfaceTree(this.map, true, this);
     } else {
         this.tree = null;
     }
-    
+
     if (typeof json === 'string') {
         this.jsonUrl = this.map.url.processUrl(json);
         this.baseUrl = utilsUrl.getBase(this.jsonUrl);
         this.baseUrlSchema = utilsUrl.getSchema(this.jsonUrl);
         this.baseUrlOrigin = utilsUrl.getOrigin(this.jsonUrl);
-        
+
         var onLoaded = (function(data){
-            this.parseJson(data);            
+            this.parseJson(data);
             this.ready = true;
             this.map.refreshView();
         }).bind(this);
-        
+
         var onError = (function(){ }).bind(this);
 
         utils.loadJSON(this.jsonUrl, onLoaded, onError, null,(utils.useCredentials ? (this.jsonUrl.indexOf(this.map.url.baseUrl) != -1) : false), this.map.core.xhrParams);
@@ -102,9 +102,10 @@ MapSurface.prototype.parseJson = function(json) {
     this.credits = json['credits'] || [];
     this.creditsUrl = null;
     this.displaySize = json['displaySize'] || 1024;
+    this.hitable = this.geodata ? (json['hitable'] || false) : false;
 
     var i, li;
-    
+
     if (json['extents']) {
         var ll = json['extents']['ll'];
         var ur = json['extents']['ur'];
@@ -113,8 +114,8 @@ MapSurface.prototype.parseJson = function(json) {
         this.extents = new BBox(0,0,0,1,1,1);
     }
 
-    this.specificity = Math.pow(2,this.lodRange[0]) / ((this.tileRange[1][0] - this.tileRange[1][0]+1)*(this.tileRange[1][1] - this.tileRange[1][1]+1));    
-    
+    this.specificity = Math.pow(2,this.lodRange[0]) / ((this.tileRange[1][0] - this.tileRange[1][0]+1)*(this.tileRange[1][1] - this.tileRange[1][1]+1));
+
     switch(typeof this.credits) {
     case 'string':
         this.creditsUrl = this.credits;
@@ -122,11 +123,11 @@ MapSurface.prototype.parseJson = function(json) {
         break;
 
     case 'object':
-        
+
         if (!Array.isArray(this.credits)) {
             var credits = this.credits;
             this.credits = [];
-                
+
             for (var key in credits){
                 this.map.addCredit(key, new MapCredit(this.map, credits[key]));
                 this.credits.push(key);
@@ -135,11 +136,11 @@ MapSurface.prototype.parseJson = function(json) {
 
         for (i = 0, li = this.credits.length; i < li; i++) {
             var credit = this.map.getCreditById(this.credits[i]);
-            this.creditsNumbers.push(credit ? credit.id : null); 
+            this.creditsNumbers.push(credit ? credit.id : null);
         }
-        
+
         break;
-    }    
+    }
 
 
     if (this.geodataUrl && (typeof this.geodataUrl === 'string') && this.geodataUrl.indexOf('{geonavtile}') != -1) {
@@ -156,7 +157,7 @@ MapSurface.prototype.parseJson = function(json) {
         }
 
         this.originalStyle = style;
-        
+
         if (style) {
             this.setStyle(style);
             this.originalStylesheet = this.stylesheet;
@@ -230,7 +231,7 @@ MapSurface.prototype.processUrl = function(url, fallback) {
     }
 
     url = url.trim();
-    
+
     if (url.indexOf('://') != -1) { //absolute
         return url;
     } else if (url.indexOf('//') == 0) {  //absolute without schema
@@ -238,7 +239,7 @@ MapSurface.prototype.processUrl = function(url, fallback) {
     } else if (url.indexOf('/') == 0) {  //absolute without host
         return this.baseUrlOrigin + url;
     } else {  //relative
-        return this.baseUrl + url; 
+        return this.baseUrl + url;
     }
 };
 
@@ -273,7 +274,7 @@ MapSurface.prototype.hasTile2 = function(id) {
         var y1 = this.tileRange[0][1] >> shift;
         var x2 = this.tileRange[1][0] >> shift;
         var y2 = this.tileRange[1][1] >> shift;
-    
+
         if (id[0] > this.lodRange[1] ||
             id[1] < x1 || id[1] > x2 ||
             id[2] < y1 || id[2] > y2 ) {
@@ -282,7 +283,7 @@ MapSurface.prototype.hasTile2 = function(id) {
     } else {
         var x = id[1] >> shift;
         var y = id[2] >> shift;
-    
+
         if (id[0] > this.lodRange[1] ||
             x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
             y < this.tileRange[0][1] || y > this.tileRange[1][1] ) {
@@ -334,22 +335,22 @@ MapSurface.prototype.setStyle = function(style) {
     } else {
         id = JSON.stringify(id);
         id = utils.getHash(id);
-        id = "#obj#" + id.toString(16); 
+        id = "#obj#" + id.toString(16);
     }
-    
+
     this.stylesheet = this.map.getStylesheet(id);
-    
+
     if (!this.stylesheet) {
         this.stylesheet = new MapStylesheet(this.map, id, style, this);
-        this.map.addStylesheet(id, this.stylesheet); 
-    } 
+        this.map.addStylesheet(id, this.stylesheet);
+    }
 
     this.style = style;
     this.styleChanged = true;
     this.geodataCounter++;
 
     //this.map.setStylesheetData(id); //force update
-    
+
     this.map.markDirty();
 };
 
@@ -396,7 +397,3 @@ MapSurface.prototype.getMonoGeodataUrl = function(id, skipBaseUrl) {
 
 
 export default MapSurface;
-
-
-
-  

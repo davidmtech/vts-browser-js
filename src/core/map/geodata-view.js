@@ -67,7 +67,7 @@ MapGeodataView.prototype.killGeodataView = function(killedByCache) {
     this.stats.gpuGeodata -= this.size;
     this.stats.graphsFluxGeodata[1][0]++;
     this.stats.graphsFluxGeodata[1][1] += this.size;
-    
+
     this.ready = false;
     this.size = 0;
     this.gpuCacheItem = null;
@@ -132,7 +132,7 @@ MapGeodataView.prototype.processPackedCommands = function(buffer, index) {
     } while(index < maxIndex);
 
 
-    this.stats.renderBuild += performance.now() - t; 
+    this.stats.renderBuild += performance.now() - t;
 
     return -1;
 };
@@ -235,13 +235,13 @@ MapGeodataView.prototype.directParse = function(data) {
     var nodes = data['nodes'] || [];
 
     for (var i = 0, li = nodes.length; i < li; i++) {
-        
+
         //VTS_WORKERCOMMAND_GROUP_BEGIN
         this.currentGpuGroup = new GpuGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
         this.gpuGroups.push(this.currentGpuGroup);
-    
+
         this.directParseNode(nodes[i], 0);
-    
+
         //VTS_WORKERCOMMAND_GROUP_END:
         this.size += this.currentGpuGroup.size;
     }
@@ -262,7 +262,7 @@ MapGeodataView.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) 
 
     var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
-    
+
     if (!this.ready && !this.processing && !doNotLoad && this.surface.stylesheet.isReady()) {
         if (this.geodata.isReady(doNotLoad, priority, doNotCheckGpu, this.surface.options.fastParse) && this.geodataProcessor.isReady()) {
 
@@ -277,7 +277,7 @@ MapGeodataView.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) 
                 } else {
                     this.directParse(JSON.parse(this.geodata.geodata));
                 }
-                
+
                 this.map.markDirty();
                 this.ready = true;
             } else {
@@ -334,7 +334,8 @@ MapGeodataView.prototype.draw = function(cameraPos) {
         var useSuperElevation = renderer.useSuperElevation;
 
         for (var i = 0, li = this.gpuGroups.length; i < li; i++) {
-            var group = this.gpuGroups[i]; 
+            var group = this.gpuGroups[i];
+            group.drawChannel = this.map.draw.drawChannel;
 
             if (group.rootNode || group.binPath) {
                 group.draw(mv, mvp, null, tiltAngle, (this.tile ? this.tile.texelSize : 1));
@@ -354,17 +355,17 @@ MapGeodataView.prototype.draw = function(cameraPos) {
                 mat4.multiply(renderer.camera.getModelviewFMatrix(), this.getWorldMatrix(group.bbox, cameraPos, mtmp), mv);
             } else {
                 mat4.multiply(renderer.camera.getModelviewFMatrix(), this.getWorldMatrix(group.bbox, cameraPos, mtmp), mv);
-            }     
-        
+            }
+
             var proj = renderer.camera.getProjectionFMatrix();
             mat4.multiply(proj, mv, mvp);
-            
+
             group.draw(mv, mvp, null, tiltAngle, (this.tile ? this.tile.texelSize : 1));
 
             this.stats.drawnFaces += group.polygons;
             this.stats.drawCalls += group.jobs.length;
         }
-        
+
         if (this.statsCoutner != this.stats.counter) {
             this.statsCoutner = this.stats.counter;
             this.stats.gpuRenderUsed += this.size;

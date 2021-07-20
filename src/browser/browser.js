@@ -38,6 +38,10 @@ var Browser = function(element, config) {
         return;
     }
 
+    if (config.tiles3d) { //} && !(config.pos || config.position)) {
+        this.config.autocenter = true;
+    }
+
     this.core = new CoreInterface(this.ui.getMapControl().getMapElement().getElement(), config);
 
     if (this.core == null) {
@@ -169,6 +173,10 @@ Browser.prototype.setupWS = function() {
 
                     this.lastWsPos = pos;
 
+                    if (json.fixedHeight) {
+                        this.config.fixedHeight = json.fixedHeight;
+                    }
+
                     if (Math.abs(pos[1] - pos2[1]) > 0.00001 ||
                         Math.abs(pos[2] - pos2[2]) > 0.00001 ||
                         Math.abs(pos[4] - pos2[4]) > 0.001 ||
@@ -236,10 +244,30 @@ Browser.prototype.onMapLoaded = function(event) {
     }
 
     var map = this.getMap();
+    map.config.autocenter = this.config.autocenter;
 
     if (this.config.tiles3d && map) {
-        this.tiles3d = map.createGeodata();
-        this.tiles3d.load3DTiles(this.config.tiles3d, {}, this.on3DTilesLoaded.bind(this));
+
+        if (!this.config.position) {
+            this.config.autocenter = true;
+        }
+
+        var freeLayer = {
+            credits:[],
+            displaySize:1024,
+            extents:{"ll":[null,null,null],"ur":[null,null,null]},
+            style:{},
+            type:"geodata",
+            hitable: true
+        };
+
+        freeLayer.geodata = {  binPath : this.config.tiles3d };
+
+        map.addFreeLayer('geodatatest', freeLayer);
+
+        var view = map.getView();
+        view.freeLayers.geodatatest = { options: { fastParse: true }};
+        map.setView(view);
     }
 
     if (this.autopilot) {
@@ -284,6 +312,10 @@ Browser.prototype.getLinkWithCurrentPos = function() {
         }
     }
 
+    if (this.config.fixedHeight) {
+        params['fixedHeight'] = '' + this.config.fixedHeight.toFixed(3);
+    }
+
     //convert prameters to url parameters string
     s = '';
     for (var key in params) {
@@ -315,7 +347,11 @@ Browser.prototype.onMapPositionChanged = function(event) {
         if (pos != pos2) {
 
             if (this.ws.readyState == 1) {
-                this.ws.send('{ "command":"pos", "pos": ' + pos + ' }')
+                if (this.config.fixedHeight) {
+                    this.ws.send('{ "command":"pos", "pos": ' + pos + ' "fixedHeight" : ' + this.config.fixedHeight + ' }')
+                } else {
+                    this.ws.send('{ "command":"pos", "pos": ' + pos + ' }')
+                }
             }
 
         }
@@ -463,6 +499,7 @@ Browser.prototype.initConfig = function() {
         bigScreenMargins : false, //75,
         minViewExtent : 20, //75,
         maxViewExtent : Number.MAXINTEGER,
+        autocenter : false,
         autoRotate : 0,
         autoPan : [0,0]
     };

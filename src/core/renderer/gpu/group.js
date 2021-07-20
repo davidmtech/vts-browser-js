@@ -43,7 +43,7 @@ var GpuGroup = function(id, bbox, origin, gpu, renderer) {
     this.geFactor = 1/16;
     this.geFactor2 = 0.5;
     this.geNormalized = false;
-    
+
     if (bbox != null && bbox[0] != null && bbox[1] != null) {
         this.bbox = new BBox(bbox[0][0], bbox[0][1], bbox[0][2], bbox[1][0], bbox[1][1], bbox[1][2]);
     }
@@ -57,7 +57,7 @@ var GpuGroup = function(id, bbox, origin, gpu, renderer) {
 //destructor
 GpuGroup.prototype.kill = function() {
     for (var i = 0, li = this.jobs.length; i < li; i++) {
-        var job = this.jobs[i]; 
+        var job = this.jobs[i];
 
         switch(job.type) {
         case VTS_JOB_FLAT_LINE:
@@ -215,7 +215,7 @@ GpuGroup.prototype.addExtentedLineJob = function(data) {
     var job = {};
     job.type = data['type'];
 
-    
+
     switch(job.type) {
     case VTS_WORKER_TYPE_FLAT_LINE:  job.type = VTS_JOB_FLAT_TLINE;  break;
     case VTS_WORKER_TYPE_FLAT_RLINE:  job.type = VTS_JOB_FLAT_RLINE;  break;
@@ -397,7 +397,7 @@ GpuGroup.prototype.addLineLabelJob = function(data) {
     job.reduce = data['reduce'];
 
     this.processReduce(job);
-    
+
     job.files = data['files'] || [];
     var fonts = data['fonts'] || ['#default'];
     job.fonts = fonts;
@@ -580,7 +580,7 @@ GpuGroup.prototype.addPack = function(data) {
         var subjob = job.subjobs[i];
 
         if (subjob.noOverlap) {
-            
+
             if (!job.noOverlap) {
                 job.noOverlap = subjob.noOverlap;
             } else {
@@ -631,7 +631,7 @@ GpuGroup.prototype.addPack = function(data) {
     } else {
         this.jobs.push(job);
     }
-    
+
     this.subjobs = null;
 };
 
@@ -677,7 +677,7 @@ GpuGroup.prototype.addMeshJob = function(data, lod) {
 
     job.type = VTS_JOB_MESH;
     job.path = data['path'];
-    
+
     job.textures = [];
 
     job.resources = new MapResourceNode(this.renderer.core.map, null, null);
@@ -713,7 +713,7 @@ GpuGroup.prototype.addRenderJob2 = function(buffer, index, tile, direct) {
         var view = new DataView(buffer.buffer);
         type = buffer[index]; index += 1;
 
-        if (type != VTS_WORKER_TYPE_PACK_BEGIN && type != VTS_WORKER_TYPE_PACK_END && 
+        if (type != VTS_WORKER_TYPE_PACK_BEGIN && type != VTS_WORKER_TYPE_PACK_END &&
             type != VTS_WORKER_TYPE_VSWITCH_BEGIN && type != VTS_WORKER_TYPE_VSWITCH_END && type != VTS_WORKER_TYPE_VSWITCH_STORE) {
 
             length = view.getUint32(index); index += 4;
@@ -922,11 +922,11 @@ GpuGroup.prototype.addRenderJob = function(data, tile) {
 
 function drawLineString(options, renderer) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
 
     if (options['points'] == null) {
-        return this;    
+        return this;
     }
 
     var points = options['points'];
@@ -942,7 +942,7 @@ function drawLineString(options, renderer) {
     color = [ color[0] * (1.0/255), color[1] * (1.0/255), color[2] * (1.0/255), color[3] * (1.0/255) ];
 
     renderer.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, blend, writeDepth, useState);
-    return this;    
+    return this;
 };
 
 
@@ -1038,13 +1038,13 @@ GpuGroup.prototype.drawNode = function(node, noSkip, splitMask, splitSpace) {
         var color = [255,0,255,255];
 
         if (node.tileset) {
-            color = [0,255,0,255];           
+            color = [0,255,0,255];
         }
 
         if (noSkip) {
             color = [255,255,0,255];
         }
-                 
+
         if (debug.drawSpaceBBox && node.volume2) {
             this.drawNodeVolume(node.volume2.points, [255,0,0,255]);
         } else {
@@ -1070,11 +1070,11 @@ GpuGroup.prototype.drawNode = function(node, noSkip, splitMask, splitSpace) {
         vec3.normalize(shift);
         vec3.scale(shift, node.volume.radius);
 
-        pos = [pos[0]+shift[0]-cameraPos[0],  
+        pos = [pos[0]+shift[0]-cameraPos[0],
                pos[1]+shift[1]-cameraPos[1],
                pos[2]+shift[2]-cameraPos[2]];
 
-        /*pos = [pos[0]-cameraPos[0],  
+        /*pos = [pos[0]-cameraPos[0],
                pos[1]-cameraPos[1],
                pos[2]-cameraPos[2]];*/
 
@@ -1096,7 +1096,7 @@ GpuGroup.prototype.drawNode = function(node, noSkip, splitMask, splitSpace) {
             text = '' + node.index;//this.getNodeLOD(node);
             renderer.draw.drawText(Math.round(pos[0]-renderer.draw.getTextSize(4*factor, text)*0.5), Math.round(pos[1]+3*factor), 4*factor, text, [1,1,0,1], pos[2]);
         }
-        
+
         if (debug.drawDistance) {
             var res = this.getNodeTexelSize(node, node.precision * renderer.curSize[0]);
             text = '' + res[1].toFixed(2) + ' ' + res[0].toFixed(2) + ' ' + node.precision.toFixed(3);
@@ -1148,7 +1148,7 @@ GpuGroup.prototype.drawNode = function(node, noSkip, splitMask, splitSpace) {
                         } else {
                             texture = jobs[0].textures[i];
                         }
-                        
+
                         if (texture) {
                             var gpuTexture = texture.getGpuTexture();
                             if (gpuTexture) {
@@ -1173,9 +1173,9 @@ GpuGroup.prototype.drawNode = function(node, noSkip, splitMask, splitSpace) {
 
     for (var i = 0, li = jobs.length; i < li; i++) {
         var job = jobs[i];
-        
+
         switch(job.type) {
-            
+
             case VTS_JOB_MESH:
                 if (this.isMeshReady(job, null, null, null, true, node)) {
                     this.drawMesh(job, node, splitMask, splitSpace);
@@ -1188,7 +1188,7 @@ GpuGroup.prototype.drawNode = function(node, noSkip, splitMask, splitSpace) {
                 }
                 break;
         }
-        
+
     }
 
 };
@@ -1205,7 +1205,7 @@ GpuGroup.prototype.isMeshReady = function(job, doNotLoad, priority, skipGpu, ski
     if (mesh.isReady(doNotLoad, priority, skipGpu)) {
         if (!skipStats) {
             stats.gpuNeeded += mesh.gpuSize;
-            
+
             //if (job.texturePath) {
                 //console.log('--' + node.lod + '--' + job.texturePath + '    ' + stats.gpuNeeded);
             //}
@@ -1213,9 +1213,9 @@ GpuGroup.prototype.isMeshReady = function(job, doNotLoad, priority, skipGpu, ski
 
         for (var i = 0, li = submeshes.length; i < li; i++) {
             var submesh = submeshes[i];
-            
+
             if (submesh.internalUVs) {
-                
+
                 var texture;
 
                 if (job.direct) {
@@ -1225,7 +1225,7 @@ GpuGroup.prototype.isMeshReady = function(job, doNotLoad, priority, skipGpu, ski
                         var resource = new MapResourceNode(this.renderer.core.map, null, null);
                         submesh.texture = resource.getTexture(path, VTS_TEXTURETYPE_COLOR, null, null, null /*tile*/, true);
                     }
-                    
+
                     texture = submesh.texture;
                 } else {
                     if (!job.texturePath) {
@@ -1235,8 +1235,8 @@ GpuGroup.prototype.isMeshReady = function(job, doNotLoad, priority, skipGpu, ski
                     if (!job.textures[i]) {
                         var path = job.texturePath + '-' + i + '.jpg';
                         job.textures[i] = job.resources.getTexture(path, VTS_TEXTURETYPE_COLOR, null, null, null /*tile*/, true);
-                    } 
-                    
+                    }
+
                     texture = job.textures[i];
                 }
 
@@ -1275,7 +1275,7 @@ GpuGroup.prototype.getGpuSize = function(job) {
 
         for (var i = 0, li = submeshes.length; i < li; i++) {
             var submesh = submeshes[i];
-            
+
             if (submesh.internalUVs && job.texturePath) {
                 if (job.textures[i]) {
                     size += job.textures[i].getGpuSize();
@@ -1295,14 +1295,14 @@ GpuGroup.prototype.drawMesh = function(job ,node, splitMask, splitSpace) {
 
     for (var i = 0, li = submeshes.length; i < li; i++) {
         var submesh = submeshes[i];
-        
+
         if (job.direct) {
             if (submesh.texture) {
-                mesh.drawSubmesh(cameraPos, i, submesh.texture, VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
+                mesh.drawSubmesh(cameraPos, i, submesh.texture, this.drawChannel == 1 ? VTS_MATERIAL_DEPTH : VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
             }
         } else {
             if (job.textures[i]) {
-                mesh.drawSubmesh(cameraPos, i, job.textures[i], VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
+                mesh.drawSubmesh(cameraPos, i, job.textures[i], this.drawChannel == 1 ? VTS_MATERIAL_DEPTH : VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
             }
         }
     }
@@ -1311,13 +1311,13 @@ GpuGroup.prototype.drawMesh = function(job ,node, splitMask, splitSpace) {
 GpuGroup.prototype.generateNode = function(index, file, lod, cindex, texelSize, points, center, radius, hasMesh) {
 
     var jobs = [];
-    
+
     if (hasMesh) {
 
         if (file.vtsFormat) {
             for (var i = 0, li = file.features.length; i < li; i++) {
                 var feature = file.features[i];
-                
+
                 switch(feature.type) {
                     case 1: //mesh
                         jobs.push({
@@ -1365,12 +1365,12 @@ GpuGroup.prototype.generateNode = function(index, file, lod, cindex, texelSize, 
 
 
 GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, texelSize, lod, index, file, visible, isready, skipRender) {
-    
+
     var renderer = this.renderer;
     var cameraPos = this.renderer.cameraPosition;
 
     if (!visible && !renderer.camera.pointsVisible2(points, cameraPos)) {
-        return;        
+        return;
     }
 
     var index2 = index * 9;
@@ -1381,10 +1381,10 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
 
     var pathFlags = tree[index2];
     var pathIndex = (pathFlags & 0xfffffff);
-    
-    if (pathFlags & (1 << 31)) {  // has json, jump to another tree (bin file) 
+
+    if (pathFlags & (1 << 31)) {  // has json, jump to another tree (bin file)
         var tab = file.pathTable;
-        
+
         if (tab[pathIndex] == 2) { //loaded
             var fileIndex = tab[pathIndex+1] | tab[pathIndex+2] << 8 | tab[pathIndex+3] << 16; // | | tab[pathIndex+3] << 24;
             file = this.binFiles[fileIndex];
@@ -1397,25 +1397,25 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
             return;
         }
     }
-        
-    var hasMesh = (pathIndex != 0); 
-    
+
+    var hasMesh = (pathIndex != 0);
+
     if (file.vtsFormat) {
         hasMesh = true;
-    }    
-    
+    }
+
     this.map.config.mapTraverseToMeshNode = false; //!!!!!!!!!!!!!!!! DEBUG
 
     if (this.loadMode == 1) { // topdown with splitting
 
         var priority = lod * res[1];
-        
+
         var noChildren = (!tree[index2+1] && !tree[index2+2] && !tree[index2+3] && !tree[index2+4] &&
                           !tree[index2+5] && !tree[index2+6] && !tree[index2+7] && !tree[index2+8]);
 
         if (noChildren || (res[0] <= this.map.draw.texelSizeFit && (hasMesh || !this.map.config.mapTraverseToMeshNode))) {
 
-            if (!skipRender && (/*node.parent ||*/ this.isBinNodeReady(points, center, index, file, null, priority, null, true))) { 
+            if (!skipRender && (/*node.parent ||*/ this.isBinNodeReady(points, center, index, file, null, priority, null, true))) {
 
                 var node = this.generateNode(index, file, lod, cindex, texelSize, points, center, radius, hasMesh);
                 this.drawNode(node);
@@ -1443,7 +1443,7 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
             var xv = [(points[1][0] - points[0][0])*0.5, (points[1][1] - points[0][1])*0.5, (points[1][2] - points[0][2])*0.5];
             var zv = [(points[0][0] - points[4][0])*0.5, (points[0][1] - points[4][1])*0.5, (points[0][2] - points[4][2])*0.5];
             var xf, yf, zf;
-            
+
             zv[0] = -zv[0];
             zv[1] = -zv[1];
             zv[2] = -zv[2];
@@ -1451,7 +1451,7 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
             for (var i = 0, li = 8; i < li; i++) {
 
                 var childIndex = tree[index2 + 1 + i];
-                
+
                 if (childIndex) {
                     var childIndex2 = childIndex * 9;
 
@@ -1514,7 +1514,7 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
                     var childCenter = [p[0] + xv[0]*0.5 + yv[0]*0.5 + zv[0]*0.5,
                                        p[1] + xv[1]*0.5 + yv[1]*0.5 + zv[1]*0.5,
                                        p[2] + xv[2]*0.5 + yv[2]*0.5 + zv[2]*0.5];
-*/                                       
+*/
                     childPointsCache[i] = childPoints;
                     childCenterCache[i] = childCenter;
 
@@ -1546,7 +1546,7 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
 
             for (var i = 0, li = 8; i < li; i++) {
                 var childIndex = tree[index2 + 1 + i];
-                
+
                 if (childIndex) {
                     var childIndex2 = childIndex * 9;
 
@@ -1562,7 +1562,7 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
                 if (!skipRender && this.isBinNodeReady(points, center, index, file, null, priority, null, true)) {
 
                     var node = this.generateNode(index, file, lod, cindex, texelSize, points, center, radius, hasMesh);
-                    
+
                     if (readyCount > 0) {
                         this.drawNode(node, null, mask, points);
                     } else {
@@ -1573,7 +1573,7 @@ GpuGroup.prototype.traverseBinNode = function(cindex, points, center, radius, te
 
         }
     }
-    
+
 };
 
 
@@ -1585,7 +1585,7 @@ GpuGroup.prototype.getPath = function(tab, index) {
             debugger
         }
     }
-    
+
     return stmp;
 };
 
@@ -1598,9 +1598,9 @@ GpuGroup.prototype.isBinNodeReady = function(points, center, index, file, doNotL
     var pathFlags = tree[index2];
     var pathIndex = (pathFlags & 0xfffffff);
 
-    if (pathFlags & (1 << 31)) {  // has json, jump to another tree (bin file) 
+    if (pathFlags & (1 << 31)) {  // has json, jump to another tree (bin file)
         var tab = file.pathTable;
-        
+
         if (tab[pathIndex] == 2) { //loaded
             var fileIndex = tab[pathIndex+1] | tab[pathIndex+2] << 8 | tab[pathIndex+3] << 16;// | tab[pathIndex+4] << 24;
             file = this.binFiles[fileIndex];
@@ -1611,7 +1611,7 @@ GpuGroup.prototype.isBinNodeReady = function(points, center, index, file, doNotL
             pathIndex = (pathFlags & 0xfffffff);
         } else {
 
-            if (tab[pathIndex] == 0) { 
+            if (tab[pathIndex] == 0) {
                 tab[pathIndex] = 1;
 
                 this.binFiles.push({});
@@ -1635,7 +1635,7 @@ GpuGroup.prototype.isBinNodeReady = function(points, center, index, file, doNotL
         }
     }
 
-    var hasMesh = (pathIndex != 0); 
+    var hasMesh = (pathIndex != 0);
 
     if (file.vtsFormat) {
         hasMesh = true;
@@ -1647,7 +1647,7 @@ GpuGroup.prototype.isBinNodeReady = function(points, center, index, file, doNotL
 
             for (var i = 0, li = file.features.length; i < li; i++) {
                 var feature = file.features[i];
-                
+
                 switch (feature.type) {
 
                     case 1: //mesh
@@ -1766,7 +1766,7 @@ GpuGroup.prototype.onBinFileLoaded = function(info, data) {
 
     } else {
         binFile.meshes = new Array(data.totalNodes);
-        this.map.stats.octoNodesMemSize += binFile.pathTable.byteLength + 
+        this.map.stats.octoNodesMemSize += binFile.pathTable.byteLength +
                                            binFile.meshes.length*4;
     }
 
@@ -1784,6 +1784,14 @@ GpuGroup.prototype.onBinFileLoaded = function(info, data) {
         this.rootCenter = data.center;
         this.rootRadius = data.radius;
         this.rootTexelSize = data.texelSize;
+
+        if (this.map.config.autocenter) {
+            var coords = this.map.convert.convertCoordsFromPhysToNav(data.center, 'fix');
+            var pos = this.map.getPosition();
+            pos.setCoords(coords);
+            pos.pos[3] = 'fix';
+            this.map.setPosition(pos);
+        }
     }
 
     this.renderer.core.map.dirty = true;
@@ -1801,23 +1809,23 @@ GpuGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize) {
     var renderCounter = [[renderer.geoRenderCounter, mv, mvp, this]];
     var map = renderer.core.map;
     this.map = map;
-    
+
     if (this.binPath) {
-        
+
         if (this.binFiles.length == 0) {
             this.binFiles.push(
                 {
                     loadState : 1
-                } 
+                }
             );
 
             this.rootPath = utilsUrl.makeAbsolute(this.binPath);
             this.rootPath = utilsUrl.getBase(this.rootPath);
 
-            localTest = true; ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //localTest = true; ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             if (localTest) {
-                
+
                 if (this.binPath.indexOf('.json') != -1)
                 {
                     var importer = new MapGeodataImport3DTiles2();
@@ -1831,11 +1839,11 @@ GpuGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize) {
 
                     importer.load(utilsUrl.makeAbsolute(this.binPath), {index: 0, root: true}, this.onBinFileLoaded.bind(this));
                 }
-                
+
             } else {
                 map.loader.processLoadBinary(utilsUrl.makeAbsolute(this.binPath), this.onBinFileLoaded.bind(this,{index:0, root: true}), null, "text", 'direct-3dtiles', {root: true});
             }
-            
+
             return;
         } else if (this.binFiles[0].loadState == 1) {
             return;
@@ -1843,11 +1851,11 @@ GpuGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize) {
 
         renderer.drawnNodes = 0;
 
-        var mode = this.map.config.mapLoadMode; 
+        var mode = this.map.config.mapLoadMode;
 
         switch(mode) {
         case 'topdown': this.loadMode = 1; /*((this.map.config.mapSplitMeshes) ? 1 : 0);*/ break;
-        case 'fit':     this.loadMode = 2; break; 
+        case 'fit':     this.loadMode = 2; break;
         case 'fitonly': this.loadMode = 3; break;
         }
 
