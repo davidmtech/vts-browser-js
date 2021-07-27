@@ -2,13 +2,13 @@
 
 import {mat4 as mat4_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
-import GpuMesh_ from '../renderer/gpu/mesh';
+//import GpuMesh_ from '../renderer/gpu/mesh';
 import BBox_ from '../renderer/bbox';
 
 //get rid of compiler mess
 var mat4 = mat4_;
 var math = math_;
-var GpuMesh = GpuMesh_;
+//var GpuMesh = GpuMesh_;
 var BBox = BBox_;
 
 
@@ -27,7 +27,7 @@ var MapSubmesh = function(mesh, stream) {
     this.texture = null;
 
     this.bbox = new BBox();
-    this.size = 0;    
+    this.size = 0;
     this.faces = 0;
     this.uvArea = 0;
     this.uvAreaComputed = false;
@@ -49,7 +49,7 @@ MapSubmesh.prototype.kill = function () {
     this.internalUVs = null;
     this.externalUVs = null;
     this.indices = null;
-    
+
     if (this.texture) {
         this.texture.kill();
         this.texture = null;
@@ -85,7 +85,7 @@ struct MapSubmeshHeader {
                                    // bit 1 - contains external texture coords
                                    // bit 2 - contains per vertex undulation
                                    // bit 3 - texture mode (0 - internal, 1 - external)
-    
+
     uchar surfaceReference;        // reference to the surface of origin, see bellow
     ushort textureLayer;           // applicable if texture mode is external: texture layer numeric id
     double boundingBox[2][3];      // read more about bounding box bellow
@@ -115,7 +115,7 @@ struct MapSubmeshHeader {
     bboxMax[0] = streamData.getFloat64(stream.index, true); stream.index += 8;
     bboxMax[1] = streamData.getFloat64(stream.index, true); stream.index += 8;
     bboxMax[2] = streamData.getFloat64(stream.index, true); stream.index += 8;
-    
+
     this.bbox.updateMaxSize();
 };
 
@@ -192,7 +192,7 @@ struct VerticesBlock {
 
     this.tmpVertices = vertices;
     this.tmpExternalUVs = externalUVs;
-   
+
 /*
 struct TexcoorsBlock {
     ushort numTexcoords;              // number of texture coordinates
@@ -209,16 +209,16 @@ struct TexcoorsBlock {
 
     if (this.flags & this.flagsInternalTexcoords) {
         var numUVs = data.getUint16(index, true); index += 2;
-    
+
         internalUVs = this.use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
         //var uvfactor = 1.0 / 65535;
-    
+
         for (i = 0, li = numUVs * 2; i < li; i+=2) {
             internalUVs[i] = (uint8Data[index] + (uint8Data[index + 1]<<8)) * uvfactor;
             internalUVs[i+1] = (65535 - (uint8Data[index+2] + (uint8Data[index + 3]<<8))) * uvfactor;
             index += 4;
         }
-    
+
         this.tmpInternalUVs = internalUVs;
     }
 
@@ -380,7 +380,7 @@ struct FacesBlock {
 
 MapSubmesh.prototype.parseWord = function (data, res) {
     var value = data[res[1]];
-    
+
     if (value & 0x80) {
         res[0] = (value & 0x7f) | (data[res[1]+1] << 7);
         res[1] += 2;
@@ -393,23 +393,23 @@ MapSubmesh.prototype.parseWord = function (data, res) {
 
 MapSubmesh.prototype.parseDelta = function (data, res) {
     var value = data[res[1]];
-    
+
     if (value & 0x80) {
         value = (value & 0x7f) | (data[res[1]+1] << 7);
 
         if (value & 1) {
-            res[0] = -((value >> 1)+1); 
+            res[0] = -((value >> 1)+1);
             res[1] += 2;
         } else {
-            res[0] = (value >> 1); 
+            res[0] = (value >> 1);
             res[1] += 2;
         }
     } else {
         if (value & 1) {
-            res[0] = -((value >> 1)+1); 
+            res[0] = -((value >> 1)+1);
             res[1] ++;
         } else {
-            res[0] = (value >> 1); 
+            res[0] = (value >> 1);
             res[1] ++;
         }
     }
@@ -451,7 +451,7 @@ struct VerticesBlock {
 
     var vertices = this.use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
     var vindex;
-    
+
     var x = 0, y = 0,z = 0;
     var cx = center[0], cy = center[1], cz = center[2];
     var mx = this.bbox.min[0];
@@ -460,7 +460,7 @@ struct VerticesBlock {
     var sx = 1.0 / (this.bbox.max[0] - this.bbox.min[0]);
     var sy = 1.0 / (this.bbox.max[1] - this.bbox.min[1]);
     var sz = 1.0 / (this.bbox.max[2] - this.bbox.min[2]);
-    
+
     var res = [0, index];
     var i, li, t;
 
@@ -472,7 +472,7 @@ struct VerticesBlock {
             y += res[0];
             this.parseDelta(uint8Data, res);
             z += res[0];
-            
+
             vindex = i * 3;
             t = ((x * multiplier * scale + cx) - mx) * sx;
             if (t < 0) t = 0; if (t > 1.0) t = 1.0;
@@ -492,14 +492,14 @@ struct VerticesBlock {
             y += res[0];
             this.parseDelta(uint8Data, res);
             z += res[0];
-            
+
             vindex = i * 3;
             vertices[vindex] = ((x * multiplier * scale + cx) - mx) * sx;
             vertices[vindex+1] = ((y * multiplier * scale + cy) - my) * sy;
             vertices[vindex+2] = ((z * multiplier * scale + cz) - mz) * sz;
         }
     }
-    
+
     index = res[1];
 
     if (this.flags & this.flagsExternalTexcoords) {
@@ -552,7 +552,7 @@ struct VerticesBlock {
 
     this.tmpVertices = vertices;
     this.tmpExternalUVs = externalUVs;
-    
+
 /*
 struct TexcoorsBlock {
     ushort numTexcoords;              // number of texture coordinates
@@ -574,7 +574,7 @@ struct TexcoorsBlock {
         var multiplierU = (this.use16bit) ? (65536.0 / quantU) : (1.0 / quantU);
         var multiplierV = (this.use16bit) ? (65536.0 / quantV) : (1.0 / quantV);
         x = 0, y = 0;
-    
+
         var internalUVs = this.use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
         res[1] = index;7
 
@@ -605,7 +605,7 @@ struct TexcoorsBlock {
         }
 
         index = res[1];
-    
+
         this.tmpInternalUVs = internalUVs;
     }
 
@@ -717,11 +717,11 @@ struct FacesBlock {
             this.parseWord(uint8Data, res);
             v1 = high - res[0];
             if (!res[0]) { high++; }
-    
+
             this.parseWord(uint8Data, res);
             v2 = high - res[0];
             if (!res[0]) { high++; }
-    
+
             this.parseWord(uint8Data, res);
             v3 = high - res[0];
             if (!res[0]) { high++; }
@@ -793,13 +793,26 @@ MapSubmesh.prototype.getFileSize = function () {
 
 
 MapSubmesh.prototype.buildGpuMesh = function () {
-    return new GpuMesh(this.map.renderer.gpu, {
+    return this.map.renderer.createMesh(
+
+        {
+            bbox: this.bbox,
+            vertices: this.vertices,
+            uvs: this.internalUVs,
+            uvs2: this.externalUVs,
+            indices: this.indices,
+            use16bit: this.use16bit
+        }
+
+    );
+
+    /*return new GpuMesh(this.map.renderer.gpu, {
         bbox: this.bbox,
         vertices: this.vertices,
         uvs: this.internalUVs,
         uvs2: this.externalUVs,
         indices: this.indices
-    }, 1, this.map.core, true, this.use16bit);
+    }, 1, this.map.core, true, this.use16bit);*/
 };
 
 

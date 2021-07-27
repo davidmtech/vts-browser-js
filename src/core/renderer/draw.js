@@ -19,7 +19,7 @@ var RendererDraw = function(renderer) {
     this.renderer = renderer;
     this.core = renderer.core;
     this.gpu = renderer.gpu;
-    this.gl = renderer.gpu.gl;
+    //this.gl = renderer.gpu.gl;
     this.rmap = renderer.rmap;
     this.mBuffer = new Float32Array(16);
     this.mBuffer2 = new Float32Array(16);
@@ -35,7 +35,7 @@ RendererDraw.prototype.drawSkydome = function(texture, shader) {
     var gpu = this.gpu;
     var gl = this.gl;
     var renderer = this.renderer;
-    
+
     var lower = 400; // put the dome a bit lower
     var normMat = mat4.create();
     mat4.multiply(math.scaleMatrix(2, 2, 2), math.translationMatrix(-0.5, -0.5, -0.5), normMat);
@@ -129,20 +129,20 @@ RendererDraw.prototype.drawBall = function(position, size, size2, shader, params
     var norm = [0,0,0, 0,0,0, 0,0,0];
     mat4.toInverseMat3(mv, norm);
     mat3.transpose(norm);
-    
+
     gpu.useProgram(shader, ['aPosition']);
     //gpu.bindTexture(renderer.redTexture);
 
     //shader.setSampler('uSampler', 0);
     shader.setMat4('uProj', proj);
     shader.setMat4('uMV', mv);
-    
+
     if (normals) {
         shader.setMat3('uNorm', norm);
         gl.cullFace(gl.FRONT);
         //gl.disable(gl.DEPTH_TEST);
     }
-    
+
     if (params) {
         shader.setVec4('uParams', params);
     }
@@ -193,7 +193,7 @@ RendererDraw.prototype.drawBall2 = function(position, size, shader, nfactor, dir
     var norm = [0,0,0, 0,0,0, 0,0,0];
     mat4.toInverseMat3(mv, norm);
     mat3.transpose(norm);
-    
+
     gpu.useProgram(shader, ['aPosition']);
     gpu.bindTexture(renderer.redTexture);
 
@@ -216,11 +216,11 @@ RendererDraw.prototype.drawLineString = function(points, screenSpace, size, colo
     var renderer = this.renderer;
     var index = 0, p, i;
 
-    var totalPoints = points.length; 
-   
+    var totalPoints = points.length;
+
     if (totalPoints > 32) {
         for (i = 0; i < totalPoints; i += 31) {
-            p = points.slice(i, i + 32); 
+            p = points.slice(i, i + 32);
             this.drawLineString(p, screenSpace, size, color, depthOffset, depthTest, transparent, writeDepth, useState);
         }
         return;
@@ -229,7 +229,7 @@ RendererDraw.prototype.drawLineString = function(points, screenSpace, size, colo
     var plineBuffer = renderer.plineBuffer;
 
 
-    if (screenSpace) { 
+    if (screenSpace) {
 
         //fill points
         for (i = 0; i < totalPoints; i++) {
@@ -274,7 +274,7 @@ RendererDraw.prototype.drawLineString = function(points, screenSpace, size, colo
 
     gpu.useProgram(prog, ['aPosition']);
 
-    if (screenSpace) { 
+    if (screenSpace) {
         prog.setMat4('uMVP', renderer.imageProjectionMatrix, depthOffset ? renderer.getZoffsetFactor(depthOffset) : null);
     } else {
         prog.setMat4('uMV', renderer.camera.getModelviewFMatrix(), null); //depthOffset ? renderer.getZoffsetFactor(depthOffset) : null);
@@ -518,7 +518,7 @@ RendererDraw.prototype.drawText = function(x, y, size, text, color, depth, useSt
         x-2,  y + sizeY+1,  (charPosX * texelX), ((charPosY+15) * texelY) ]);
 
     gl.drawElements(gl.TRIANGLES, indices.numItems, gl.UNSIGNED_SHORT, 0);
-    
+
 
     for (var i = 0, li = text.length; i < li; i++) {
         char = text.charCodeAt(i) - 32;
@@ -553,7 +553,7 @@ RendererDraw.prototype.drawText = function(x, y, size, text, color, depth, useSt
                 x,  y + sizeY,  (charPosX * texelX), ((charPosY+16) * texelY) ]);
 
             x += sizeX;
-                
+
             break;
         }
 
@@ -592,7 +592,7 @@ RendererDraw.prototype.getTextSize = function(size, text) {
             break;
         }
     }
-    
+
     return x;
 };
 
@@ -695,7 +695,7 @@ RendererDraw.prototype.drawGpuJobs = function() {
         } else {
 
             for (j = 0; j < lj; j++) {
- 
+
                 job = buffer[j];
                 this.drawGpuJob(gpu, gl, renderer, job, screenPixelSize);
             }
@@ -707,7 +707,7 @@ RendererDraw.prototype.drawGpuJobs = function() {
                 }
             }*/
         }
-    
+
         renderer.jobsTimer3 = performance.now();
 
         if (renderer.gmapIndex > 0) {
@@ -843,7 +843,7 @@ RendererDraw.prototype.drawGpuJobs = function() {
                 var draw = job.draw, fade = null;
 
                 if (!hitmapRender && job.hysteresis[3] === true) {
- 
+
                     if (draw) {
                         if (job.timerHide != 0) {
                             fade = job.timerHide / (job.hysteresis[1]+1);
@@ -873,7 +873,7 @@ RendererDraw.prototype.drawGpuJobs = function() {
                     }
 
                     // update job matricies
-                    if (job.renderCounter[0][0] !== geoRenderCounter && job.renderCounter[0][0] !== null) { 
+                    if (job.renderCounter[0][0] !== geoRenderCounter && job.renderCounter[0][0] !== null) {
                         job.updatePos = true;
 
                         var renderCounter = job.renderCounter[0];
@@ -883,7 +883,7 @@ RendererDraw.prototype.drawGpuJobs = function() {
                         var group = renderCounter[3];
                         var bbox = group.bbox;
                         var geoPos = renderer.cameraPosition;
-                    
+
                         var m = math.translationMatrix(bbox.min[0] - geoPos[0], bbox.min[1] - geoPos[1], bbox.min[2] - geoPos[2]);
                         mat4.multiply(renderer.camera.getModelviewMatrix(), m, mv);
 
@@ -892,7 +892,7 @@ RendererDraw.prototype.drawGpuJobs = function() {
 
                         job.mv = mv;
                         job.mvp = mvp;
-                    }                    
+                    }
 
                     if (sortHysteresis) {
 
@@ -1034,13 +1034,13 @@ RendererDraw.prototype.paintGL = function() {   //remove this??
 
 
 RendererDraw.prototype.processNoOverlap = function(renderer, job, pp, p1, p2, camVec, l, stickShift, texture, files, color) {
-    var res = { 
+    var res = {
         exit: true
     };
 
     var reduce78 = (job.reduce && (job.reduce[0] >= 7 && job.reduce[0] <= 11));
 
-    if (!renderer.drawAllLabels && job.noOverlap) { 
+    if (!renderer.drawAllLabels && job.noOverlap) {
         if (!pp) {
             //if (job.type == VTS_JOB_LINE_LABEL) {
               //  pp = renderer.project2(job.center2, job.mvp, [0,0,0]);
@@ -1061,7 +1061,7 @@ RendererDraw.prototype.processNoOverlap = function(renderer, job, pp, p1, p2, ca
                 if (!renderer.rmap.checkRectangle(pp[0]-200, pp[1]-200, pp[0]+200, pp[1]+200, 0)) {
                     return res;
                 }
-            } else{ 
+            } else{
                 if (!renderer.rmap.checkRectangle(pp[0], pp[1], pp[0], pp[1], 0)) {
                     return res;
                 }
@@ -1086,7 +1086,7 @@ RendererDraw.prototype.processNoOverlap = function(renderer, job, pp, p1, p2, ca
                 if (!job.reduce || (job.reduce && !(job.reduce[0] >= 8 && job.reduce[0] <= 11))) {  //not overlap code not used for reduce==8
                     depth = o[5] / l;
                 }
-            } 
+            }
         }
 
         job.lastSubJob = [job, stickShift, texture, files, color, pp, true, depth, o];
@@ -1225,9 +1225,9 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             } else {
                 if (state != 0) {
                     return;
-                }        
+                }
             }
-        
+
         } else if (job.state & (1 << 8)) { //has hover layers?
 
             if (renderer.hoverFeature && renderer.hoverFeature[0]['#id'] == id) {
@@ -1243,13 +1243,13 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
         } else {
             if (state != 0) {
                 return;;
-            }        
+            }
         }
 
     } else {
         if (state != 0) {
             return;
-        }        
+        }
     }
 
     var mvp = job.mvp, prog, texture, res;
@@ -1294,13 +1294,13 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
 
         if (useSuperElevation) {
             prog = advancedHitPass ? job.program2 : renderer.progLineSE;
-        } else {            
+        } else {
             prog = advancedHitPass ? job.program2 : debugWires ? renderer.progLineWireframe : job.program;
         }
 
         var flatShade = (!advancedHitPass && job.type == VTS_JOB_POLYGON && job.style == 1);
 
-        if (flatShade) { 
+        if (flatShade) {
             prog = useSuperElevation ? renderer.progCFlatShadeTileSE : renderer.progCFlatShadeTile;
         }
 
@@ -1330,7 +1330,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             prog.setMat4('uParamsSE', m);
         }
 
-        if (flatShade) { 
+        if (flatShade) {
             prog.setMat4('uMV', job.mv);
             prog.setMat4('uProj', renderer.camera.getProjectionFMatrix(), renderer.getZoffsetFactor(job.zbufferOffset));
             prog.setVec4('uColor', color);
@@ -1356,7 +1356,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             gl.bindBuffer(gl.ARRAY_BUFFER, gpu.barycentricBuffer);
             gl.vertexAttribPointer(barycentericAttribute, gpu.barycentricBuffer.itemSize, gl.FLOAT, false, 0, 0);
         }
-        
+
         //draw polygons
         gl.drawArrays(gl.TRIANGLES, 0, job.vertexPositionBuffer.numItems);
 
@@ -1433,7 +1433,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                         if (job.widthByRatio) {
                             textureParams[0] = 1/(renderer.cameraViewExtent2*job.lineWidth)/(texture.width/t[2]);
                         } else {
-                            textureParams[0] = 1/job.lineWidth/(texture.width/t[2]);    
+                            textureParams[0] = 1/job.lineWidth/(texture.width/t[2]);
                         }
                     } else {
                         if (job.widthByRatio) {
@@ -1445,7 +1445,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                             textureParams[0] = 1/(renderer.cameraViewExtent2/renderer.curSize[1])/(texture.width/t[2]);
                             textureParams[0] /= (job.lineWidth*0.5);
                             textureParams[3] = 1;
-                        }    
+                        }
                     }
                 }
 
@@ -1488,7 +1488,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
 
         } else {
             gpu.useProgram(prog, advancedHitPass ? ['aPosition','aNormal','aElement'] : ['aPosition','aNormal']);
-        }           
+        }
 
         prog.setVec4('uColor', color);
         prog.setVec2('uScale', screenPixelSize2);
@@ -1596,22 +1596,22 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                     }
 
                     l = 1/l;
-                    camVec[0] *= l;                       
-                    camVec[1] *= l;                       
-                    camVec[2] *= l;                       
+                    camVec[0] *= l;
+                    camVec[1] *= l;
+                    camVec[2] *= l;
                 } else {
                     vec3.normalize(camVec);
                 }
-                    
+
                 job.normal = [0,0,0];
                 vec3.normalize(job.center2, job.normal);
-                    
+
                 localTilt = -vec3.dot(camVec, job.normal);
 
                 if (localTilt < Math.cos(math.radians(job.culling))) {
                     return;
                 }
-                
+
             } else if (job.visibility) {
 
                 p2 = job.center2;
@@ -1657,7 +1657,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                 //camVec = res.camVec;
                 //l = res.l;
             }
-           
+
             this.drawGpuSubJobLineLabel(gpu, gl, renderer, screenPixelSize, [job,0,texture,files,color,pp]);
 
             /*
@@ -1744,7 +1744,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             m[15] = renderer.earthERatio;
 
             prog.setMat4('uParamsSE', m);
-        }  
+        }
 
         prog.setSampler('uSampler', 0);
         prog.setMat4('uMVP', mvp, renderer.getZoffsetFactor(job.zbufferOffset));
@@ -1801,21 +1801,21 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             var a, r = job.reduce;
 
             if (r[0] > 4) {
-                
+
                 if (r[0] == 4) {
                     a = Math.max(r[1], Math.floor(r[2] / Math.max(1, renderer.drawnGeodataTiles)));
 
                     if (job.index >= a) {
                         return;
-                    } 
+                    }
                     r[5] = a; //for debug
                 } else {
-                    a = Math.pow(job.texelSize * job.tiltAngle, VTS_TILE_COUNT_FACTOR); 
+                    a = Math.pow(job.texelSize * job.tiltAngle, VTS_TILE_COUNT_FACTOR);
                     a = Math.max(r[1], Math.round(r[2] * (a / Math.max(0.00001, this.renderer.drawnGeodataTilesFactor))));
 
                     if (job.index >= a) {
                         return;
-                    } 
+                    }
                     r[5] = a; //for debug
                 }
 
@@ -1832,7 +1832,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
 
                 if (job.index > indexLimit) {
                     return;
-                } 
+                }
                 r[5] = indexLimit; //for debug
             }
         }
@@ -1843,7 +1843,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             if (job.type == VTS_JOB_PACK) {
 
                 var notready = false;
-                
+
                 for (var j = 0, lj = job.subjobs.length; j < lj; j++) {
                     var subjob = job.subjobs[j];
 
@@ -1938,22 +1938,22 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                 }
 
                 l = 1/l;
-                camVec[0] *= l;                       
-                camVec[1] *= l;                       
-                camVec[2] *= l;                       
+                camVec[0] *= l;
+                camVec[1] *= l;
+                camVec[2] *= l;
             } else {
                 vec3.normalize(camVec);
             }
-                
+
             job.normal = [0,0,0];
             vec3.normalize(job.center2, job.normal);
-                
+
             localTilt = -vec3.dot(camVec, job.normal);
 
             if (localTilt < Math.cos(math.radians(job.culling))) {
                 return;
             }
-            
+
         } else if (job.visibility) {
 
             p2 = job.center2;
@@ -2041,7 +2041,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                         vec3.normalize(camVec);
                         job.normal = [0,0,0];
                         vec3.normalize(job.center2, job.normal);
-                            
+
                         localTilt = -vec3.dot(camVec, job.normal);
                     }
                 }
@@ -2062,13 +2062,13 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                 if (localTilt < 0) {
                     localTilt = 0;
                 }
-               
+
                 stickShift = Math.pow(1-localTilt,stickMode[1]) * stickHeight * renderer.cameraTiltFator;
 
             } else {
                 stickShift = renderer.cameraTiltFator * s[0];
             }
-                
+
             if (stickShift < s[1]) {
                 stickShift = 0;
             }
@@ -2095,7 +2095,7 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
             camVec = res.camVec;
             l = res.l;
         }
-        
+
         if (job.type == VTS_JOB_PACK) {
             return;
         }
@@ -2252,8 +2252,8 @@ RendererDraw.prototype.drawGpuJob = function(gpu, gl, renderer, job, screenPixel
                 }
 
             }
-            
-            return;   
+
+            return;
         }
 
         gpu.useProgram(prog, ['aPosition', 'aTexCoord', 'aOrigin']);
@@ -2344,10 +2344,10 @@ RendererDraw.prototype.drawGpuSubJob = function(gpu, gl, renderer, screenPixelSi
             p1 = renderer.cameraPosition;
             var camVec = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
             vec3.normalize(camVec);
-                
+
             job.normal = [0,0,0];
             vec3.normalize(job.center2, job.normal);
-                
+
             localTilt = -vec3.dot(camVec, job.normal);
             if (localTilt < Math.cos(math.radians(job.culling))) {
                 return;
@@ -2355,19 +2355,19 @@ RendererDraw.prototype.drawGpuSubJob = function(gpu, gl, renderer, screenPixelSi
         }
 
         //if (o) {
-            //var x1 = pp[0]+o[0], y1 = pp[1]+o[1], 
+            //var x1 = pp[0]+o[0], y1 = pp[1]+o[1],
               //  x2 = pp[0]+o[2], y2 = pp[1]+o[3]+stickShift;
 
             /*
             if (s[0] != 0) {
                 stickShift = renderer.cameraTiltFator * s[0];
-                    
+
                 if (stickShift < s[1]) {
                     stickShift = 0;
                 }
             }*/
 
-            /* 
+            /*
             var rmap = renderer.rmap;
 
             //screen including credits
@@ -2401,7 +2401,7 @@ RendererDraw.prototype.drawGpuSubJob = function(gpu, gl, renderer, screenPixelSi
                         vec3.normalize(camVec);
                         job.normal = [0,0,0];
                         vec3.normalize(job.center2, job.normal);
-                            
+
                         localTilt = -vec3.dot(camVec, job.normal);
                     }
                 }
@@ -2422,13 +2422,13 @@ RendererDraw.prototype.drawGpuSubJob = function(gpu, gl, renderer, screenPixelSi
                 if (localTilt < 0) {
                     localTilt = 0;
                 }
-               
+
                 stickShift = Math.pow(1-localTilt,stickMode[1]) * stickHeight * renderer.cameraTiltFator;
 
             } else {
                 stickShift = renderer.cameraTiltFator * s[0];
             }
-              
+
             if (stickShift < s[1]) {
                 stickShift = 0;
             }
@@ -2636,8 +2636,8 @@ RendererDraw.prototype.drawGpuSubJob = function(gpu, gl, renderer, screenPixelSi
             }
 
         }
-        
-        return;   
+
+        return;
     }
 
     gpu.useProgram(prog, ['aPosition', 'aTexCoord', 'aOrigin']);
@@ -2770,10 +2770,10 @@ RendererDraw.prototype.drawGpuSubJobLineLabel = function(gpu, gl, renderer, scre
         pp = subjob[5];
 
         if (!pp || job.updatePos) {
-            pp = renderer.project2(job.center2, renderer.camera.mvp, renderer.cameraPosition, true);                    
+            pp = renderer.project2(job.center2, renderer.camera.mvp, renderer.cameraPosition, true);
         }
 
-        var targetSize = job.labelSize * 0.5; 
+        var targetSize = job.labelSize * 0.5;
         var sizeFactor = renderer.camera.scaleFactor2(pp[3])*0.5*renderer.curSize[1]*(renderer.curSize[0]/renderer.curSize[1]);
         var labelPoints = job.labelPoints;
         var labelIndex = job.labelIndex;
@@ -2795,7 +2795,7 @@ RendererDraw.prototype.drawGpuSubJobLineLabel = function(gpu, gl, renderer, scre
 
                 labelIndex = j;
                 labelMorph = (targetSize - s1) / (s2 - s1);
-                break;                
+                break;
             }
         }
 
@@ -2929,14 +2929,14 @@ RendererDraw.prototype.drawGpuSubJobLineLabel = function(gpu, gl, renderer, scre
                 pp[2] = p[2] + (p2[2] - p[2]) * labelMorph;
                 r = p[3] + (p2[3] - p[3]) * labelMorph;
 
-                pp = renderer.project2(pp, renderer.camera.mvp, renderer.cameraPosition, true);                    
+                pp = renderer.project2(pp, renderer.camera.mvp, renderer.cameraPosition, true);
                 this.drawCircle(pp, r*sizeFactor*margin, 1, [255, 0, 255, 255], null, null, null, null, null);
             }
 
             pp = subjob[5];
 
             if (!pp) {
-                pp = renderer.project2(job.center2, renderer.camera.mvp, renderer.cameraPosition, true);                    
+                pp = renderer.project2(job.center2, renderer.camera.mvp, renderer.cameraPosition, true);
             }
 
             this.drawCircle(pp, 8, 1, [255, 255, 0, 255], null, null, null, null, null);

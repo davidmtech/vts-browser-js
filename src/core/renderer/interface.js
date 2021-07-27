@@ -1,13 +1,13 @@
 
-import GpuTexture_ from './gpu/texture';
-import GpuMesh_ from './gpu/mesh';
-import GpuProgram_ from './gpu/program';
+//import GpuTexture_ from './gpu/texture';
+//import GpuMesh_ from './gpu/mesh';
+//import GpuProgram_ from './gpu/program';
 import {Octree as Octree_, OctreeRaycaster as OctreeRaycaster_} from './octree.js';
 
 //get rid of compiler mess
-var GpuTexture = GpuTexture_;
-var GpuMesh = GpuMesh_;
-var GpuProgram = GpuProgram_;
+//var GpuTexture = GpuTexture_;
+//var GpuMesh = GpuMesh_;
+//var GpuProgram = GpuProgram_;
 var Octree = Octree_;
 var OctreeRaycaster = OctreeRaycaster_;
 
@@ -24,15 +24,15 @@ RendererInterface.prototype.clear = function(options) {
                         (options['color'] || [255,255,255,255]),
                         ((options['depth'] != null) ? options['depth'] : 1.0) );
     }
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.createState = function(options) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
-    
+
     var stateOptions = {
         blend : (options['blend'] != null) ? options['blend'] : false,
         stencil : (options['stencil'] != null) ? options['stencil'] : false,
@@ -51,7 +51,7 @@ RendererInterface.prototype.setState = function(state) {
     if (state != null) {
         this.gpu.setState(state);
     }
-    return this;    
+    return this;
 };
 
 
@@ -93,7 +93,7 @@ RendererInterface.prototype.removeTexture = function(texture) {
     if (texture) {
         texture.kill();
     }
-    return this;    
+    return this;
 };
 
 
@@ -123,7 +123,7 @@ RendererInterface.prototype.removeMesh = function(mesh) {
     if (mesh) {
         mesh.kill();
     }
-    return this;    
+    return this;
 };
 
 
@@ -145,27 +145,27 @@ RendererInterface.prototype.removeResource = function(resource) {
     if (resource != null && resource.kill != null) {
         resource.kill();
     }
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.addJob = function(/*options*/) {
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.clearJobs = function(/*options*/) {
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawMesh = function(options) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
 
     if (!options['mesh'] == null || !options['shaderVariables']) {
-        return this;    
+        return this;
     }
 
     //var shaderAttributes = options['shaderAttributes'];
@@ -177,25 +177,25 @@ RendererInterface.prototype.drawMesh = function(options) {
     var shaderVariables = options['shaderVariables'];
     var shader = options['shader'] || 'textured';
 
-   
-    var renderer = this.renderer; 
+
+    var renderer = this.renderer;
     var mesh = options['mesh'];
     var texture = options['texture'];
     var mv = renderer.camera.getModelviewMatrix();
     var proj = renderer.camera.getProjectionMatrix();
     var fogDensity = renderer.fogDensity;
-    
+
     if (typeof shader === 'string') {
         switch(shader) {
         case 'hit':
 
             if (!shaderVariables['uMV']) {
                 shaderVariables['uMV'] = ['mat4', mv];
-            } 
+            }
 
             if (!shaderVariables['uProj']) {
                 shaderVariables['uProj'] = ['mat4', proj];
-            } 
+            }
 
             uvAttr = null;
             uv2Attr = null;
@@ -212,16 +212,16 @@ RendererInterface.prototype.drawMesh = function(options) {
 
             if (!shaderVariables['uMV']) {
                 shaderVariables['uMV'] = ['mat4', mv];
-            } 
+            }
 
             if (!shaderVariables['uProj']) {
                 shaderVariables['uProj'] = ['mat4', proj];
-            } 
+            }
 
             if (!shaderVariables['uFogDensity']) {
                 shaderVariables['uFogDensity'] = ['float', fogDensity];
-            } 
-            
+            }
+
             uv2Attr = (shader == 'textured') ? null : 'aNormal';
             shader = (shader == 'textured') ? renderer.progTile[0] : ((shader == 'shaded') ? renderer.progShadedTile : renderer.progTShadedTile);
             break;
@@ -234,17 +234,17 @@ RendererInterface.prototype.drawMesh = function(options) {
 
     var attributes = [vertexAttr];
     if (uvAttr){
-        attributes.push(uvAttr);        
-    } 
+        attributes.push(uvAttr);
+    }
     if (uv2Attr){
-        attributes.push(uv2Attr);        
-    } 
+        attributes.push(uv2Attr);
+    }
 
     renderer.gpu.useProgram(shader, attributes);
 
     for (var key in shaderVariables) {
         var item = shaderVariables[key];
-        
+
         if (item.length == 2) {
             switch(item[0]){
             case 'floatArray':
@@ -275,27 +275,27 @@ RendererInterface.prototype.drawMesh = function(options) {
             case 'sampler':
                 shader.setSampler(key, item[1]);
                 break;
-            } 
+            }
         }
     }
 
     if (texture) {
         renderer.gpu.bindTexture(texture);
     }
-    
+
     //mesh.draw(shader, vertexAttr, texture ? uvAttr : null, uv2Attr, null);
     mesh.draw(shader, vertexAttr, uvAttr, uv2Attr, null);
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawImage = function(options) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
 
     if (options['texture'] == null || options['rect'] == null) {
-        return this;    
+        return this;
     }
 
     var rect = options['rect'];
@@ -309,17 +309,17 @@ RendererInterface.prototype.drawImage = function(options) {
     color = [ color[0] * (1.0/255), color[1] * (1.0/255), color[2] * (1.0/255), color[3] * (1.0/255) ];
 
     this.renderer.draw.drawImage(rect[0], rect[1], rect[2], rect[3], options['texture'], color, depth, depthOffset, depthTest, blend, writeDepth, useState);
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawBillboard = function(options) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
 
     if (options['texture'] == null || options['mvp'] == null) {
-        return this;    
+        return this;
     }
 
     var mvp = options['mvp'];
@@ -335,17 +335,17 @@ RendererInterface.prototype.drawBillboard = function(options) {
     color[3] *= 1.0/255;
 
     this.renderer.draw.drawBillboard(mvp, options['texture'], color, depthOffset, depthTest, blend, writeDepth, useState);
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawLineString = function(options) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
 
     if (options['points'] == null) {
-        return this;    
+        return this;
     }
 
     var points = options['points'];
@@ -363,32 +363,32 @@ RendererInterface.prototype.drawLineString = function(options) {
     color[3] *= 1.0/255;
 
     this.renderer.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, blend, writeDepth, useState);
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawJobs = function(/*options*/) {
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawBBox = function(/*options*/) {
-    return this;    
+    return this;
 };
 
 
 RendererInterface.prototype.drawDebugText = function(options) {
     if (options == null || typeof options !== 'object') {
-        return this;    
+        return this;
     }
 
     var text = options['text'];
     var coords = options['coords'];
 
     if (!text || !coords) {
-        return this;    
+        return this;
     }
-    
+
     var color = options['color'] || [255,255,255,255];
     var size = options['size'] || 16;
     var depth = options['depth'];
@@ -402,7 +402,7 @@ RendererInterface.prototype.drawDebugText = function(options) {
 
     this.renderer.draw.drawText(coords[0] - (lx * 0.5), coords[1], size, text, color, depth, useState);
 
-    return this;    
+    return this;
 };
 
 

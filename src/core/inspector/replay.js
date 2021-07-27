@@ -1,11 +1,11 @@
 
-import GpuTexture_ from '../renderer/gpu/texture';
+//import GpuTexture_ from '../renderer/gpu/texture';
 import {math as math_} from '../utils/math';
 import {vec3 as vec3_, mat4 as mat4_} from '../utils/matrix';
 
 //get rid of compiler mess
 var math = math_;
-var GpuTexture = GpuTexture_;
+//var GpuTexture = GpuTexture_;
 var vec3 = vec3_, mat4 = mat4_;
 
 
@@ -59,8 +59,8 @@ InspectorReplay.prototype.init = function() {
             + 'width: 100%;'
             + 'overflow: hidden;'
             + 'text-overflow: ellipsis;'
-            + 'white-space: nowrap;'    
-        + '}' 
+            + 'white-space: nowrap;'
+        + '}'
 
         + '#vts-replay-lod-slider {'
             + 'width: 240px;'
@@ -75,7 +75,7 @@ InspectorReplay.prototype.init = function() {
         + '#vts-replay-lod-single {'
             + 'margin-left: 10px;'
         + '}'
-    
+
         + '#vts-replay-time-slider {'
             + 'width: 330px;'
         + '}'
@@ -104,11 +104,11 @@ InspectorReplay.prototype.init = function() {
             + 'overflow-x: hidden;'
             + 'border: 1px solid #ddd;'
             + 'padding-right: 5px;'
-            + 'margin-top: 10px;'            
+            + 'margin-top: 10px;'
             + 'font-size: 12px;'
-            + 'word-wrap: break-word;'   
+            + 'word-wrap: break-word;'
         + '}'
-       
+
     );
 
     this.element = document.createElement('div');
@@ -116,7 +116,7 @@ InspectorReplay.prototype.init = function() {
     this.element.innerHTML =
             '<div id="vts-replay-panel-left">'
             + '<div id="vts-replay-items"></div>'
-            + '<div id="vts-replay-panel-lod">'  
+            + '<div id="vts-replay-panel-lod">'
                 + '<input id="vts-replay-lod-slider" type="range" min="0" max="30" step="1" value="30" /><br/>'
                 + '<span>LOD:</span>'
                 + '<input id="vts-replay-lod-text" type="text" value="30"/>'
@@ -128,24 +128,24 @@ InspectorReplay.prototype.init = function() {
             + '<div id="vts-replay-info"></div>'
           + '</div>'
           + '<div id="vts-replay-panel-right">'
-            + '<div id="vts-replay-panel-gtime">'  
+            + '<div id="vts-replay-panel-gtime">'
                 + '<span id="vts-replay-info-meshes">Meshes Count: 0 Min/Max: 0/0 Avg. 0</span><br/>'
-                + '<canvas id="vts-replay-canvas-meshes" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-meshes" width=340 height=30></canvas><br/>'
                 + '<span id="vts-replay-info-textures">Internal Textures Count: 0 Min/Max: 0/0 Avg. 0</span><br/>'
-                + '<canvas id="vts-replay-canvas-textures" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-textures" width=340 height=30></canvas><br/>'
                 + '<span id="vts-replay-info-textures2">External Textures Count: 0 Min/Max: 0/0 Avg. 0</span><br/>'
-                + '<canvas id="vts-replay-canvas-textures2" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-textures2" width=340 height=30></canvas><br/>'
                 + '<span id="vts-replay-info-geodata">Geodata Count: 0 Min/Max: 0/0 Avg. 0</span><br/>'
-                + '<canvas id="vts-replay-canvas-geodata" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-geodata" width=340 height=30></canvas><br/>'
                 + '<span id="vts-replay-info-metatiles">Metatiles Count: 0 Min/Max: 0/0 Avg. 0</span><br/>'
-                + '<canvas id="vts-replay-canvas-metatiles" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-metatiles" width=340 height=30></canvas><br/>'
                 + '<span id="vts-replay-info-intervals">Interval Count: 0 Min/Max: 0/0 Avg. 0</span><br/>'
-                + '<canvas id="vts-replay-canvas-intervals" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-intervals" width=340 height=30></canvas><br/>'
                 + '<span id="vts-replay-info-threads">Threads Min/Max: 0/0 Avg. 0 </span><br/>'
-                + '<canvas id="vts-replay-canvas-threads" width=340 height=30></canvas><br/>'  
+                + '<canvas id="vts-replay-canvas-threads" width=340 height=30></canvas><br/>'
             + '</div>'
 
-            + '<div id="vts-replay-panel-time">'  
+            + '<div id="vts-replay-panel-time">'
                 + '<input id="vts-replay-time-slider" type="range" min="0" max="2000" value="0" /><br/>'
                 + '<span>File:</span>'
                 + '<input id="vts-replay-time-text" type="text" value="0"/>'
@@ -166,11 +166,11 @@ InspectorReplay.prototype.init = function() {
 
     this.lodText = document.getElementById('vts-replay-lod-text');
     this.lodText.onchange = this.onTextChange.bind(this, 'lod');
-    
+
     document.getElementById('vts-replay-lod-up').onclick = this.onSliderChange.bind(this, 'lod', 'down');
     document.getElementById('vts-replay-lod-down').onclick = this.onSliderChange.bind(this, 'lod', 'up');
     document.getElementById('vts-replay-lod-single').onclick = this.onSliderChange.bind(this, 'lod', 'single');
-    
+
     this.timeSlider = document.getElementById('vts-replay-time-slider');
     this.timeSlider.onchange = this.onSliderChange.bind(this, 'time');
     this.timeSlider.oninput = this.onSliderChange.bind(this, 'time');
@@ -190,19 +190,19 @@ InspectorReplay.prototype.init = function() {
     this.element.addEventListener('dblclick', inspector.doNothing.bind(this), false);
 
     this.infoMeshes = document.getElementById('vts-replay-info-meshes');
-    this.ctxMeshes = document.getElementById('vts-replay-canvas-meshes').getContext('2d');  
+    this.ctxMeshes = document.getElementById('vts-replay-canvas-meshes').getContext('2d');
     this.infoTextures = document.getElementById('vts-replay-info-textures');
-    this.ctxTextures = document.getElementById('vts-replay-canvas-textures').getContext('2d');  
+    this.ctxTextures = document.getElementById('vts-replay-canvas-textures').getContext('2d');
     this.infoTextures2 = document.getElementById('vts-replay-info-textures2');
-    this.ctxTextures2 = document.getElementById('vts-replay-canvas-textures2').getContext('2d');  
+    this.ctxTextures2 = document.getElementById('vts-replay-canvas-textures2').getContext('2d');
     this.infoGeodata = document.getElementById('vts-replay-info-geodata');
-    this.ctxGeodata = document.getElementById('vts-replay-canvas-geodata').getContext('2d');  
+    this.ctxGeodata = document.getElementById('vts-replay-canvas-geodata').getContext('2d');
     this.infoMetatiles = document.getElementById('vts-replay-info-metatiles');
-    this.ctxMetatiles = document.getElementById('vts-replay-canvas-metatiles').getContext('2d');  
+    this.ctxMetatiles = document.getElementById('vts-replay-canvas-metatiles').getContext('2d');
     this.infoIntervals = document.getElementById('vts-replay-info-intervals');
-    this.ctxIntervals = document.getElementById('vts-replay-canvas-intervals').getContext('2d');  
+    this.ctxIntervals = document.getElementById('vts-replay-canvas-intervals').getContext('2d');
     this.infoThreads = document.getElementById('vts-replay-info-threads');
-    this.ctxThreads = document.getElementById('vts-replay-canvas-threads').getContext('2d');  
+    this.ctxThreads = document.getElementById('vts-replay-canvas-threads').getContext('2d');
 
     this.cameraLines = [];
     this.cameraLines2 = [];
@@ -249,32 +249,32 @@ InspectorReplay.prototype.onSliderChange = function(type, button) {
         switch (button) {
         case 'up':
             this.lodSlider.stepUp();
-            this.lodText.value = this.lodSlider.value;    
+            this.lodText.value = this.lodSlider.value;
             break;
-            
+
         case 'down':
             this.lodSlider.stepDown();
-            this.lodText.value = this.lodSlider.value;    
+            this.lodText.value = this.lodSlider.value;
             break;
 
         default:
-            this.lodText.value = this.lodSlider.value;    
-        } 
+            this.lodText.value = this.lodSlider.value;
+        }
     } else {
         switch (button) {
         case 'up':
             this.timeSlider.stepUp();
-            this.timeText.value = this.timeSlider.value;    
+            this.timeText.value = this.timeSlider.value;
             break;
-            
+
         case 'down':
             this.timeSlider.stepDown();
-            this.timeText.value = this.timeSlider.value;    
+            this.timeText.value = this.timeSlider.value;
             break;
 
         default:
-            this.timeText.value = this.timeSlider.value;    
-        } 
+            this.timeText.value = this.timeSlider.value;
+        }
     }
 
     var map = this.core.getMap();
@@ -300,9 +300,9 @@ InspectorReplay.prototype.onSliderChange = function(type, button) {
 
 InspectorReplay.prototype.onTextChange = function(type) {
     if (type == 'lod') {
-        this.lodSlider.value = this.lodText.value;    
+        this.lodSlider.value = this.lodText.value;
     } else {
-        this.timeSlider.value = this.timeText.value;    
+        this.timeSlider.value = this.timeText.value;
     }
 
     var map = this.core.getMap();
@@ -330,25 +330,25 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
     var p2 = camera.center;
 
     this.cameraLines = [p1, p2];
-/*        
+/*
     var screenSize = renderer.getCanvasSize();
-    
+
     var v1 = map.getScreenRay(0+1,0+1);
     var v2 = map.getScreenRay(screenSize[0]-1,0+1);
     var v3 = map.getScreenRay(screenSize[0]-1,screenSize[1]-1);
     var v4 = map.getScreenRay(0+1,screenSize[1]-1);
     var v5 = map.getScreenRay(screenSize[0]*0.5,screenSize[1]*0.5);
-    
+
     var l = camera.distance;
-    
-    //l = map.getPositionViewExtent(pos);    
-    
+
+    //l = map.getPositionViewExtent(pos);
+
     vec3.scale(v1, l*10);
     //vec3.scale(v2, l);
     //vec3.scale(v3, l);
     //vec3.scale(v4, l);
     //vec3.scale(v5, l);
-    
+
     vec3.add(v1, p1);
     //vec3.add(v2, p1);
     //vec3.add(v3, p1);
@@ -359,20 +359,20 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
     */
 /*
     this.cameraLines2 = [p1];
-    
+
     for (var y = 0; y < screenSize[1]*0.5; y += 100) {
         for (var x = screenSize[0]*0.5; x < screenSize[0]; x += 100) {
 
             var v1 = map.getScreenRay(x,y);
             vec3.scale(v1, l);
             vec3.add(v1, p1);
-            
+
             this.cameraLines2.push(v1);
         }
-    }    
+    }
 */
     this.cameraLines2 = [[p1], [p1], [p1], [p1]];
-    
+
     var segments = 16;
 
     var map2 = this.core.getMap();
@@ -380,15 +380,15 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
     var m2 = map2.camera.getRotationviewMatrix();
     var m = mat4.create();
     mat4.inverse(m2, m);
-    
+
     this.cameraMatrix = m;
-    
+
     var a = Math.tan(math.radians(map2.camera.getFov()));
     var b = a * map2.camera.getAspect();
     var c = Math.sqrt(a*a + b*b);
-    
+
     var dfov = Math.atan(c/1);
-    
+
     var l = camera.cameraDistance / segments;
     var l2 = 0.5 * l * Math.tan(dfov);
     var l3 = l2 * map2.camera.getAspect();
@@ -404,23 +404,23 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
         vec3.scale(v2, (i+1));
         vec3.scale(v3, (i+1));
         vec3.scale(v4, (i+1));
-        
+
         mat4.multiplyVec3(m, v1);
         mat4.multiplyVec3(m, v2);
         mat4.multiplyVec3(m, v3);
         mat4.multiplyVec3(m, v4);
-    
+
         vec3.add(v1, p1);
         vec3.add(v2, p1);
         vec3.add(v3, p1);
         vec3.add(v4, p1);
-        
+
         this.cameraLines2[0].push(v1);
         this.cameraLines2[1].push(v2);
         this.cameraLines2[2].push(v3);
         this.cameraLines2[3].push(v4);
     }
-    
+
     this.cameraLines3 = [[p1], [p1], [p1], [p1]];
 
     segments = 256;
@@ -428,7 +428,7 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
     //l = (camera.distance * 20.1) / segments;
     l2 = 0.5 * l * Math.tan(dfov);
     l3 = l2 * map2.camera.getAspect();
-    
+
     for (i = 0; i < segments; i++) {
         v1 = [-l3, -l2, -l];
         v2 = [l3, -l2, -l];
@@ -439,17 +439,17 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
         vec3.scale(v2, (i+1));
         vec3.scale(v3, (i+1));
         vec3.scale(v4, (i+1));
-        
+
         mat4.multiplyVec3(m, v1);
         mat4.multiplyVec3(m, v2);
         mat4.multiplyVec3(m, v3);
         mat4.multiplyVec3(m, v4);
-    
+
         vec3.add(v1, p1);
         vec3.add(v2, p1);
         vec3.add(v3, p1);
         vec3.add(v4, p1);
-        
+
         this.cameraLines3[0].push(v1);
         this.cameraLines3[1].push(v2);
         this.cameraLines3[2].push(v3);
@@ -465,9 +465,9 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
     vec3.scale(v2, segments);
     vec3.scale(v3, segments);
     vec3.scale(v4, segments);
-    
+
     p1 = [0,0,0];
-    
+
     var vertices = [ p1[0], p1[1], p1[2],
         v1[0], v1[1], v1[2],
         v2[0], v2[1], v2[2],
@@ -484,7 +484,7 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
         v4[0], v4[1], v4[2],
         v1[0], v1[1], v1[2]
     ];
-                      
+
     var uvs = [ 0,0, 0,0, 0,0,
         0,0, 0,0, 0,0,
         0,0, 0,0, 0,0,
@@ -501,7 +501,7 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
         'ztest' : true,
         'culling' : false
     });
-    
+
     this.frustumMesh = renderer.createMesh({ 'vertices': vertices, 'uvs': uvs, 'normals': normals });
     this.cameraGenarated = true;
 };
@@ -513,8 +513,8 @@ InspectorReplay.prototype.itemButton = function(item, button) {
         return;
     }
 
-    var replay = map.draw.replay;    
-    
+    var replay = map.draw.replay;
+
     switch (item) {
     case 'DrawnTiles':
         replay.storeTiles = true;
@@ -564,9 +564,9 @@ InspectorReplay.prototype.itemButton = function(item, button) {
         }
 
         break;
-            
+
     case 'Globe':
-                        
+
         break;
     }
 
@@ -607,19 +607,19 @@ InspectorReplay.prototype.switchItem = function(item, htmlId) {
         break;
 
     case 'Camera':
-        
+
         if (!this.cameraGenarated) {
             this.itemButton('Camera');
         }
-        
+
         this.drawCamera = element.checked;
         break;
-            
+
     case 'Globe':
         var renderer = this.core.getRenderer();
-        
+
         if (!this.globeTexture) {
-            var texture = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAEACAMAAADyTj5VAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo0Mzk4RkVFMzlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo0Mzk4RkVFNDlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjQzOThGRUUxOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjQzOThGRUUyOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+5rvbhAAAAAZQTFRFwcHBLS0tMDfv/wAAAiZJREFUeNrs2LENAEEIA0HTf9ME5DTgIZn8ta+TnLjymzuW6kMIwIcQgA8hAAqAAmBdAM4O4E/wBPgQAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACEIAPIQAfwg7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABSAAH0IAPoQAfAgB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQAPxcAQYAZt2IEFFJhxsAAAAASUVORK5CYII=';        
+            var texture = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAEACAMAAADyTj5VAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo0Mzk4RkVFMzlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo0Mzk4RkVFNDlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjQzOThGRUUxOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjQzOThGRUUyOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+5rvbhAAAAAZQTFRFwcHBLS0tMDfv/wAAAiZJREFUeNrs2LENAEEIA0HTf9ME5DTgIZn8ta+TnLjymzuW6kMIwIcQgA8hAAqAAmBdAM4O4E/wBPgQAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACEIAPIQAfwg7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABSAAH0IAPoQAfAgB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQAPxcAQYAZt2IEFFJhxsAAAAASUVORK5CYII=';
             this.globeTexture = new GpuTexture(renderer.gpu, texture, this.core, null, true);
         }
 
@@ -642,9 +642,9 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
     var loaded = replay.loaded;
     var index = replay.loadedIndex;
 
-    this.timeSlider.max = loaded.length; 
+    this.timeSlider.max = loaded.length;
 
-    var ctx;   
+    var ctx;
     var lx = 340;
     var ly = 30;
 
@@ -665,10 +665,10 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
 
     var i = Math.floor(replay.loadedIndex / lx) * lx, li = (lx-1);
     var shift = i, file;
-    
+
     for (i = 0; i < li; i++) {
         file = loaded[i + shift];
-        
+
         if (file) {
             switch(file.kind) {
             case 'mesh':       ctx = this.ctxMeshes; break;
@@ -683,18 +683,18 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
             var grey = Math.round(Math.min(255, 60+20 * Math.max(1, file.duration / 300)));
             ctx.fillStyle='rgb('+grey+','+grey+','+grey+')';
 
-            var h = (file.duration / 300) * 30;                 
+            var h = (file.duration / 300) * 30;
             ctx.fillRect(i, ly, 1, -h);
 
             //interval
             grey = Math.round(Math.min(255, 60+20 * Math.max(1, file.interval / 300)));
             this.ctxIntervals.fillStyle='rgb('+grey+','+grey+','+grey+')';
-            h = (file.interval / 300) * 30;                 
+            h = (file.interval / 300) * 30;
             this.ctxIntervals.fillRect(i, ly, 1, -h);
 
             //interval
             this.ctxThreads.fillStyle='rgb(80,80,80)';
-            h = (file.threads / map.config.mapDownloadThreads) * 30;                 
+            h = (file.threads / map.config.mapDownloadThreads) * 30;
             this.ctxThreads.fillRect(i, ly, 1, -h);
         }
     }
@@ -706,66 +706,66 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
     var minMetatiles = Number.MAX_VALUE, maxMetatiles = 0, avgMetatiles = 0, avgMetatilesCount = 0;
     var minThreads = Number.MAX_VALUE, maxThreads = 0, avgThreads = 0, avgThreadsCount = 0;
     var minIntervals = Number.MAX_VALUE, maxIntervals = 0, avgIntervals = 0, avgIntervalsCount = 0;
-    
+
     li = loaded.length;
 
     for (i = 0; i < li; i++) {
         file = loaded[i];
-        
+
         if (file) {
-            
+
             switch(file.kind) {
             case 'mesh':
-                if (file.duration < minMeshes) minMeshes = file.duration; 
-                if (file.duration > maxMeshes) maxMeshes = file.duration; 
+                if (file.duration < minMeshes) minMeshes = file.duration;
+                if (file.duration > maxMeshes) maxMeshes = file.duration;
                 avgMeshes += file.duration;
-                avgMeshesCount++;  
+                avgMeshesCount++;
                 break;
-                    
+
             case 'texture-in':
-                if (file.duration < minTextures) minTextures = file.duration; 
-                if (file.duration > maxTextures) maxTextures = file.duration; 
+                if (file.duration < minTextures) minTextures = file.duration;
+                if (file.duration > maxTextures) maxTextures = file.duration;
                 avgTextures += file.duration;
-                avgTexturesCount++;  
+                avgTexturesCount++;
                 break;
-                    
+
             case 'texture-ex':
-                if (file.duration < minTextures2) minTextures2 = file.duration; 
-                if (file.duration > maxTextures2) maxTextures2 = file.duration; 
+                if (file.duration < minTextures2) minTextures2 = file.duration;
+                if (file.duration > maxTextures2) maxTextures2 = file.duration;
                 avgTextures2 += file.duration;
-                avgTextures2Count++;  
+                avgTextures2Count++;
                 break;
-                    
+
             case 'geodata':
-                if (file.duration < minGeodata) minGeodata = file.duration; 
-                if (file.duration > maxGeodata) maxGeodata = file.duration; 
+                if (file.duration < minGeodata) minGeodata = file.duration;
+                if (file.duration > maxGeodata) maxGeodata = file.duration;
                 avgGeodata += file.duration;
-                avgGeodataCount++;  
+                avgGeodataCount++;
                 break;
-                    
+
             case 'metatile':
-                if (file.duration < minMetatiles) minMetatiles = file.duration; 
-                if (file.duration > maxMetatiles) maxMetatiles = file.duration; 
+                if (file.duration < minMetatiles) minMetatiles = file.duration;
+                if (file.duration > maxMetatiles) maxMetatiles = file.duration;
                 avgMetatiles += file.duration;
-                avgMetatilesCount++;  
+                avgMetatilesCount++;
                 break;
 
             default:
                 continue;
             }
-                
-            if (file.threads < minThreads) minThreads = file.threads; 
-            if (file.threads > maxThreads) maxThreads = file.threads; 
-            avgThreads += file.threads;
-            avgThreadsCount++;  
 
-            if (file.threads < minIntervals) minIntervals = file.threads; 
-            if (file.threads > maxIntervals) maxIntervals = file.threads; 
+            if (file.threads < minThreads) minThreads = file.threads;
+            if (file.threads > maxThreads) maxThreads = file.threads;
+            avgThreads += file.threads;
+            avgThreadsCount++;
+
+            if (file.threads < minIntervals) minIntervals = file.threads;
+            if (file.threads > maxIntervals) maxIntervals = file.threads;
             avgIntervals += file.threads;
-            avgIntervalsCount++;  
+            avgIntervalsCount++;
         }
     }
-    
+
     index -= shift;
 
     this.ctxMeshes.fillStyle = '#ff0000';
@@ -811,8 +811,8 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
     this.infoTextures2.innerHTML = 'External Textures Min/Max/Avg/Count: ' + minTextures2.toFixed(0) + '/' + maxTextures2.toFixed(0) + '/' + avgTextures2.toFixed(1) + '/' + avgTextures2Count;
     this.infoGeodata.innerHTML = 'Geodata Min/Max/Avg/Count: ' + minGeodata.toFixed(0) + '/' + maxGeodata.toFixed(0) + '/' + avgGeodata.toFixed(1) + '/' + avgGeodataCount;
     this.infoMetatiles.innerHTML = 'Metatiles Min/Max/Avg/Count: ' + minMetatiles.toFixed(0) + '/' + maxMetatiles.toFixed(0) + '/' + avgMetatiles.toFixed(1) + '/' + avgMetatilesCount;
-    this.infoIntervals.innerHTML = 'Intervals Min/Max/Avg: ' + minIntervals.toFixed(0) + '/' + maxIntervals.toFixed(0) + '/' + avgIntervals.toFixed(1);  
-    this.infoThreads.innerHTML = 'Threads Min/Max/Avg: ' + minThreads + '/' + maxThreads + '/' + avgThreads.toFixed(1);  
+    this.infoIntervals.innerHTML = 'Intervals Min/Max/Avg: ' + minIntervals.toFixed(0) + '/' + maxIntervals.toFixed(0) + '/' + avgIntervals.toFixed(1);
+    this.infoThreads.innerHTML = 'Threads Min/Max/Avg: ' + minThreads + '/' + maxThreads + '/' + avgThreads.toFixed(1);
 };
 
 
@@ -872,15 +872,15 @@ InspectorReplay.prototype.buildReplayCombo = function() {
         html += '<div id="vts-replay-item-' + keys[i] + '" class="vts-replay-item">'
                  + '<input id="vts-replay-checkbox-' + keys[i] + '" type="checkbox"/>'
                  + '<span title=' + items[i][0] + '>' + items[i][0] + '&nbsp;&nbsp;</span>';
-                 
+
         if (items[i][1] > 0) {
             html += '<input id="vts-replay-sbutton-' + keys[i] + '" type="button" value="S"/>';
         }
-        
+
         if (items[i][1] > 1) {
             html += '<input id="vts-replay-fbutton-' + keys[i] + '" type="button" value="' + ((keys[i] == 'Camera') ? 'R' : 'F') + '"/>';
         }
-        
+
         html += '</div>';
     }
 
@@ -907,4 +907,3 @@ InspectorReplay.prototype.buildReplayCombo = function() {
 
 
 export default InspectorReplay;
-

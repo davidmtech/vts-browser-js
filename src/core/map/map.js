@@ -18,7 +18,7 @@ import MapRenderSlots_ from './render-slots';
 import MapStats_ from './stats';
 import MapSurfaceSequence_ from './surface-sequence';
 import MapUrl_ from './url';
-import GpuTexture_ from '../renderer/gpu/texture';
+//import GpuTexture_ from '../renderer/gpu/texture';
 
 //get rid of compiler mess
 var vec3 = vec3_;
@@ -40,7 +40,7 @@ var MapRenderSlots = MapRenderSlots_;
 var MapStats = MapStats_;
 var MapSurfaceSequence = MapSurfaceSequence_;
 var MapUrl = MapUrl_;
-var GpuTexture = GpuTexture_;
+//var GpuTexture = GpuTexture_;
 
 
 var Map = function(core, mapConfig, path, config, configStorage) {
@@ -92,10 +92,10 @@ var Map = function(core, mapConfig, path, config, configStorage) {
         glueImagery : {},
         mapdata : {}
     };
-    
+
     this.mobile = false;
     this.metanodeBuffer = new Uint8Array(1024);
-   
+
     this.gpuCache = new MapCache(this, this.config.mapGPUCache*1024*1024);
     this.resourcesCache = new MapCache(this, this.config.mapCache*1024*1024);
     this.metatileCache = new MapCache(this, this.config.mapMetatileCache*1024*1024);
@@ -110,7 +110,7 @@ var Map = function(core, mapConfig, path, config, configStorage) {
 
     this.stats = new MapStats(this);
     this.resourcesTree = new MapResourceTree(this);
-   
+
     this.mapConfig = new MapConfig(this, mapConfig);
     this.convert = new MapConvert(this);
     this.measure = new MapMeasure(this);
@@ -136,7 +136,7 @@ var Map = function(core, mapConfig, path, config, configStorage) {
     this.lastHoverFeatureId = null;
     this.hoverFeatureCounter = 0;
     this.hoverFeatureList = [];
-    
+
     this.draw = new MapDraw(this);
     this.draw.setupDetailDegradation();
 
@@ -178,7 +178,7 @@ var Map = function(core, mapConfig, path, config, configStorage) {
 
 Map.prototype.kill = function() {
     this.killed = true;
-    
+
     if (this.tree) {
         this.tree.kill();
     }
@@ -205,7 +205,7 @@ Map.prototype.setupMobileMode = function() {
     this.mobile = this.config.mapMobileMode;
 
     if (!this.mobile && this.config.mapMobileModeAutodect) {
-        this.mobile = platform.isMobile();        
+        this.mobile = platform.isMobile();
     }
 
     this.setupCache();
@@ -304,7 +304,7 @@ Map.prototype.getCredits = function() {
 Map.prototype.getVisibleCredits = function() {
     var imagery = this.visibleCredits.imagery;
     var glueImagery = this.visibleCredits.glueImagery;
-    var imageryArray = []; 
+    var imageryArray = [];
     var imagerySpecificity = [];
     var i, li, t, sorted;
 
@@ -313,18 +313,18 @@ Map.prototype.getVisibleCredits = function() {
             imagery[key] = glueImagery[key];
         }
     }
-    
+
     this.visibleCredits.glueImagery = {};
-    
+
     for (key in imagery) {
         imageryArray.push(key);
-        imagerySpecificity.push(imagery[key]); 
+        imagerySpecificity.push(imagery[key]);
     }
 
     //sort imagery
     do {
         sorted = true;
-        
+
         for (i = 0, li = imagerySpecificity.length - 1; i < li; i++) {
             if (imagerySpecificity[i] < imagerySpecificity[i+1]) {
                 t = imagerySpecificity[i];
@@ -334,24 +334,24 @@ Map.prototype.getVisibleCredits = function() {
                 imageryArray[i] = imageryArray[i+1];
                 imageryArray[i+1] = t;
                 sorted = false;
-            } 
+            }
         }
-        
+
     } while(!sorted);
 
     var mapdata = this.visibleCredits.mapdata;
-    var mapdataArray = []; 
-    var mapdataSpecificity = []; 
+    var mapdataArray = [];
+    var mapdataSpecificity = [];
 
     for (key in mapdata) {
         mapdataArray.push(key);
-        mapdataSpecificity.push(mapdata[key]); 
+        mapdataSpecificity.push(mapdata[key]);
     }
-    
+
     //sort imagery
     do {
         sorted = true;
-        
+
         for (i = 0, li = mapdataSpecificity.length - 1; i < li; i++) {
             if (mapdataSpecificity[i] < mapdataSpecificity[i+1]) {
                 t = mapdataSpecificity[i];
@@ -361,22 +361,22 @@ Map.prototype.getVisibleCredits = function() {
                 mapdataArray[i] = mapdataArray[i+1];
                 mapdataArray[i+1] = t;
                 sorted = false;
-            } 
+            }
         }
-        
+
     } while(!sorted);
 
     return {
-        '3D' : [], 
-        'imagery' : imageryArray, 
-        'mapdata' : mapdataArray 
+        '3D' : [],
+        'imagery' : imageryArray,
+        'mapdata' : mapdataArray
     };
 };
 
 
 Map.prototype.addSurface = function(id, surface) {
     this.surfaces.push(surface);
-    surface.index = this.surfaces.length - 1; 
+    surface.index = this.surfaces.length - 1;
 };
 
 
@@ -420,7 +420,7 @@ Map.prototype.getBoundLayerOptions = function(id) {
     if (this.boundLayers[id]) {
         return this.boundLayers[id].getOptions();
     }
-    
+
     return null;
 };
 
@@ -483,7 +483,7 @@ Map.prototype.getFreeLayerOptions = function(id) {
     if (this.freeLayers[id]) {
         return this.freeLayers[id].getOptions();
     }
-    
+
     return null;
 };
 
@@ -499,7 +499,7 @@ Map.prototype.getFreeLayers = function() {
     for (var key in this.freeLayers) {
         keys.push(key);
     }
-    return keys;    
+    return keys;
 };
 
 
@@ -543,15 +543,15 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
         p = this.convert.convertPositionHeightMode(p, 'fix', true);
         this.setPosition(p);
     }
-    
+
     if (typeof view === 'string') {
         view = view.trim();
-        
+
         if (view.charAt(0) == '{') {
             try {
                 view = JSON.parse(view);
             } catch(e){
-                return;            
+                return;
             }
         } else {
             view = this.getNamedView(view);
@@ -559,7 +559,7 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
             if (!view) {
                 return;
             }
-            
+
             //view = JSON.parse(JSON.stringify(view));
             view = view.getInfo();
         }
@@ -591,7 +591,7 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
             renderer.setSuperElevationState(false);
         }
     } else {
-        renderer.setSuperElevationState(false);        
+        renderer.setSuperElevationState(false);
     }
 
     if (string != this.currentViewString || forceRefresh) {
@@ -637,14 +637,14 @@ Map.prototype.getStylesheetData = function(id) {
     if (stylesheet) {
         return {'url':stylesheet.url, 'data': stylesheet.data};
     }
-    
+
     return {'url':null, 'data':{}};
 };
 
 
 Map.prototype.setStylesheetData = function(id, data) {
     var stylesheet = this.getStylesheet(id);
-    
+
     //if (stylesheet) {
       //  stylesheet.data = data;
     //}
@@ -659,7 +659,7 @@ Map.prototype.setStylesheetData = function(id, data) {
         for (var key in this.freeLayers) {
             var freeLayer = this.getFreeLayer(key);
             if (freeLayer && freeLayer.geodata && freeLayer.stylesheet == stylesheet) {
-                
+
                 if (freeLayer.geodataProcessor) {
                     freeLayer.geodataProcessor.setStylesheet(freeLayer.stylesheet);
                 }
@@ -670,7 +670,7 @@ Map.prototype.setStylesheetData = function(id, data) {
     }
 
     this.markDirty();
-        
+
     //TODO: reset geodatview in free layers
 };
 
@@ -686,21 +686,21 @@ Map.prototype.refreshFreelayesInView = function() {
 
     for (var key in freeLayers) {
         var freeLayer = this.getFreeLayer(key);
-        
+
         if (freeLayer) {
-            
+
             freeLayer.zFactor = freeLayers[key]['depthOffset'];
             freeLayer.maxLod = freeLayers[key]['maxLod'];
-            
+
             this.freeLayerSequence.push(freeLayer);
-            
+
             if (freeLayers[key]['style']) {
                 freeLayer.setStyle(freeLayers[key]['style']);
             } else {
                 freeLayer.setStyle(freeLayer.originalStyle);
             }
-            
-            //TODO: generate bound layer seqence for      
+
+            //TODO: generate bound layer seqence for
         }
     }
 };
@@ -908,11 +908,11 @@ Map.prototype.setConfigParam = function(key, value) {
     case 'mapCheckTextureSize':           this.config.mapCheckTextureSize = utils.validateBool(value, false); break;
     case 'mapTraverseToMeshNode':         this.config.mapTraverseToMeshNode = utils.validateBool(value, true); break;
     case 'mapNormalizeOctantTexelSize':   this.config.mapNormalizeOctantTexelSize = utils.validateBool(value, true); break;
-    case 'mapDMapSize':                   this.config.mapDMapSize = utils.validateNumber(value, 16, Number.MAXINTEGER, 512); break; 
+    case 'mapDMapSize':                   this.config.mapDMapSize = utils.validateNumber(value, 16, Number.MAXINTEGER, 512); break;
     case 'mapDMapMode':                   this.config.mapDMapMode = utils.validateNumber(value, 1, Number.MAXINTEGER, 1); break;
     case 'mapSplitSpace':                 this.config.mapSplitSpace = value; break;
     case 'mario':                         this.config.mario = utils.validateBool(value, true); break;
-    case 'mapFeaturesReduceMode':         
+    case 'mapFeaturesReduceMode':
         value = utils.validateString(value, 'scr-count4');
         if (value == 'auto') value = 'scr-count2';
         if (value == 'legacy') value = 'scr-count2';
@@ -996,7 +996,7 @@ Map.prototype.getConfigParam = function(key) {
     case 'mapSortHysteresis':             return this.config.mapSortHysteresis;
     case 'mapHysteresisWait':             return this.config.mapHysteresisWait;
     case 'mapBenevolentMargins':          return this.config.mapBenevolentMargins;
-    case 'mapDMapSize':                   return this.config.mapDMapSize; 
+    case 'mapDMapSize':                   return this.config.mapDMapSize;
     case 'mapDMapMode':                   return this.config.mapDMapMode;
     case 'mario':                         return this.config.mario;
     }
@@ -1049,7 +1049,7 @@ Map.prototype.renderToImage = function(texture) {
     var data2 = new Uint8Array( w * h * 4 );
     for (var y = 0; y < h; y++) {
         var index = y * w * 4;
-        var index2 = (h - y - 1) * w * 4; 
+        var index2 = (h - y - 1) * w * 4;
 
         for (var x = 0; x < w; x++) {
             data2[index2] = data[index];
@@ -1089,13 +1089,13 @@ Map.prototype.getScreenDepth = function(screenX, screenY, useFallback) {
         } else { //elipsoid fallback
             var navigationSrsInfo = this.getNavigationSrs().getSrsInfo();
             var planetRadius = navigationSrsInfo['b'] + this.referenceFrame.getGlobalHeightRange()[0];
-        
+
             var offset = [cameraPos[0], cameraPos[1], cameraPos[2]];
             a = vec3.dot(ray, ray); //minification is wrong there
             var b = 2 * vec3.dot(ray, offset);
             var c = vec3.dot(offset, offset) - planetRadius * planetRadius;
             d = b * b - 4 * a * c;
-            
+
             if (d > 0) {
                 d = Math.sqrt(d);
                 var t1 = (-b - d) / (2*a);
@@ -1142,8 +1142,8 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
     }
 
     var cameraSpaceCoords = this.renderer.hitTest(screenX, screenY);
-    
-    var fallbackUsed = false; 
+
+    var fallbackUsed = false;
     var cameraPos = this.camera.position;
     var worldPos;
 
@@ -1157,14 +1157,14 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
         //if (d > 1e-6) {
         a = [planePos[0] - cameraPos[0], planePos[1] - cameraPos[1], planePos[2] - cameraPos[2]];
         t = vec3.dot(a, planeNormal) / d;
-            
-            //var t = (vec3.dot(cameraPos, planeNormal) + (-500)) / d;            
+
+            //var t = (vec3.dot(cameraPos, planeNormal) + (-500)) / d;
         if (t >= 0) {
             if (!cameraSpaceCoords[3] || t < cameraSpaceCoords[5]) {
                 worldPos = [ (ray[0] * t) + cameraPos[0],
                     (ray[1] * t) + cameraPos[1],
                     (ray[2] * t) + cameraPos[2] ];
-    
+
                 fallbackUsed = true;
             }
         }
@@ -1173,13 +1173,13 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
     } else /*if (false)*/ { //elipsoid fallback
         var navigationSrsInfo = this.getNavigationSrs().getSrsInfo();
         var planetRadius = navigationSrsInfo['b'] + this.referenceFrame.getGlobalHeightRange()[0];
-    
+
         var offset = [cameraPos[0], cameraPos[1], cameraPos[2]];
         a = vec3.dot(ray, ray); //minification is wrong there
         var b = 2 * vec3.dot(ray, offset);
         var c = vec3.dot(offset, offset) - planetRadius * planetRadius;
         d = b * b - 4 * a * c;
-        
+
         if (d > 0) {
             d = Math.sqrt(d);
             var t1 = (-b - d) / (2*a);
@@ -1187,7 +1187,7 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
             var t = (t1 < t2) ? t1 : t2;
 
             //console.log("hit: " + t + ",   " + cameraSpaceCoords[5]);
-            
+
             if (!cameraSpaceCoords[3] || t < cameraSpaceCoords[5]) {
                 worldPos = [ (ray[0] * t) + cameraPos[0],
                     (ray[1] * t) + cameraPos[1],
@@ -1195,13 +1195,13 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
 
                 fallbackUsed = true;
             }
-        }   
+        }
     }
-    
+
     if (!cameraSpaceCoords[3] && !fallbackUsed) {
         return null;
     }
-    
+
     if (!fallbackUsed) {
         worldPos = [ cameraSpaceCoords[0] + cameraPos[0],
             cameraSpaceCoords[1] + cameraPos[1],
@@ -1217,7 +1217,7 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
     if (mode == 'float') {
         lod =  (lod != null) ? lod : this.measure.getOptimalHeightLod(navCoords, 100, this.config.mapNavSamplesPerViewExtent);
         var surfaceHeight = this.measure.getSurfaceHeight(navCoords, lod);
-        navCoords[2] -= surfaceHeight[0]; 
+        navCoords[2] -= surfaceHeight[0];
     }
 
     return navCoords;
@@ -1245,9 +1245,9 @@ Map.prototype.hitTestGeoLayers = function(screenX, screenY, mode) {
 
     if (res[0]) { //do we hit something?
         //console.log(JSON.stringify([id, JSON.stringify(this.hoverFeatureList[id])]));
-       
+
         var id = (res[1]) + (res[2]<<8);
-		
+
         var feature = this.hoverFeatureList[id];
 
         if (!feature) {
@@ -1256,7 +1256,7 @@ Map.prototype.hitTestGeoLayers = function(screenX, screenY, mode) {
 
         if (feature[6]) { //advanced hit feature?
             res = this.renderer.hitTestGeoLayers(screenX, screenY, true);
-        
+
             if (res[0]) { //do we hit something?
                 elementIndex = (res[1]) + (res[2]<<8);
             }
@@ -1265,7 +1265,7 @@ Map.prototype.hitTestGeoLayers = function(screenX, screenY, mode) {
         if (mode == 'hover') {
             this.lastHoverFeature = this.hoverFeature;
             this.lastHoverFeatureId = this.hoverFeatureId;
-            
+
             if (feature && feature[3]) {
                 this.hoverFeature = feature;
                 this.hoverFeatureId = (feature != null) ? feature[0]['#id'] : null;
@@ -1367,7 +1367,7 @@ Map.prototype.applyCredits = function(tile) {
             this.visibleCredits.mapdata[key] = value;
         }
     }
-    
+
     /*if (this.drawBBoxes) {
         console.log(JSON.stringify(tile.id) + " " + JSON.stringify(this.visibleCredits));
     }*/
@@ -1484,11 +1484,11 @@ Map.prototype.update = function() {
         this.dirty = false;
         this.bestMeshTexelSize = 0;//Number.MAX_VALUE;
         this.bestGeodataTexelSize = 0;//Number.MAX_VALUE;
-        
+
         this.renderSlots.processRenderSlots();
 
         this.loader.update();
-        
+
         this.core.callListener('map-update', {});
 
         //this.renderer.gpu.setState(this.drawTileState);

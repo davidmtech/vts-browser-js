@@ -1,22 +1,22 @@
 
 import RendererGeometry_ from './geometry';
-import GpuBBox_ from './gpu/bbox';
-import GpuFont_ from './gpu/font';
-import GpuMesh_ from './gpu/mesh';
-import GpuPixelLine3_ from './gpu/pixel-line3';
-import GpuProgram_ from './gpu/program';
-import GpuShaders_ from './gpu/shaders';
-import GpuTexture_ from './gpu/texture';
+//import GpuBBox_ from './gpu/bbox';
+//import GpuFont_ from './gpu/font';
+//import GpuMesh_ from './gpu/mesh';
+//import GpuPixelLine3_ from './gpu/pixel-line3';
+//import GpuProgram_ from './gpu/program';
+//import GpuShaders_ from './gpu/shaders';
+//import GpuTexture_ from './gpu/texture';
 
 //get rid of compiler mess
 var RendererGeometry = RendererGeometry_;
-var GpuBBox = GpuBBox_;
-var GpuFont = GpuFont_;
-var GpuMesh = GpuMesh_;
-var GpuPixelLine3 = GpuPixelLine3_;
-var GpuProgram = GpuProgram_;
-var GpuShaders = GpuShaders_;
-var GpuTexture = GpuTexture_;
+//var GpuBBox = GpuBBox_;
+//var GpuFont = GpuFont_;
+//var GpuMesh = GpuMesh_;
+//var GpuPixelLine3 = GpuPixelLine3_;
+//var GpuProgram = GpuProgram_;
+//var GpuShaders = GpuShaders_;
+//var GpuTexture = GpuTexture_;
 
 
 var RendererInit = function(renderer) {
@@ -77,7 +77,7 @@ RendererInit.prototype.initShaders = function() {
 
     renderer.progSkydome = new GpuProgram(gpu, shaders.skydomeVertexShader, shaders.skydomeFragmentShader);
     renderer.progStardome = new GpuProgram(gpu, shaders.skydomeVertexShader, shaders.stardomeFragmentShader);
-    
+
     renderer.progAtmo2 = new GpuProgram(gpu, shaders.atmoVertexShader, shaders.atmoFragmentShader);
     renderer.progAtmo = new GpuProgram(gpu, shaders.atmoVertexShader3, shaders.atmoFragmentShader3);
 
@@ -88,8 +88,8 @@ RendererInit.prototype.initShaders = function() {
 
     renderer.progLine = new GpuProgram(gpu, shaders.lineVertexShader, shaders.lineFragmentShader); //line
     renderer.progLineSE = new GpuProgram(gpu, '#define applySE\n' + shaders.lineVertexShader, shaders.lineFragmentShader); //line SE
-    renderer.progELine = new GpuProgram(gpu, '#define withElements\n' + shaders.lineVertexShader, '#define withElements\n' + shaders.lineFragmentShader); //line elements 
-    renderer.progELineSE = new GpuProgram(gpu, '#define applySE\n#define withElements\n' + shaders.lineVertexShader, '#define withElements\n' + shaders.lineFragmentShader); //line SE elements 
+    renderer.progELine = new GpuProgram(gpu, '#define withElements\n' + shaders.lineVertexShader, '#define withElements\n' + shaders.lineFragmentShader); //line elements
+    renderer.progELineSE = new GpuProgram(gpu, '#define applySE\n#define withElements\n' + shaders.lineVertexShader, '#define withElements\n' + shaders.lineFragmentShader); //line SE elements
     renderer.progLine3 = new GpuProgram(gpu, '#define pixelLine\n' + shaders.lineVertexShader, shaders.lineFragmentShader); //pixel line
     renderer.progELine3 = new GpuProgram(gpu, '#define pixelLine\n#define withElements\n' + shaders.lineVertexShader, '#define withElements\n' + shaders.lineFragmentShader); //pixel line elements
     renderer.progLine3SE = new GpuProgram(gpu, '#define applySE\n#define pixelLine\n' + shaders.lineVertexShader, shaders.lineFragmentShader); //pixel line SE
@@ -109,15 +109,15 @@ RendererInit.prototype.initShaders = function() {
     renderer.progETPLine = new GpuProgram(gpu, shaders.etplineVertexShader, shaders.elineFragmentShader); //textured pixed line elements
     //renderer.progLineWireframe = new GpuProgram(gpu, shaders.lineWireframeVertexShader, shaders.lineWireframeFragmentShader); //line with wireframe for debugging
 
-    renderer.progText2 = new GpuProgram(gpu, '#define lineLabel\n' + shaders.lineVertexShader, shaders.text2FragmentShader); //line label 
-    renderer.progText2SE = new GpuProgram(gpu, '#define applySE\n#define lineLabel\n' + shaders.lineVertexShader, shaders.text2FragmentShader); //line label 
+    renderer.progText2 = new GpuProgram(gpu, '#define lineLabel\n' + shaders.lineVertexShader, shaders.text2FragmentShader); //line label
+    renderer.progText2SE = new GpuProgram(gpu, '#define applySE\n#define lineLabel\n' + shaders.lineVertexShader, shaders.text2FragmentShader); //line label
 
-    renderer.progLineLabel16 = new GpuProgram(gpu, '#define DSIZE 16\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader); 
-    renderer.progLineLabel32 = new GpuProgram(gpu, '#define DSIZE 32\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader); 
-    renderer.progLineLabel48 = new GpuProgram(gpu, '#define DSIZE 48\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader); 
-    renderer.progLineLabel64 = new GpuProgram(gpu, '#define DSIZE 64\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader); 
-    renderer.progLineLabel96 = new GpuProgram(gpu, '#define DSIZE 96\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader); 
-    renderer.progLineLabel128 = new GpuProgram(gpu, '#define DSIZE 128\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader); 
+    renderer.progLineLabel16 = new GpuProgram(gpu, '#define DSIZE 16\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader);
+    renderer.progLineLabel32 = new GpuProgram(gpu, '#define DSIZE 32\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader);
+    renderer.progLineLabel48 = new GpuProgram(gpu, '#define DSIZE 48\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader);
+    renderer.progLineLabel64 = new GpuProgram(gpu, '#define DSIZE 64\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader);
+    renderer.progLineLabel96 = new GpuProgram(gpu, '#define DSIZE 96\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader);
+    renderer.progLineLabel128 = new GpuProgram(gpu, '#define DSIZE 128\n#define lineLabel2\n' + shaders.lineVertexShader, shaders.text2FragmentShader);
 
     renderer.progPolygon = new GpuProgram(gpu, shaders.polygonVertexShader, shaders.polygonFragmentShader);
     renderer.progImage = new GpuProgram(gpu, shaders.imageVertexShader, shaders.imageFragmentShader);
@@ -128,8 +128,8 @@ RendererInit.prototype.initShaders = function() {
     renderer.progLabel32 = new GpuProgram(gpu, '#define DSIZE 32\n' + shaders.icon3VertexShader, shaders.text2FragmentShader);
     renderer.progLabel48 = new GpuProgram(gpu, '#define DSIZE 48\n' + shaders.icon3VertexShader, shaders.text2FragmentShader);
     renderer.progLabel64 = new GpuProgram(gpu, '#define DSIZE 64\n' + shaders.icon3VertexShader, shaders.text2FragmentShader);
-    renderer.progLabel96 = new GpuProgram(gpu, '#define DSIZE 96\n' + shaders.icon3VertexShader, shaders.text2FragmentShader); 
-    renderer.progLabel128 = new GpuProgram(gpu, '#define DSIZE 128\n' + shaders.icon3VertexShader, shaders.text2FragmentShader); 
+    renderer.progLabel96 = new GpuProgram(gpu, '#define DSIZE 96\n' + shaders.icon3VertexShader, shaders.text2FragmentShader);
+    renderer.progLabel128 = new GpuProgram(gpu, '#define DSIZE 128\n' + shaders.icon3VertexShader, shaders.text2FragmentShader);
 };
 
 RendererInit.prototype.initProceduralShaders = function() {

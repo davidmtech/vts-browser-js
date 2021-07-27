@@ -228,6 +228,8 @@ MapDraw.prototype.drawMap = function(skipFreeLayers) {
     this.degradeHorizonFactor = 200.0 * this.config.mapDegradeHorizonParams[0];
     this.degradeHorizonTiltFactor = 0.5*(1.0+Math.cos(math.radians(Math.min(180,Math.abs(renderer.cameraOrientation[1]*2*3)))));
 
+    this.renderer.startRender();
+
     if (this.drawChannel != 1) {
         if (debug.drawWireframe == 2) {
             gpu.clear(true, true, [255,255,255,255]);
@@ -476,8 +478,8 @@ MapDraw.prototype.drawMap = function(skipFreeLayers) {
 
     //draw skydome before geodata
     if (this.drawChannel != 1 && !projected && debug.drawFog &&
-        ((body && body.atmosphere) || map.referenceFrame.id == 'melown2015' || map.referenceFrame.id == 'mars-qsc' || map.referenceFrame.id == 'earth-qsc') &&
-        renderer.progAtmo.isReady() && renderer.progAtmo2.isReady()) {
+        ((body && body.atmosphere) || map.referenceFrame.id == 'melown2015' || map.referenceFrame.id == 'mars-qsc' || map.referenceFrame.id == 'earth-qsc')/* &&
+    renderer.progAtmo.isReady() && renderer.progAtmo2.isReady()*/) {
 
         var navigationSrsInfo = map.getNavigationSrs().getSrsInfo();
         var earthRadius =  navigationSrsInfo['a'];
@@ -542,6 +544,10 @@ MapDraw.prototype.drawMap = function(skipFreeLayers) {
             }
         }
     }
+
+
+    this.renderer.finishRender();
+
 
     if (this.config.mapForceFrameTime) {
         if (this.config.mapForceFrameTime != -1) {

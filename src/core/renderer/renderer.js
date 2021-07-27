@@ -1,8 +1,11 @@
 
 import {vec3 as vec3_, mat4 as mat4_} from '../utils/matrix';
-import GpuDevice_ from './gpu/device';
-import GpuTexture_ from './gpu/texture';
-import GpuFont_ from './gpu/font';
+//import GpuDevice_ from './gpu/device';
+//import GpuTexture_ from './gpu/texture';
+//import GpuFont_ from './gpu/font';
+
+import * as THREE from './libs/three.module.js';
+
 import Camera_ from './camera';
 import RenderInit_ from './init';
 import RenderDraw_ from './draw';
@@ -10,13 +13,14 @@ import RenderRMap_ from './rmap';
 
 //get rid of compiler mess
 var vec3 = vec3_, mat4 = mat4_;
-var GpuDevice = GpuDevice_;
-var GpuTexture = GpuTexture_;
-var GpuFont = GpuFont_;
+//var GpuDevice = GpuDevice_;
+//var GpuTexture = GpuTexture_;
+//var GpuFont = GpuFont_;
 var Camera = Camera_;
 var RenderInit = RenderInit_;
 var RenderDraw = RenderDraw_;
 var RenderRMap = RenderRMap_;
+var matCounter = 1;
 
 var Renderer = function(core, div, onUpdate, onResize, config) {
     this.config = config || {};
@@ -67,8 +71,48 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.viewExtent = 1;
     //this.texelSizeLimit = this.core.mapConfig.texelSize * texelSizeFactor;
 
-    this.gpu = new GpuDevice(this, div, this.curSize, this.config.rendererAllowScreenshots, this.config.rendererAntialiasing, this.config.rendererAnisotropic);
+//    this.gpu = new GpuDevice(this, div, this.curSize, this.config.rendererAllowScreenshots, this.config.rendererAntialiasing, this.config.rendererAnisotropic);
+
+    this.gpu = {
+
+        createState : (function(){}),
+        clear : (function(){}),
+        setState : (function(){}),
+        setViewport : (function(){}),
+
+    };
+
+    this.draw = {
+
+        getTextSize : (function(){}),
+        drawText : (function(){}),
+        drawBall : (function(){}),
+
+        clearJobHBuffer : (function(){}),
+        clearJobBuffer : (function(){}),
+    }
+
+
     this.camera = new Camera(this, 45, 2, 1200000.0);
+
+    this.box = new THREE.Box3();
+    this.box.setFromCenterAndSize( new THREE.Vector3( 0,0,0 ), new THREE.Vector3( 1,1,1) );
+
+    this.helper = new THREE.Box3Helper( this.box, 0x0000ff );
+
+
+    this.scene = new THREE.Scene();
+    //this.scene.background = new THREE.Color( 0xaaaaaa );
+    this.scene.background = new THREE.Color( 0xaa0000 );
+
+    this.camera2 = new THREE.PerspectiveCamera( 45, this.aspectRatio, 0.1, 10000);
+    this.camera2.position.set(  0, 200, 0 );
+    this.camera2.lookAt( new THREE.Vector3() );
+
+    this.models = new THREE.Group();
+    this.models.frustumCulled = false;
+    this.scene.add(this.models);
+    this.scene.add(this.helper);
 
     //reduce garbage collection
     this.drawTileMatrix = mat4.create();
@@ -181,16 +225,168 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
     window.addEventListener('resize', (this.onResize).bind(this), false);
 
-    this.gpu.init();
+    //this.gpu.init();
 
     //intit resources
     // eslint-disable-next-line
-    this.init = new RenderInit(this);
+    //this.init = new RenderInit(this);
     this.rmap = new RenderRMap(this, 50);
-    this.draw = new RenderDraw(this);
+    //this.draw = new RenderDraw(this);
 
     var factor = 1;
     this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
+};
+
+Renderer.prototype.startRender = function(options) {
+
+    this.scene.updateMatrixWorld();
+    this.models.clear();
+
+    this.camera2.position.fromArray(this.camera.position);
+    this.camera2.setRotationFromMatrix( new THREE.Matrix4().fromArray(this.camera.rotationview).invert());
+    this.camera2.near = this.camera.near;
+    this.camera2.far = this.camera.far;
+    this.camera2.updateProjectionMatrix();
+}
+
+Renderer.prototype.addSceneObject = function(object) {
+
+    this.models.add(object);
+
+}
+
+Renderer.prototype.finishRender = function(options) {
+
+    this.gpu2.render( this.scene, this.camera2 );
+
+}
+
+
+Renderer.prototype.createTexture = function(options) {
+
+    this.renderer.camera2.setPosition();
+
+}
+
+Renderer.prototype.createTexture = function(options) {
+
+    const texture = new THREE.Texture(options.image);
+    texture.width = options.width;
+    texture.height = options.height;
+    texture.gpuSize = texture.width * texture.height * 4;
+    texture.needsUpdate = true;
+
+    return texture;
+};
+
+
+Renderer.prototype.createMesh = function(options) {
+/*
+    {
+        bbox: this.bbox,
+        vertices: this.vertices,
+        uvs: this.internalUVs,
+        uvs2: this.externalUVs,
+        indices: this.indices,
+        use16bit: this.use16bit
+    }
+*/
+    const geometry = new THREE.BufferGeometry();
+
+    if (options.vertices) {
+        if (options.use16bit) {
+            const att = new THREE.Uint16BufferAttribute( options.vertices, 3 );
+            att.normalized = true;
+            geometry.setAttribute( 'position', att );
+        } else {
+            geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( options.vertices, 3 )/*.onUpload( disposeArray )*/ );
+        }
+    }
+
+    const uv = options.uvs || options.uvs2;
+
+    if (uv) {
+        if (options.use16bit) {
+            const att = new THREE.Uint16BufferAttribute( uv, 2 );
+            att.normalized = true;
+            geometry.setAttribute( 'uv', att );
+        } else {
+            geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 )/*.onUpload( disposeArray )*/ );
+        }
+    }
+
+    if (options.indices) {
+        geometry.setIndex(options.indices);
+    }
+
+    const material = new THREE.MeshBasicMaterial({});
+
+    material.onBeforeCompile = function ( shader ) {
+
+        shader.uniforms.uvTrans = { value: new THREE.Vector4(1,1,0,0) };
+
+        const t = material.userData.uvTrans;
+
+        if (t) {
+            shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+        }
+
+        shader.vertexShader = 'uniform vec4 uvTrans;\n' + shader.vertexShader;
+
+        shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>',
+                                                          '#include <uv_vertex>\n\tvUv = vec2(vUv.x * uvTrans.x + uvTrans.z, vUv.y * uvTrans.y + uvTrans.w);') ;
+
+
+        // = shader.vertexShader;
+
+
+
+
+        /*shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
+        shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        [
+        `float theta = sin( time + position.y ) / ${ amount.toFixed( 1 ) };`,
+        'float c = cos( theta );',
+        'float s = sin( theta );',
+        'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
+        'vec3 transformed = vec3( position ) * m;',
+        'vNormal = vNormal * m;'
+        ].join( '\n' )
+        );*/
+
+        material.userData.shader = shader;
+
+    };
+
+
+    material.customProgramCacheKey = function () {
+        return matCounter++;
+    };
+
+    //return material;
+
+
+    const mesh = new THREE.Mesh( geometry, material);
+
+    mesh.position.set(0, 0, 0);
+
+    const bbox = options.bbox;
+
+    if (bbox) {
+        mesh.bbox = options.bbox;
+        mesh.scale.set( bbox.max[0] - bbox.min[0], bbox.max[1] - bbox.min[1], bbox.max[2] - bbox.min[2] );
+    }
+
+    //mesh.position.set(bbox.min[0], bbox.min[1], bbox.min[2]);
+    //mesh.scale.set( bbox.max[0] - bbox.min[0], bbox.max[1] - bbox.min[1], bbox.max[2] - bbox.min[2] );
+
+
+    //mesh.scale.set( 30,30,30 );
+
+    mesh.frustumCulled = false;
+
+    return mesh;
 };
 
 Renderer.prototype.initProceduralShaders = function() {
@@ -245,7 +441,7 @@ Renderer.prototype.resizeGL = function(width, height, skipCanvas, skipPaint) {
     this.camera.setAspect(width / height);
     this.curSize = [width, height];
     this.oldSize = [width, height];
-    this.gpu.resize(this.curSize, skipCanvas);
+    //this.gpu.resize(this.curSize, skipCanvas);
 
     //if (skipPaint !== true) { //remove this??
        // this.draw.paintGL();
@@ -258,6 +454,33 @@ Renderer.prototype.resizeGL = function(width, height, skipCanvas, skipPaint) {
     m[12] = -width*0.5*m[0]; m[13] = -height*0.5*m[5]; m[14] = 0; m[15] = 1;
 
     this.imageProjectionMatrix = m;
+
+    this.camera2.aspect = width / height;
+    this.camera2.updateProjectionMatrix();
+
+    /*
+    this.camera2D.left = width / -2;
+    this.camera2D.right = width / 2;
+    this.camera2D.top = height / -2;
+    this.camera2D.bottom = height / 2;
+    this.camera2D.updateProjectionMatrix();
+    */
+
+   if (!this.gpu2) {
+       this.gpu2 = new THREE.WebGLRenderer( { antialias: false } );
+
+       this.gpu2.autoClear = false;
+       this.gpu2.autoUpdateScene = false;
+       this.gpu2.outputEncoding = THREE.sRGBEncoding;
+       this.gpu2.setPixelRatio( window.devicePixelRatio );
+       this.gpu2.setSize( width, height );
+
+       //    this.gpu = new GpuDevice(this, div, this.curSize, this.config.rendererAllowScreenshots, this.config.rendererAntialiasing, this.config.rendererAnisotropic);
+
+       this.div.appendChild( this.gpu2.domElement );
+   }
+
+   this.gpu2.setSize( width, height );
 };
 
 

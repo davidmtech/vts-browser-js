@@ -1,10 +1,10 @@
 
 import {utils as utils_} from '../utils/utils';
-import GpuTexture_ from '../renderer/gpu/texture';
+//import GpuTexture_ from '../renderer/gpu/texture';
 
 //get rid of compiler mess
 var utils = utils_;
-var GpuTexture = GpuTexture_;
+//var GpuTexture = GpuTexture_;
 
 
 var MapSubtexture = function(map, path, type, tile, internal) {
@@ -37,12 +37,12 @@ var MapSubtexture = function(map, path, type, tile, internal) {
 MapSubtexture.prototype.kill = function() {
     this.killImage();
     this.killGpuTexture();
-    
+
     if (this.mask) {
-        this.mask.killImage(); 
-        this.mask.killGpuTexture(); 
+        this.mask.killImage();
+        this.mask.killGpuTexture();
     }
-    
+
     //this.tile.validate();
 };
 
@@ -57,7 +57,7 @@ MapSubtexture.prototype.killImage = function(killedByCache) {
     }
 
     if (this.mask) {
-        this.mask.killImage(); 
+        this.mask.killImage();
     }
 
     if (!this.gpuTexture) {
@@ -72,30 +72,35 @@ MapSubtexture.prototype.killImage = function(killedByCache) {
 
 MapSubtexture.prototype.killGpuTexture = function(killedByCache) {
 /*
-    //debug only    
+    //debug only
     if (!this.map.lastRemoved) {
         this.map.lastRemoved = [];
     }
 
-    //debug only    
+    //debug only
     if (this.map.lastRemoved.indexOf(this.mapLoaderUrl) != -1) {
         console.log("tex: " + this.mapLoaderUrl);
     }
 
-    //debug only    
+    //debug only
     this.map.lastRemoved.unshift(this.mapLoaderUrl);
     this.map.lastRemoved = this.map.lastRemoved.slice(0,20);
 */
 
     if (this.gpuTexture != null) {
-        this.stats.gpuTextures -= this.gpuTexture.size;
-        this.gpuTexture.kill();
+        //this.stats.gpuTextures -= this.gpuTexture.size;
+        //this.gpuTexture.kill();
+
+        this.stats.gpuTextures -= this.gpuSize;
+        this.gpuTexture.dispose();
+
 
         this.stats.graphsFluxTexture[1][0]++;
-        this.stats.graphsFluxTexture[1][1] += this.gpuTexture.size;
+        //this.stats.graphsFluxTexture[1][1] += this.gpuTexture.size;
+        this.stats.graphsFluxTexture[1][1] += this.gpuSize;
 
         if (this.mask) {
-            this.mask.killGpuTexture(); 
+            this.mask.killGpuTexture();
         }
     }
 
@@ -117,7 +122,7 @@ MapSubtexture.prototype.killGpuTexture = function(killedByCache) {
 MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, texture) {
     var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
-    
+
     if (this.neverReady) {
         return false;
     }
@@ -126,7 +131,7 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
     case VTS_TEXTURECHECK_TYPE:
     case VTS_TEXTURECHECK_CODE:
     case VTS_TEXTURECHECK_SIZE:
-        
+
         if (this.checkStatus != 2) {
             this.checkType = texture.checkType;
             this.checkValue = texture.checkValue;
@@ -139,23 +144,23 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
                     this.scheduleHeadRequest(priority, (this.checkType == VTS_TEXTURECHECK_SIZE));
                 }
             } else if (this.checkStatus == -1) {
-            
+
                 if (texture.extraInfo) { //find at least texture with lower resolution
                     if (!texture.extraBound) {
                         texture.extraBound = { tile: texture.extraInfo.tile, layer: texture.extraInfo.layer};
-                        texture.setBoundTexture(texture.extraBound.tile.parent, texture.extraBound.layer);        
+                        texture.setBoundTexture(texture.extraBound.tile.parent, texture.extraBound.layer);
                     }
-        
+
                     while (texture.extraBound.texture.extraBound || texture.extraBound.texture.checkStatus == -1) {
                         //while (texture.extraBound.texture.checkStatus == -1) {
-                        texture.setBoundTexture(texture.extraBound.sourceTile.parent, texture.extraBound.layer);        
+                        texture.setBoundTexture(texture.extraBound.sourceTile.parent, texture.extraBound.layer);
                     }
                 }
             }
-    
+
             return false;
         }
-            
+
         break;
     }
 
@@ -179,7 +184,7 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
                 if (!this.imageData) {
                     t = performance.now();
                     this.buildHeightMap();
-                    this.stats.renderBuild += performance.now() - t; 
+                    this.stats.renderBuild += performance.now() - t;
                 }
             }
 
@@ -190,14 +195,14 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
             if (!this.imageData) {
                 t = performance.now();
                 this.buildHeightMap();
-                this.stats.renderBuild += performance.now() - t; 
+                this.stats.renderBuild += performance.now() - t;
             }
         } else {
             if (!this.gpuTexture) {
                 if (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed) {
                     return false;
                 }
-                
+
                 if (doNotUseGpu) {
                     return false;
                 }
@@ -208,18 +213,18 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
 
                 t = performance.now();
                 this.buildGpuTexture();
-                this.stats.renderBuild += performance.now() - t; 
+                this.stats.renderBuild += performance.now() - t;
             }
 
             if (!doNotLoad && this.gpuCacheItem) {
                 this.map.gpuCache.updateItem(this.gpuCacheItem);
             }
         }
-        
-        
+
+
         return true;
     } else {
-        if (this.loadState == 0) { 
+        if (this.loadState == 0) {
             if (doNotLoad) {
                 //remove from queue
                 //if (this.mapLoaderUrl) {
@@ -234,7 +239,7 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
             if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount &&
                 performance.now() > this.loadErrorTime + this.map.config.mapLoadErrorRetryTime) {
 
-                this.scheduleLoad(priority);                    
+                this.scheduleLoad(priority);
             }
         } //else load in progress
     }
@@ -283,12 +288,12 @@ MapSubtexture.prototype.onLoadError = function(killBlob) {
     this.loadState = 3;
     this.loadErrorTime = performance.now();
     this.loadErrorCounter ++;
-    
+
     //make sure we try to load it again
-    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) { 
+    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) {
         setTimeout((function(){ if (!this.map.killed) { this.map.markDirty(); } }).bind(this), this.map.config.mapLoadErrorRetryTime);
-    }    
-    
+    }
+
     this.mapLoaderCallError();
 };
 
@@ -296,7 +301,7 @@ MapSubtexture.prototype.onLoadError = function(killBlob) {
 MapSubtexture.prototype.onBinaryLoaded = function(data, direct, filesize) {
     if (this.fastHeaderCheck && this.checkType && this.checkType != VTS_TEXTURECHECK_MEATATILE) {
         this.onHeadLoaded(null, data, null /*status*/);
-        
+
         if (this.checkStatus == -1) {
             this.mapLoaderCallLoaded();
             return;
@@ -339,12 +344,12 @@ MapSubtexture.prototype.onLoaded = function(killBlob, bitmap) {
     }
 
     var size = this.image.naturalWidth * this.image.naturalHeight * (this.heightMap ? 3 : 3);
-    this.gpuSize = this.image.naturalWidth * this.image.naturalHeight * 4;  //aproximate size 
+    this.gpuSize = this.image.naturalWidth * this.image.naturalHeight * 4;  //aproximate size
 
     //if (!this.image.complete) {
        // size = size;
     //}
-    
+
     //console.log(size);
 
     this.cacheItem = this.map.resourcesCache.insert(this.killImage.bind(this, true), size);
@@ -392,12 +397,12 @@ MapSubtexture.prototype.onLoadHeadError = function() {
     this.checkStatus = 3;
     this.loadErrorTime = performance.now();
     this.loadErrorCounter ++;
-    
+
     //make sure we try to load it again
-    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) { 
+    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) {
         setTimeout((function(){ if (!this.map.killed) { this.map.markDirty(); } }).bind(this), this.map.config.mapLoadErrorRetryTime);
-    }    
-    
+    }
+
     this.mapLoaderCallError();
 };
 
@@ -421,7 +426,7 @@ MapSubtexture.prototype.onHeadLoaded = function(downloadAll, data, status) {
                 }
             }
             break;
-                
+
         case VTS_TEXTURECHECK_TYPE:
             if (data) {
                 if (data.type == this.checkValue) {
@@ -429,7 +434,7 @@ MapSubtexture.prototype.onHeadLoaded = function(downloadAll, data, status) {
                 }
             }
             break;
-                
+
         case VTS_TEXTURECHECK_CODE:
             if (status) {
                 if (this.checkValue.indexOf(status) != -1) {
@@ -449,19 +454,19 @@ MapSubtexture.prototype.onHeadLoaded = function(downloadAll, data, status) {
                 }
             }
             break;
-                
+
         case VTS_TEXTURECHECK_TYPE:
             if (data) {
                 //if (!data.indexOf) {
                   //  data = data;
                 //}
-                    
+
                 if (data.indexOf(this.checkValue) != -1) {
                     this.checkStatus = -1;
                 }
             }
             break;
-                
+
         case VTS_TEXTURECHECK_CODE:
             if (status) {
                 if (this.checkValue.indexOf(status) != -1) {
@@ -470,17 +475,18 @@ MapSubtexture.prototype.onHeadLoaded = function(downloadAll, data, status) {
             }
             break;
         }
-        
+
         this.mapLoaderCallLoaded();
     }
 };
 
 
 MapSubtexture.prototype.buildGpuTexture = function () {
+
     if (this.map.config.mapCheckTextureSize && (this.image.naturalWidth > 1024 || this.image.naturalHeight > 1024)) {
         console.log('very large texture: ' + this.image.naturalWidth + 'x' + this.image.naturalHeight + ' ' + this.mapLoaderUrl);
 
-        var size = 16;
+        /*var size = 16;
         var data = new Uint8Array( size * size * 4 );
 
         for (var i = 0; i < size; i++) {
@@ -491,20 +497,30 @@ MapSubtexture.prototype.buildGpuTexture = function () {
                 data[index + 2] = 0;
                 data[index + 3] = 255;
             }
-        }
+        }*/
 
-        this.gpuTexture = new GpuTexture(this.map.renderer.gpu);
-        this.gpuTexture.createFromData(size, size, data);
-        this.gpuTexture.width = this.image.naturalWidth;
-        this.gpuTexture.height = this.image.naturalHeight;
-        //this.gpuTexture = this.map.renderer.blackTexture; 
-        this.gpuSize = 0; //this.image.naturalWidth * this.image.naturalHeight * 4;
+        const canvas = document.createElement('canvas');
+        canvas.width = 16;
+        canvas.height = 16;
+
+        const context = canvas.getContext('2d');
+
+        //this.gpuTexture = new GpuTexture(this.map.renderer.gpu);
+        //this.gpuTexture.createFromData(size, size, data);
+
+        this.gpuTexture = this.map.renderer.createTexture({ image: canvas, width: this.image.naturalWidth, height: this.image.naturalHeight});
+
+
+        //this.gpuTexture = this.map.renderer.blackTexture;
+        this.gpuTexture.gpuSize = 16*16*4; //this.image.naturalWidth * this.image.naturalHeight * 4;
         return;
     }
 
-    this.gpuTexture = new GpuTexture(this.map.renderer.gpu, null, this.map.core);
-    this.gpuTexture.createFromImage(this.image, (this.type == VTS_TEXTURETYPE_CLASS) ? 'nearest' : 'linear', false);
-    this.gpuSize = this.gpuTexture.getSize();
+    //this.gpuTexture = new GpuTexture(this.map.renderer.gpu, null, this.map.core);
+    //this.gpuTexture.createFromImage(this.image, (this.type == VTS_TEXTURETYPE_CLASS) ? 'nearest' : 'linear', false);
+
+    this.gpuTexture = this.map.renderer.createTexture({ image: this.image, width: this.image.naturalWidth, height: this.image.naturalHeight});
+    this.gpuSize = this.gpuTexture.gpuSize;
 
     this.stats.gpuTextures += this.gpuSize;
 
@@ -536,9 +552,8 @@ MapSubtexture.prototype.getHeightMapValue = function(x, y) {
     if (this.imageData) {
         return this.imageData[(y * this.imageExtents[0] + x)*4];
     }
-    
+
     return 0;
 };
 
 export default MapSubtexture;
-

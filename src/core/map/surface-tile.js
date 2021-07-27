@@ -1,11 +1,11 @@
 
 import {vec3 as vec3_} from '../utils/matrix';
-import GpuTexture_ from '../renderer/gpu/texture';
+//import GpuTexture_ from '../renderer/gpu/texture';
 import {math as math_} from '../utils/math';
 
 //get rid of compiler mess
 var vec3 = vec3_;
-var GpuTexture = GpuTexture_;
+//var GpuTexture = GpuTexture_;
 var math = math_;
 
  var tileBorderTable = [
@@ -60,7 +60,7 @@ var MapSurfaceTile = function(map, parent, id) {
     this.virtual = false;
     this.virtualReady = false;
     this.virtualSurfaces = [];
-    
+
     this.resetDrawCommands = false;
     this.drawCommands = [[], [], []];
 
@@ -75,11 +75,11 @@ var MapSurfaceTile = function(map, parent, id) {
     this.imageryCredits = {};
     this.glueImageryCredits = {};
     this.mapdataCredits = {};
-    
+
     this.resources = this.map.resourcesTree.findNode(id, true);   // link to resource tree
     this.metaresources = this.map.resourcesTree.findAgregatedNode(id, 5, true); //link to meta resource tree
     this.boundresources = this.map.resourcesTree.findAgregatedNode(id, 8, true); //link to meta resource tree
-    
+
     this.children = [null, null, null, null];
 };
 
@@ -144,7 +144,7 @@ MapSurfaceTile.prototype.kill = function() {
     this.lastSurface = null;
     this.lastState = null;
     this.lastRenderState = null;
-        
+
     this.hmap = null;
     this.heightMap = null;
     this.drawCommands = [[], [], []];
@@ -181,8 +181,8 @@ MapSurfaceTile.prototype.viewSwitched = function() {
         boundTextures : this.boundTextures,
         surfaceGeodata : this.surfaceGeodata,
         surfaceGeodataView : this.surfaceGeodataView,
-        resourceSurface : this.resourceSurface 
-    };    
+        resourceSurface : this.resourceSurface
+    };
 
     if (this.drawCommands[0].length > 0) {  // check only visible chanel
         this.lastRenderState = {
@@ -193,8 +193,8 @@ MapSurfaceTile.prototype.viewSwitched = function() {
     } else {
         this.lastRenderState = null;
     }
-    
-    //zero surface related data    
+
+    //zero surface related data
     this.verifyChildren = true;
     this.renderReady = false;
     this.lastMetanode = this.metanode;
@@ -240,12 +240,12 @@ MapSurfaceTile.prototype.viewSwitched = function() {
     this.surfaceGeodata = null;
     this.surfaceGeodataView = null;
     this.resourceSurface = null;
-    
+
     this.virtual = false;
     this.virtualReady = false;
     this.virtualSurfaces = [];
     this.virtualSurfacesUncomplete = false;
-    
+
     this.drawCommands = [[], [], []];
     this.imageryCredits = {};
     this.glueImageryCredits = {};
@@ -258,11 +258,11 @@ MapSurfaceTile.prototype.restoreLastState = function() {
         return;
     }
     this.surfaceMesh = this.lastState.surfaceMesh;
-    this.surfaceTextures = this.lastState.surfaceTextures; 
+    this.surfaceTextures = this.lastState.surfaceTextures;
     this.boundTextures = this.lastState.boundTextures;
     this.surfaceGeodata = this.lastState.surfaceGeodata;
     this.surfaceGeodataView = this.lastState.surfaceGeodataView;
-    this.resourceSurface = this.lastState.resourceSurface; 
+    this.resourceSurface = this.lastState.resourceSurface;
     this.lastSurface = null;
     this.lastState = null;
     this.lastResourceSurface = null;
@@ -273,7 +273,7 @@ MapSurfaceTile.prototype.addChild = function(index) {
     if (this.children[index]) {
         return;
     }
-    
+
     var id = this.id;
     var childId = [id[0] + 1, id[1] << 1, id[2] << 1];
 
@@ -292,7 +292,7 @@ MapSurfaceTile.prototype.removeChildByIndex = function(index) {
         this.children[index].kill();
         this.children[index] = null;
     }
-    
+
     //remove resrource node?
 };
 
@@ -313,32 +313,32 @@ MapSurfaceTile.prototype.isMetanodeReady = function(tree, priority, preventLoad)
     if (this.map.viewCounter != this.viewCoutner) {
         this.viewSwitched();
         this.viewCoutner = this.map.viewCounter;
-        this.map.markDirty(); 
+        this.map.markDirty();
     }
-        
+
     if (!preventLoad) {
-   
+
         //provide surface for tile
         if (this.virtualSurfacesUncomplete || (this.surface == null && this.virtualSurfaces.length == 0) ) { //|| this.virtualSurfacesUncomplete) {
             this.checkSurface(tree, priority);
         }
-   
+
         //provide metanode for tile
         if (this.metanode == null || this.lastMetanode) {
-            
+
             if (!this.virtualSurfacesUncomplete) {
                 var ret = this.checkMetanode(tree, priority);
-                
+
                 if (!ret && !(this.metanode != null && this.lastMetanode)) { //metanode is not ready yet
                     return false;
                 }
             }
-            
+
             /*if (this.lastMetanode) {
                 processFlag2 = true;
             }*/
         }
-        
+
     }
 
     if (this.metanode == null) { // || processFlag3) { //only for wrong data
@@ -383,7 +383,7 @@ MapSurfaceTile.prototype.isMetanodeReady = function(tree, priority, preventLoad)
             node.border2 = null;
             node.border3 = null;
             node.borderReady = false;
-     
+
             node.generateCullingHelpers();
         }
     }
@@ -398,10 +398,10 @@ MapSurfaceTile.prototype.checkSurface = function(tree, priority) {
     this.virtualReady = false;
     this.virtualSurfaces = [];
     this.virtualSurfacesUncomplete = false;
-    
+
     if (tree.freeLayerSurface) {  //free layer has only one surface
         this.surface = tree.freeLayerSurface;
-        return; 
+        return;
     }
 
     var sequence = tree.surfaceSequence;
@@ -415,28 +415,28 @@ MapSurfaceTile.prototype.checkSurface = function(tree, priority) {
 
         var res = surface.hasTile2(this.id);
         if (res[0]) {
-            
+
             //check if tile exist
             if (this.id[0] > 0) { //surface.lodRange[0]) {
                 // removed for debug !!!!!
                 // ????????
                 var parent = this.parent;
-                if (parent) { 
-                    
+                if (parent) {
+
                     if (parent.virtualSurfacesUncomplete) {
                         this.virtualSurfacesUncomplete = true;
                         this.virtualSurfaces = [];
                         return;
                     }
-                    
+
                     var metatile = parent.metaresources.getMetatile(surface, null, this);
                     if (metatile) {
-                        
+
                         if (!metatile.isReady(priority)) {
                             this.virtualSurfacesUncomplete = true;
                             continue;
                         }
-                        
+
                         var node = metatile.getNode(parent.id);
                         if (node) {
                             if (!node.hasChildById(this.id)) {
@@ -450,9 +450,9 @@ MapSurfaceTile.prototype.checkSurface = function(tree, priority) {
                     }
                 }
             }
-    
+
             //store surface
-            this.virtualSurfaces.push([surface, alien]);        
+            this.virtualSurfaces.push([surface, alien]);
         }
     }
 
@@ -488,13 +488,13 @@ MapSurfaceTile.prototype.checkMetanode = function(tree, priority) {
         if (!this.virtual) {
             this.metanode = metatile.getNode(this.id);
             this.lastMetanode = null;
-            this.map.markDirty(); 
+            this.map.markDirty();
         }
 
         if (this.metanode != null) {
             this.metanode.tile = this; //used only for validate
             this.lastMetanode = null;
-            this.map.markDirty(); 
+            this.map.markDirty();
 
             for (var i = 0; i < 4; i++) {
                 if (this.metanode.hasChild(i)) {
@@ -508,7 +508,7 @@ MapSurfaceTile.prototype.checkMetanode = function(tree, priority) {
     } else {
         return false;
     }
-    
+
     return true;
 };
 
@@ -525,9 +525,9 @@ MapSurfaceTile.prototype.isVirtualMetanodeReady = function(tree, priority) {
             readyCount++;
         }
     }
-    
+
     if (readyCount == li) {
-        return true;        
+        return true;
     } else {
         return false;
     }
@@ -556,12 +556,12 @@ MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
                 //internalTextureCount is reference to surface
                 if (!alien && surface.glue && !metanode.hasGeometry() &&
                     metanode.internalTextureCount > 0) {
-                    
+
                     var desiredSurfaceIndex = metanode.internalTextureCount - 1;
                     desiredSurfaceIndex = this.map.getSurface(surface.id[desiredSurfaceIndex]).viewSurfaceIndex;
-                    
-                    var jump = false; 
-                        
+
+                    var jump = false;
+
                     for (var j = i; j < li; j++) {
                         if (surfaces[j].viewSurfaceIndex <= desiredSurfaceIndex) {
                             jump = (j > i);
@@ -569,12 +569,12 @@ MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
                             break;
                         }
                     }
-                    
+
                     if (jump) {
                         continue;
-                    }                         
+                    }
                 }
-                
+
                 if (metanode.hasGeometry()) {
                     node = metanode.clone();
                     this.surface = surface;
@@ -606,33 +606,33 @@ MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
                     node = metanode.clone();
                     this.surface = surface;
                 } else {
-                    node.flags |= metanode.flags & ((15)<<4); 
+                    node.flags |= metanode.flags & ((15)<<4);
 
                     /*
                     for (var j = 0, lj = metanode.credits.length; j <lj; j++) {
                         if (node.credits.indexOf(metanode.credits[j]) == -1) {
                             node.credits.push(metanode.credits[j]);
-                        } 
+                        }
                     }*/
-                   
+
                     if (metatile.useVersion < 4) {
                         // removed for debug !!!!!
-                        node.bbox.min[0] = Math.min(node.bbox.min[0], metanode.bbox.min[0]); 
-                        node.bbox.min[1] = Math.min(node.bbox.min[1], metanode.bbox.min[1]); 
-                        node.bbox.min[2] = Math.min(node.bbox.min[2], metanode.bbox.min[2]); 
-                        node.bbox.max[0] = Math.max(node.bbox.max[0], metanode.bbox.max[0]); 
-                        node.bbox.max[1] = Math.max(node.bbox.max[1], metanode.bbox.max[1]); 
+                        node.bbox.min[0] = Math.min(node.bbox.min[0], metanode.bbox.min[0]);
+                        node.bbox.min[1] = Math.min(node.bbox.min[1], metanode.bbox.min[1]);
+                        node.bbox.min[2] = Math.min(node.bbox.min[2], metanode.bbox.min[2]);
+                        node.bbox.max[0] = Math.max(node.bbox.max[0], metanode.bbox.max[0]);
+                        node.bbox.max[1] = Math.max(node.bbox.max[1], metanode.bbox.max[1]);
                         node.bbox.max[2] = Math.max(node.bbox.max[2], metanode.bbox.max[2]);
                     }
                 }
             }
         }
     }
-    
+
     if (node) {
         node.generateCullingHelpers(true);
     }
-    
+
     return node;
 };
 
@@ -643,7 +643,7 @@ MapSurfaceTile.prototype.bboxVisible = function(id, bbox, cameraPos, node) {
     if (id[0] < map.measure.minDivisionNodeDepth) {
         return true;
     }
-    
+
     var skipGeoTest = map.config.mapDisableCulling;
     if (!skipGeoTest && map.isGeocent) {
         if (node) {
@@ -653,13 +653,13 @@ MapSurfaceTile.prototype.bboxVisible = function(id, bbox, cameraPos, node) {
             var rayVec = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
             var distance = vec3.normalize4(rayVec) * camera.distanceFactor;
                 //vec3.normalize(camVec);
-                
+
             var a = vec3.dot(rayVec, node.diskNormal);
             //} else { //version without perspektive
             //    var a = vec3.dot(camera.vector, node.diskNormal);
             //}
             this.tiltAngle = a;
-            
+
             if (distance > 150000 && a > node.diskAngle) {
                 return false;
             }
@@ -702,7 +702,7 @@ MapSurfaceTile.prototype.getPixelSize = function(bbox, screenPixelSize, cameraPo
     var tilePos4y = max[1] - cameraPos[1];
     var h1 = min[2] - cameraPos[2];
     var h2 = max[2] - cameraPos[2];
-    
+
     //camera inside bbox
     if (cameraPos[0] > min[0] && cameraPos[0] < max[0] &&
         cameraPos[1] > min[1] && cameraPos[1] < max[1] &&
@@ -711,7 +711,7 @@ MapSurfaceTile.prototype.getPixelSize = function(bbox, screenPixelSize, cameraPo
         if (returnDistance) {
             return [Number.POSITIVE_INFINITY, 0.1];
         }
-    
+
         return Number.POSITIVE_INFINITY;
     }
 
@@ -815,14 +815,14 @@ MapSurfaceTile.prototype.getPixelSize3Old = function(node, screenPixelSize, fact
     if (d < 0) {
         d = -d;
         //return [Number.POSITIVE_INFINITY, 0.1];
-    } 
+    }
 
     var a = vec3.dot(camera.geocentNormal, node.diskNormal);
-    
+
     if (a < node.diskAngle2) {
-        var a2 = Math.acos(a); 
+        var a2 = Math.acos(a);
         var a3 = Math.acos(node.diskAngle2);
-        a2 = a2 - a3; 
+        a2 = a2 - a3;
 
         var l1 = Math.tan(a2) * node.diskDistance;
         d = Math.sqrt(l1*l1 + d*d);
@@ -844,11 +844,11 @@ MapSurfaceTile.prototype.getPixelSize3 = function(node, screenPixelSize) {
     var d = cameraDistance - (node.diskDistance + (node.maxZ - node.minZ)), d2; //vertical distance from top bbox level
 
     if (a < node.diskAngle2) { //is camera inside tile conus?
-        
+
         //get horizontal distance
-        var a2 = Math.acos(a); 
+        var a2 = Math.acos(a);
         var a3 = node.diskAngle2A;
-        a2 = a2 - a3; 
+        a2 = a2 - a3;
         var l1 = Math.tan(a2) * node.diskDistance;// * factor;
 
         if (d < 0) { //is camera is belown top bbox level?
@@ -871,7 +871,7 @@ MapSurfaceTile.prototype.getPixelSize3 = function(node, screenPixelSize) {
             } else { //is camera inside bbox
                 return [Number.POSITIVE_INFINITY, 0.1];
             }
-        } 
+        }
     }
 
     return [camera.camera.scaleFactor2(d) * screenPixelSize, d];
@@ -884,11 +884,11 @@ MapSurfaceTile.prototype.getPixelSize22 = function(bbox, screenPixelSize, camera
     var max = bbox.max;
     var p1 = bbox.center();
     bbox.updateMaxSize();
-    var d = bbox.maxSize * 0.5; 
-    
+    var d = bbox.maxSize * 0.5;
+
     var dd = [cameraPos[0]-p1[0],
                cameraPos[1]-p1[1],
-               cameraPos[2]-p1[2]]; 
+               cameraPos[2]-p1[2]];
 
     var d2 = vec3.length(dd) - (bbox.maxSize * 0.5);
 
@@ -910,7 +910,7 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
     var texelSizeFit = draw.texelSizeFit;
     var node = this.metanode;
     var cameraPos = map.camera.position;
-    var preciseDistance = (map.isGeocent && (map.config.mapPreciseDistanceTest || node.metatile.useVersion >= 4));  
+    var preciseDistance = (map.isGeocent && (map.config.mapPreciseDistanceTest || node.metatile.useVersion >= 4));
 
     if (node.hasGeometry()) {
         var screenPixelSize = Number.POSITIVE_INFINITY;
@@ -925,14 +925,14 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
             var height = camera.camera.getViewHeight();
             pixelSize = [(screenPixelSize*2.0) / height, height];
         } else {
-            
-            if (node.usedDisplaySize()) { 
-               
+
+            if (node.usedDisplaySize()) {
+
                 if (!preciseDistance) {
                     screenPixelSize = draw.ndcToScreenPixel * ((node.bbox ? node.bbox.maxSize : node.bboxMaxSize) / 256);
 
                     factor = (node.displaySize / 256) * camera.distance;
-                    
+
                     v = camera.vector; //move camera away hack
                     p = [cameraPos[0] - v[0] * factor, cameraPos[1] - v[1] * factor, cameraPos[2] - v[2] * factor];
 
@@ -947,14 +947,14 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
                     pixelSize = this.getPixelSize3(node, screenPixelSize);
                 }
             } else {
-                
+
                 if (!preciseDistance && texelSizeFit > 1.1) {
                     screenPixelSize = draw.ndcToScreenPixel * node.pixelSize * (texelSizeFit / 1.1);
                     factor = (texelSizeFit / 1.1) * camera.distance;
-                    
+
                     v = camera.vector; //move camera away hack
                     p = [cameraPos[0] - v[0] * factor, cameraPos[1] - v[1] * factor, cameraPos[2] - v[2] * factor];
-                    
+
                     pixelSize = this.getPixelSize(node.bbox, screenPixelSize, p, p, true);
                 } else {
                     if (preciseDistance) {
@@ -989,7 +989,7 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
     var degradeFadeEnd = degradeHorizon[2];
 
     //reduce degrade factor by tilt
-    var degradeFactor = draw.degradeHorizonFactor * draw.degradeHorizonTiltFactor; 
+    var degradeFactor = draw.degradeHorizonFactor * draw.degradeHorizonTiltFactor;
     var distance = this.distance * camera.distanceFactor;
 
     //apply degrade factor smoothly from specified tile distance
@@ -1029,7 +1029,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     if ((this.texelSize == Number.POSITIVE_INFINITY || this.texelSize > 4.4) && this.metanode && this.metanode.hasChildren()) {
         return;
     }
-    
+
     if (!this.metanode) {
         return;
     }
@@ -1042,41 +1042,41 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
 
     if (divNode) {
-        node = divNode[0]; 
+        node = divNode[0];
         ll = divNode[1][0];
         ur = divNode[1][1];
     } else {
         res = map.measure.getSpatialDivisionNodeAndExtents(this.id);
-        node = res[0]; 
+        node = res[0];
         ll = res[1][0];
         ur = res[1][1];
     }
-   
+
     var middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5];
 
     var hasPoles = map.referenceFrame.hasPoles;
 
     angle = angle || this.metanode.diskAngle2;
-    
+
     if ((hasPoles && !node.isPole) &&  Math.acos(angle) > Math.PI*0.1) {
-        angle = Math.cos(Math.acos(angle) * 0.5); 
-        
+        angle = Math.cos(Math.acos(angle) * 0.5);
+
         this.drawGrid(cameraPos, [node, [ [ll[0], ll[1]],  [middle[0], middle[1]] ] ], angle, false, true);
         this.drawGrid(cameraPos, [node, [ [middle[0], ll[1]],  [ur[0], middle[1]] ] ], angle, false, true);
 
         this.drawGrid(cameraPos, [node, [ [ll[0], middle[1]],  [middle[0], ur[1]] ] ], angle, false, true);
         this.drawGrid(cameraPos, [node, [ [middle[0], middle[1]],  [ur[0], ur[1]] ] ], angle, false, true);
-       
+
         return;
     }
-     
+
     var desiredSamplesPerViewExtent = 5;
     var nodeExtent = node.extents.ur[1] - node.extents.ll[1];
     var viewExtent = this.distance ;//* 0.1;
     var lod = Math.log((desiredSamplesPerViewExtent * nodeExtent) / viewExtent) / map.log2;
     lod = Math.max(0,lod - 8 + node.id[0]);
-   
-    var h, factor, prog, draw = map.draw; 
+
+    var h, factor, prog, draw = map.draw;
 
     var sx = cameraPos[0];
     var sx = cameraPos[0];
@@ -1113,7 +1113,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                 mleft[0], mleft[1], mleft[2],
                 middle[0], middle[1], middle[2],
                 mright[0], mright[1], mright[2],
-                
+
                 n3[0], n3[1], n3[2],
                 mbottom[0], mbottom[1], mbottom[2],
                 n2[0], n2[1], n2[2]
@@ -1125,7 +1125,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
             buffer[0] = n4[0] - sx;
             buffer[1] = n4[1] - sy;
             buffer[2] = n4[2] - sz;
-            
+
             buffer[3] = mtop[0] - sx;
             buffer[4] = mtop[1] - sy;
             buffer[5] = mtop[2] - sz;
@@ -1137,23 +1137,23 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
             buffer[9] = mleft[0] - sx;
             buffer[10] = mleft[1] - sy;
             buffer[11] = mleft[2] - sz;
-                    
+
             buffer[12] = middle[0] - sx;
             buffer[13] = middle[1] - sy;
             buffer[14] = middle[2] - sz;
-                    
+
             buffer[15] = mright[0] - sx;
             buffer[16] = mright[1] - sy;
             buffer[17] = mright[2] - sz;
-                
+
             buffer[18] = n3[0] - sx;
             buffer[19] = n3[1] - sy;
             buffer[20] = n3[2] - sz;
-            
+
             buffer[21] = mbottom[0] - sx;
             buffer[22] = mbottom[1] - sy;
             buffer[23] = mbottom[2] - sz;
-            
+
             buffer[24] = n2[0] - sx;
             buffer[25] = n2[1] - sy;
             buffer[26] = n2[2] - sz;
@@ -1163,24 +1163,24 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
     if (!flatGrid) {
 
-        var mnode = this.metanode; 
-           
+        var mnode = this.metanode;
+
         var border = mnode.border, borderNodes = mnode.borderNodes;
         var i, li, n, tree = map.tree, id = this.id;
-        
+
         if (!border) {
             mnode.border = new Array(9);
             mnode.borderNodes = new Array(9);
             border = mnode.border, borderNodes = mnode.borderNodes;
             border[4] = useSurrogatez ? mnode.surrogatez : mnode.minZ;
         }
-        
+
 
         var borderTable = tileBorderTable;
         var skip = false;
 
         if (!mnode.borderReady) {
-            
+
             for (i = 0; i < 9; i++) {
                 if (i != 4 && !borderNodes[i]) {
                     n = tree.getNodeById([id[0], id[1] + borderTable[i][0], id[2] + borderTable[i][1]], true);
@@ -1194,7 +1194,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                     }
                 }
             }
-           
+
         }
 
         var border2 = mnode.border2;
@@ -1202,7 +1202,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
         if (!border2 || !mnode.borderReady) {
             border2 = [
-                ((border[0] + border[1] + border[3] + border[4]) * 0.25) - h, 
+                ((border[0] + border[1] + border[3] + border[4]) * 0.25) - h,
                 ((border[1] + border[4]) * 0.5) - h,
                 ((border[2] + border[1] + border[5] + border[4]) * 0.25) - h,
 
@@ -1260,7 +1260,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                         if (lowestNode) {
                             if (n.id[0] < lowestNode.id[0]) {
                                 lowestNode = n;
-                            } 
+                            }
                         } else {
                             lowestNode = n;
                         }
@@ -1280,7 +1280,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                         case 0:  bcoords = [mnode.llx, mnode.lly]; break;
                         case 1:  bcoords = [(mnode.urx+mnode.llx)*0.5, mnode.lly]; break;
                         case 2:  bcoords = [mnode.urx, mnode.lly]; break;
-                        
+
                         case 3:  bcoords = [mnode.llx, (mnode.ury+mnode.lly)*0.5]; break;
                         case 5:  bcoords = [mnode.urx, (mnode.ury+mnode.lly)*0.5]; break;
 
@@ -1294,7 +1294,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                     }
 
                     if (n.border2) {
-                        mnode.border3[i] = (n.getGridHeight(bcoords, n.border2, 3) + (useSurrogatez ? n.surrogatez : n.minZ))  - h; 
+                        mnode.border3[i] = (n.getGridHeight(bcoords, n.border2, 3) + (useSurrogatez ? n.surrogatez : n.minZ))  - h;
                     } else {
                         border2[i];
                     }
@@ -1302,7 +1302,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                     mnode.border3[i] = border2[i];
                 }
             }
-        }                     
+        }
     }
 
     var renderer = map.renderer;
@@ -1313,7 +1313,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         buffer[0] = gridPoints[0] - sx;
         buffer[1] = gridPoints[1] - sy;
         buffer[2] = gridPoints[2] - sz;
-        
+
         buffer[3] = gridPoints[3] - sx;
         buffer[4] = gridPoints[4] - sy;
         buffer[5] = gridPoints[5] - sz;
@@ -1325,23 +1325,23 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         buffer[9] = gridPoints[9] - sx;
         buffer[10] = gridPoints[10] - sy;
         buffer[11] = gridPoints[11] - sz;
-                
+
         buffer[12] = gridPoints[12] - sx;
         buffer[13] = gridPoints[13] - sy;
         buffer[14] = gridPoints[14] - sz;
-                
+
         buffer[15] = gridPoints[15] - sx;
         buffer[16] = gridPoints[16] - sy;
         buffer[17] = gridPoints[17] - sz;
-            
+
         buffer[18] = gridPoints[18] - sx;
         buffer[19] = gridPoints[19] - sy;
         buffer[20] = gridPoints[20] - sz;
-        
+
         buffer[21] = gridPoints[21] - sx;
         buffer[22] = gridPoints[22] - sy;
         buffer[23] = gridPoints[23] - sz;
-        
+
         buffer[24] = gridPoints[24] - sx;
         buffer[25] = gridPoints[25] - sy;
         buffer[26] = gridPoints[26] - sz;
@@ -1349,8 +1349,8 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
     if (hasPoles && !map.poleRadius && node.id[0] == 1 && !node.isPole) {
         var p = node.getPhysicalCoords([node.extents.ur[0], node.extents.ur[1], 0]);
-        map.poleRadius = Math.sqrt(p[0]*p[0]+p[1]*p[1]); 
-        map.poleRadiusFactor = 8 * Math.pow(2.0, 552058 / map.poleRadius); 
+        map.poleRadius = Math.sqrt(p[0]*p[0]+p[1]*p[1]);
+        map.poleRadiusFactor = 8 * Math.pow(2.0, 552058 / map.poleRadius);
     }
 
     factor = 1;
@@ -1380,21 +1380,21 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         }
 
         if (useTexture && !this.gridTexture.isReady(false, 0, false)) {  //TODO: set params with max priority
-            useTexture = false;       
-        }     
+            useTexture = false;
+        }
     }
 
     var hitmapRender = renderer.onlyDepth;
 
     if (hasPoles && node.isPole) {
-        factor = map.poleRadiusFactor; 
-        prog = hitmapRender ? renderer.progPlane2D :renderer.progPlane2; 
+        factor = map.poleRadiusFactor;
+        prog = hitmapRender ? renderer.progPlane2D :renderer.progPlane2;
         renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
         prog.setVec4('uParams4', [-sx, -sy, map.poleRadius, 0]);
     } else {
 
         if (!flatGrid) {
-            prog = hitmapRender ? renderer.progPlane3D : renderer.progPlane3; 
+            prog = hitmapRender ? renderer.progPlane3D : renderer.progPlane3;
             renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
 
             var border;
@@ -1409,7 +1409,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
             prog.setVec3('uVector', mnode.diskNormal);
 
         } else {
-            prog = hitmapRender ? renderer.progPlane : renderer.progPlane; 
+            prog = hitmapRender ? renderer.progPlane : renderer.progPlane;
             renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
         }
     }
@@ -1417,13 +1417,13 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     prog.setMat4('uMV', mv);
     prog.setMat4('uProj', proj);
     prog.setFloatArray('uPoints', buffer);
-    
+
     /*
     var lx = (ur[0] - ll[0]);
     var ly = (ll[1] - ur[1]);
     var px = (ll[0] - node.extents.ll[0]) / lx;
     var py = (ur[1] - node.extents.ll[1]) / ly;
-    
+
     var llx = (node.extents.ur[0] - node.extents.ll[0]) / lx;
     var lly = (node.extents.ur[1] - node.extents.ll[1]) / ly;
 
@@ -1431,7 +1431,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     py = py / lly;
     llx = 1.0/llx;
     lly = 1.0/lly;
-    
+
     llx *= step1;
     lly *= step1;
     px *= step1;
@@ -1460,26 +1460,26 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         //prog.setVec4('uParams3', [(py - Math.floor(py)), (px - Math.floor(px)), lly*0.5, llx*0.5]);
         prog.setVec4('uParams2', [0, 0, 0, 0]);
     } else {
-        renderer.gpu.bindTexture(renderer.heightmapTexture);       
+        renderer.gpu.bindTexture(renderer.heightmapTexture);
         prog.setVec4('uParams', [step1 * factor, draw.fogDensity, 1/15, node.gridStep2 * factor]);
         prog.setVec4('uParams3', [(py - Math.floor(py)), (px - Math.floor(px)), lly, llx]);
         prog.setVec4('uParams2', [0, 0, node.gridBlend, 0]);
     }
-    
+
     prog.setVec4('uFogColor', draw.atmoColor);
 
     //draw bbox
-    renderer.planeMesh.draw(prog, 'aPosition', 'aTexCoord');    
+    renderer.planeMesh.draw(prog, 'aPosition', 'aTexCoord');
 
     this.map.stats.drawnFaces += renderer.planeMesh.polygons;
-}; 
+};
 
 
 MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipeline, texture) {
     //if ((this.texelSize == Number.POSITIVE_INFINITY || this.texelSize > 4.4) && this.metanode && this.metanode.hasChildren()) {
       //  return;
     //}
-    
+
     if (!this.metanode) {
         return;
     }
@@ -1492,39 +1492,39 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
     }
 
     if (divNode) {
-        node = divNode[0]; 
+        node = divNode[0];
         ll = divNode[1][0];
         ur = divNode[1][1];
     } else {
         res = map.measure.getSpatialDivisionNodeAndExtents(this.id);
-        node = res[0]; 
+        node = res[0];
         ll = res[1][0];
         ur = res[1][1];
     }
-   
+
     var middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5];
     var hasPoles = map.referenceFrame.hasPoles;
     angle = angle || this.metanode.diskAngle2;
-    
+
     if ((hasPoles && !node.isPole) &&  Math.acos(angle) > Math.PI*0.1) {
-        angle = Math.cos(Math.acos(angle) * 0.5); 
-        
+        angle = Math.cos(Math.acos(angle) * 0.5);
+
         this.drawHmapTile(cameraPos, [node, [ [ll[0], ll[1]],  [middle[0], middle[1]] ] ], angle);
         this.drawHmapTile(cameraPos, [node, [ [middle[0], ll[1]],  [ur[0], middle[1]] ] ], angle);
 
         this.drawHmapTile(cameraPos, [node, [ [ll[0], middle[1]],  [middle[0], ur[1]] ] ], angle);
         this.drawHmapTile(cameraPos, [node, [ [middle[0], middle[1]],  [ur[0], ur[1]] ] ], angle);
-       
+
         return;
     }
-     
+
     var desiredSamplesPerViewExtent = 5;
     var nodeExtent = node.extents.ur[1] - node.extents.ll[1];
     var viewExtent = this.distance ;//* 0.1;
     var lod = Math.log((desiredSamplesPerViewExtent * nodeExtent) / viewExtent) / map.log2;
     lod = Math.max(0,lod - 8 + node.id[0]);
-   
-    var h, factor, prog, draw = map.draw; 
+
+    var h, factor, prog, draw = map.draw;
 
     var sx = cameraPos[0];
     var sx = cameraPos[0];
@@ -1560,7 +1560,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
                 mleft[0], mleft[1], mleft[2],
                 middle[0], middle[1], middle[2],
                 mright[0], mright[1], mright[2],
-                
+
                 n3[0], n3[1], n3[2],
                 mbottom[0], mbottom[1], mbottom[2],
                 n2[0], n2[1], n2[2]
@@ -1572,7 +1572,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
             buffer[0] = n4[0] - sx;
             buffer[1] = n4[1] - sy;
             buffer[2] = n4[2] - sz;
-            
+
             buffer[3] = mtop[0] - sx;
             buffer[4] = mtop[1] - sy;
             buffer[5] = mtop[2] - sz;
@@ -1584,23 +1584,23 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
             buffer[9] = mleft[0] - sx;
             buffer[10] = mleft[1] - sy;
             buffer[11] = mleft[2] - sz;
-                    
+
             buffer[12] = middle[0] - sx;
             buffer[13] = middle[1] - sy;
             buffer[14] = middle[2] - sz;
-                    
+
             buffer[15] = mright[0] - sx;
             buffer[16] = mright[1] - sy;
             buffer[17] = mright[2] - sz;
-                
+
             buffer[18] = n3[0] - sx;
             buffer[19] = n3[1] - sy;
             buffer[20] = n3[2] - sz;
-            
+
             buffer[21] = mbottom[0] - sx;
             buffer[22] = mbottom[1] - sy;
             buffer[23] = mbottom[2] - sz;
-            
+
             buffer[24] = n2[0] - sx;
             buffer[25] = n2[1] - sy;
             buffer[26] = n2[2] - sz;
@@ -1614,7 +1614,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         buffer[0] = gridPoints[0] - sx;
         buffer[1] = gridPoints[1] - sy;
         buffer[2] = gridPoints[2] - sz;
-        
+
         buffer[3] = gridPoints[3] - sx;
         buffer[4] = gridPoints[4] - sy;
         buffer[5] = gridPoints[5] - sz;
@@ -1626,23 +1626,23 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         buffer[9] = gridPoints[9] - sx;
         buffer[10] = gridPoints[10] - sy;
         buffer[11] = gridPoints[11] - sz;
-                
+
         buffer[12] = gridPoints[12] - sx;
         buffer[13] = gridPoints[13] - sy;
         buffer[14] = gridPoints[14] - sz;
-                
+
         buffer[15] = gridPoints[15] - sx;
         buffer[16] = gridPoints[16] - sy;
         buffer[17] = gridPoints[17] - sz;
-            
+
         buffer[18] = gridPoints[18] - sx;
         buffer[19] = gridPoints[19] - sy;
         buffer[20] = gridPoints[20] - sz;
-        
+
         buffer[21] = gridPoints[21] - sx;
         buffer[22] = gridPoints[22] - sy;
         buffer[23] = gridPoints[23] - sz;
-        
+
         buffer[24] = gridPoints[24] - sx;
         buffer[25] = gridPoints[25] - sy;
         buffer[26] = gridPoints[26] - sz;
@@ -1650,18 +1650,18 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
 
     if (hasPoles && !map.poleRadius && node.id[0] == 1 && !node.isPole) {
         var p = node.getPhysicalCoords([node.extents.ur[0], node.extents.ur[1], 0]);
-        map.poleRadius = Math.sqrt(p[0]*p[0]+p[1]*p[1]); 
-        map.poleRadiusFactor = 8 * Math.pow(2.0, 552058 / map.poleRadius); 
+        map.poleRadius = Math.sqrt(p[0]*p[0]+p[1]*p[1]);
+        map.poleRadiusFactor = 8 * Math.pow(2.0, 552058 / map.poleRadius);
     }
 
-    var mnode = this.metanode; 
+    var mnode = this.metanode;
     var testMode = draw.debug.drawTestMode;
 
     factor = 1;
 
     if (hasPoles && node.isPole) {
-        factor = map.poleRadiusFactor; 
-        prog = renderer.progPlane2; 
+        factor = map.poleRadiusFactor;
+        prog = renderer.progPlane2;
         renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
         prog.setVec4('uParams4', [-sx, -sy, map.poleRadius, 0]);
     } else {
@@ -1681,7 +1681,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
 
         if (testMode == 3 || testMode == 4) {
             if (!renderer.ntextures) {
-                renderer.ntextures = [ 
+                renderer.ntextures = [
                     new GpuTexture(renderer.gpu, './textures/test/test001.png', renderer.core, null), //0
                     new GpuTexture(renderer.gpu, './textures/test/test002.png', renderer.core, null), //1
                     new GpuTexture(renderer.gpu, './textures/test003.jpg', renderer.core, null),      //2
@@ -1752,7 +1752,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
             vts.mat4.multiply(mv3, vts.mat3.toMat4(space), mv3);
             prog.setMat3('uSpace', vts.mat4.toMat3(mv3));
             */
-            
+
             prog.setMat3('uSpace', space);
         }
     }
@@ -1760,7 +1760,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
     prog.setMat4('uMV', mv);
     prog.setMat4('uProj', proj);
     prog.setFloatArray('uPoints', buffer);
-    
+
 
     var step1 = node.gridStep1 * factor;
     prog.setVec4('uParams', [step1 * factor, draw.fogDensity, 1/127, node.gridStep2 * factor]);
@@ -1809,7 +1809,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         }
     }
 
-    prog.setSampler('uSampler', 0);    
+    prog.setSampler('uSampler', 0);
 
 //    if(this.hmap) {
         renderer.gpu.bindTexture(this.hmap.getGpuTexture(), 1);
@@ -1818,11 +1818,11 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
   //      renderer.gpu.bindTexture(renderer.blackTexture2, 1);
    // }
 
-    prog.setSampler('uSampler2', 1);    
+    prog.setSampler('uSampler2', 1);
 
     //draw bbox
-    //renderer.planeMesh2.draw(prog, 'aPosition', 'aTexCoord');    
-    renderer.planeMesh2.draw(prog, 'aPosition');    
+    //renderer.planeMesh2.draw(prog, 'aPosition', 'aTexCoord');
+    renderer.planeMesh2.draw(prog, 'aPosition');
 
     /*
     if (vecRight && gridPoints) {
@@ -1837,9 +1837,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
 
 
     this.map.stats.drawnFaces += renderer.planeMesh2.polygons;
-}; 
+};
 
 
 export default MapSurfaceTile;
-
-

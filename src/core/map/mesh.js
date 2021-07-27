@@ -3,16 +3,16 @@ import {mat4 as mat4_} from '../utils/matrix';
 import {utils as utils_} from '../utils/utils';
 import MapSubmesh_ from './submesh';
 import BBox_ from '../renderer/bbox';
-import GpuProgram_ from '../renderer/gpu/program';
-import GpuShaders_ from '../renderer/gpu/shaders';
+//import GpuProgram_ from '../renderer/gpu/program';
+//import GpuShaders_ from '../renderer/gpu/shaders';
 
 //get rid of compiler mess
 var mat4 = mat4_;
 var BBox = BBox_;
 var MapSubmesh = MapSubmesh_;
 var utils = utils_;
-var GpuProgram = GpuProgram_;
-var GpuShaders = GpuShaders_;
+//var GpuProgram = GpuProgram_;
+//var GpuShaders = GpuShaders_;
 
 var MapMesh = function(map, url, tile) {
     this.generateLines = true;
@@ -76,7 +76,7 @@ MapMesh.prototype.killGpuSubmeshes = function(killedByCache) {
     var size = 0;
     for (var i = 0, li = this.gpuSubmeshes.length; i < li; i++) {
         this.gpuSubmeshes[i].kill();
-        size += this.gpuSubmeshes[i].getSize();
+        size += this.gpuSubmeshes[i].gpuSize;
     }
 
     if (li > 0) {
@@ -364,7 +364,8 @@ MapMesh.prototype.buildGpuSubmeshes = function() {
 
     for (var i = 0, li = this.submeshes.length; i < li; i++) {
         this.gpuSubmeshes[i] = this.submeshes[i].buildGpuMesh();
-        size += this.gpuSubmeshes[i].getSize();
+        this.gpuSubmeshes[i].gpuSize = this.submeshes[i].size;
+        size += this.gpuSubmeshes[i].gpuSize;
     }
 
     this.stats.gpuMeshes += size;
@@ -400,14 +401,81 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
         this.gpuSubmeshes[index] = this.submeshes[index].buildGpuMesh();
     }
 
-    var submesh = this.submeshes[index];
-    var gpuSubmesh = this.gpuSubmeshes[index];
+    const submesh = this.submeshes[index];
+    const gpuSubmesh = this.gpuSubmeshes[index];
 
     if (!gpuSubmesh) {
         return;
     }
 
-    var renderer = this.map.renderer;
+    if (texture) {
+        const gpuTexture = texture.getGpuTexture();
+
+        if (gpuSubmesh.material.map != gpuTexture) {
+            gpuSubmesh.material.map = gpuTexture;
+
+            switch(type) {
+            case VTS_MATERIAL_INTERNAL:
+            case VTS_MATERIAL_FOG:
+            case VTS_MATERIAL_INTERNAL_NOFOG:
+                break;
+
+            case VTS_MATERIAL_EXTERNAL:
+            case VTS_MATERIAL_EXTERNAL_NOFOG:
+
+
+                if (gpuSubmesh.material.userData.shader) {
+                    const t = texture.getTransform();
+
+                    //gpuSubmesh.material.userData.shader.uniforms.uvTrans.set(0.2,0.2,t[2],t[3]);
+                    gpuSubmesh.material.userData.shader.uniforms.uvTrans.value.set(1,1,0,0);
+                    //gpuSubmesh.material.userData.shader.uniforms.uvTrans.set(t[0],t[1],t[2],t[3]);
+                }
+
+                break;
+
+            }
+
+        }
+    }
+
+    const t = texture.getTransform();
+
+    gpuSubmesh.material.userData.uvTrans = t;
+
+    if (gpuSubmesh.material.userData.shader) {
+        //gpuSubmesh.material.userData.shader.uniforms.uvTrans.set(0.2,0.2,t[2],t[3]);
+        //gpuSubmesh.material.userData.shader.uniforms.uvTrans.value.set(1,1,0,0);
+        gpuSubmesh.material.userData.shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+    }
+
+
+    if (gpuSubmesh.material.userData.shader) {
+        //const m = gpuSubmesh.material.userData.shader.uniforms.uvTransform.value;
+        //m.elements[0] = 0.2;
+        //m.elements[4] = 0.2;
+
+        //const m = gpuSubmesh.material.userData.shader.uniforms.uvTransform.value;
+
+
+        //gpuSubmesh.material.needsUpdate = true;
+
+        //gpuSubmesh.material.userData.shader.uniforms.uvTransform.value = m.clone();
+    }
+
+
+    const bbox = gpuSubmesh.bbox;
+
+    if (bbox) {
+        gpuSubmesh.position.set( bbox.min[0] - cameraPos[0], bbox.min[1] - cameraPos[1], bbox.min[2] - cameraPos[2] );
+    }
+
+    const renderer = this.map.renderer;
+
+    renderer.addSceneObject(gpuSubmesh);
+    return;
+
+    /*
     var draw = this.map.draw;
     var program = null;
     var gpuMask = null;
@@ -666,7 +734,7 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
         program.setMat4('uProj', proj);
     }
 
-    if (splitMask /*&& type != VTS_MATERIAL_FLAT*/) {
+    if (splitMask) {
         program.setFloatArray('uClip', splitMask);
 
         //var fx = this.getLinePointParametricDist(points[0], points[1], point);
@@ -779,6 +847,8 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
             }
         }
     }
+
+    */
 
     this.stats.drawnFaces += this.faces;
     this.stats.drawCalls ++;
