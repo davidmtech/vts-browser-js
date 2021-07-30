@@ -3,6 +3,7 @@ import {vec3 as vec3_, mat4 as mat4_} from '../utils/matrix';
 //import GpuDevice_ from './gpu/device';
 //import GpuTexture_ from './gpu/texture';
 //import GpuFont_ from './gpu/font';
+import GpuShaders_ from './shaders';
 
 import * as THREE from './libs/three.module.js';
 
@@ -12,14 +13,16 @@ import RenderDraw_ from './draw';
 import RenderRMap_ from './rmap';
 
 //get rid of compiler mess
-var vec3 = vec3_, mat4 = mat4_;
+const vec3 = vec3_, mat4 = mat4_;
 //var GpuDevice = GpuDevice_;
 //var GpuTexture = GpuTexture_;
 //var GpuFont = GpuFont_;
-var Camera = Camera_;
-var RenderInit = RenderInit_;
-var RenderDraw = RenderDraw_;
-var RenderRMap = RenderRMap_;
+const Camera = Camera_;
+const RenderInit = RenderInit_;
+const RenderDraw = RenderDraw_;
+const RenderRMap = RenderRMap_;
+const GpuShaders = GpuShaders_;
+
 var matCounter = 1;
 
 var Renderer = function(core, div, onUpdate, onResize, config) {
@@ -233,9 +236,140 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.rmap = new RenderRMap(this, 50);
     //this.draw = new RenderDraw(this);
 
+    this.tileMaterialInjectVersion = this.generateMaterial(new THREE.MeshBasicMaterial({}), {
+        uniforms: {  uvTrans : { value: new THREE.Vector4(1,1,0,0) } },
+        vertUniforms: 'uniform vec4 uvTrans;\n',
+        vertUvCode: 'vUv = vec2(vUv.x * uvTrans.x + uvTrans.z, vUv.y * uvTrans.y + uvTrans.w);',
+        onRender: (function(texture, t){
+
+            //texture.needsUpdate = true;
+            this.material.map = texture;
+            //this.material.needsUpdate = true;
+
+            if (this.material.userData.shader) {
+                this.material.userData.shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+                this.material.userData.shader.uniforms.map.value = texture;
+                this.material.userData.shader.uniforms.map.needsUpdate = true;
+                //this.material.userData.shader.needsUpdate = true;
+                //this.material.userData.shader.uniformsNeedUpdate = true;
+                this.material.uniformsNeedUpdate = true;
+                this.material.isShaderMaterial = true;      // THIS IS HACK, I SHOULD CREATE IT AS SHADER MATERIAL !!!!
+            }
+
+        })
+
+     });
+
+     this.tileMaterial = this.generateTileMaterial({
+
+         onRender: (function(texture, t, flags, splitMask){
+
+             //if (this.material.userData.shader) {
+                 //this.material.userData.shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+                 //this.material.userData.shader.uniforms.map.value = texture;
+                 //this.material.userData.shader.uniforms.map.needsUpdate = true;
+
+                 this.material.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+                 this.material.uniforms.map.value = texture;
+                 this.material.uniforms.map.needsUpdate = true;
+
+                 if (flags & VTS_MAT_FLAG_C4){
+                     this.material.uniforms.uClip.value = splitMask.slice();
+                     this.material.uniforms.uClip.needsUpdate = true;
+                 }
+
+
+                 this.material.uniformsNeedUpdate = true;
+             //}
+
+         })
+
+     });
+
+     this.tileMaterials = new Array(64);
+     this.tileMaterials[0] = this.tileMaterial;
+
+
     var factor = 1;
     this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
 };
+
+Renderer.prototype.generateMaterial = function(material, options) {
+
+    material.onBeforeCompile = function ( shader ) {
+
+        if (options.uniforms) {
+
+            for (let key in options.uniforms) {
+                shader.uniforms[key] = options.uniforms[key];
+            }
+
+        }
+
+        material.userData.shader = shader;
+
+        if (options.vertUniforms) {
+            shader.vertexShader = options.vertUniforms + shader.vertexShader;
+        }
+
+        if (options.vertUvCode) {
+            shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>',
+                                                              '#include <uv_vertex>\n\t' + options.vertUvCode);
+        }
+
+    };
+
+    material.customProgramCacheKey = function () {
+        return matCounter++;
+    };
+
+    if (options.onRender) {
+        material.userData.onRender = options.onRender;
+    }
+
+    return material;
+};
+
+Renderer.prototype.generateTileMaterial = function(options) {
+
+    const defines = (options.defines || {});
+
+    const uniforms = {
+
+        uvTrans : { value: new THREE.Vector4(1,1,0,0) },
+        map : { value: null }
+
+    };
+
+    //str += '#define TMIN ' + (0.5-this.map.config.mapSplitMargin) + '\n' + '#define TMAX ' + (0.5+this.map.config.mapSplitMargin) + '\n';
+
+    if (options.flags) {
+        if (options.flags & VTS_MAT_FLAG_C4){
+            defines.clip4 = true;
+            defines.TMIN = (0.5-this.config.mapSplitMargin);
+            defines.TMAX = (0.5+this.config.mapSplitMargin);
+            uniforms.uClip = { value: [1,1,1,1] };
+         }
+        if (options.flags & VTS_MAT_FLAG_C8) defines.clip8 = true;
+        if (options.flags & VTS_MAT_FLAG_FLAT) defines.flatShade = true;
+    }
+
+    const material = new THREE.ShaderMaterial( {
+
+        defines : defines,
+        uniforms: uniforms,
+        vertexShader: GpuShaders.tileVertexShader,
+        fragmentShader: GpuShaders.tileFragmentShader
+
+    } );
+
+    if (options.onRender) {
+        material.userData.onRender = options.onRender;
+    }
+
+    return material;
+
+}
 
 Renderer.prototype.startRender = function(options) {
 
@@ -319,55 +453,9 @@ Renderer.prototype.createMesh = function(options) {
         geometry.setIndex(options.indices);
     }
 
-    const material = new THREE.MeshBasicMaterial({});
-
-    material.onBeforeCompile = function ( shader ) {
-
-        shader.uniforms.uvTrans = { value: new THREE.Vector4(1,1,0,0) };
-
-        const t = material.userData.uvTrans;
-
-        if (t) {
-            shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
-        }
-
-        shader.vertexShader = 'uniform vec4 uvTrans;\n' + shader.vertexShader;
-
-        shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>',
-                                                          '#include <uv_vertex>\n\tvUv = vec2(vUv.x * uvTrans.x + uvTrans.z, vUv.y * uvTrans.y + uvTrans.w);') ;
 
 
-        // = shader.vertexShader;
-
-
-
-
-        /*shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
-        shader.vertexShader = shader.vertexShader.replace(
-        '#include <begin_vertex>',
-        [
-        `float theta = sin( time + position.y ) / ${ amount.toFixed( 1 ) };`,
-        'float c = cos( theta );',
-        'float s = sin( theta );',
-        'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
-        'vec3 transformed = vec3( position ) * m;',
-        'vNormal = vNormal * m;'
-        ].join( '\n' )
-        );*/
-
-        material.userData.shader = shader;
-
-    };
-
-
-    material.customProgramCacheKey = function () {
-        return matCounter++;
-    };
-
-    //return material;
-
-
-    const mesh = new THREE.Mesh( geometry, material);
+    const mesh = new THREE.Mesh( geometry, this.tileMaterial);
 
     mesh.position.set(0, 0, 0);
 

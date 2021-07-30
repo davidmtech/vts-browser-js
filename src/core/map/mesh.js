@@ -404,73 +404,47 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
     const submesh = this.submeshes[index];
     const gpuSubmesh = this.gpuSubmeshes[index];
 
-    if (!gpuSubmesh) {
+    if (!gpuSubmesh || !texture) {
         return;
     }
 
+    let gpuTexture = null;
+
     if (texture) {
-        const gpuTexture = texture.getGpuTexture();
-
-        if (gpuSubmesh.material.map != gpuTexture) {
-            gpuSubmesh.material.map = gpuTexture;
-
-            switch(type) {
-            case VTS_MATERIAL_INTERNAL:
-            case VTS_MATERIAL_FOG:
-            case VTS_MATERIAL_INTERNAL_NOFOG:
-                break;
-
-            case VTS_MATERIAL_EXTERNAL:
-            case VTS_MATERIAL_EXTERNAL_NOFOG:
-
-
-                if (gpuSubmesh.material.userData.shader) {
-                    const t = texture.getTransform();
-
-                    //gpuSubmesh.material.userData.shader.uniforms.uvTrans.set(0.2,0.2,t[2],t[3]);
-                    gpuSubmesh.material.userData.shader.uniforms.uvTrans.value.set(1,1,0,0);
-                    //gpuSubmesh.material.userData.shader.uniforms.uvTrans.set(t[0],t[1],t[2],t[3]);
-                }
-
-                break;
-
-            }
-
-        }
+        gpuTexture = texture.getGpuTexture();
     }
+
+    const renderer = this.map.renderer;
 
     const t = texture.getTransform();
 
-    gpuSubmesh.material.userData.uvTrans = t;
+    let flags = 0;
+    let material = null;
 
-    if (gpuSubmesh.material.userData.shader) {
-        //gpuSubmesh.material.userData.shader.uniforms.uvTrans.set(0.2,0.2,t[2],t[3]);
-        //gpuSubmesh.material.userData.shader.uniforms.uvTrans.value.set(1,1,0,0);
-        gpuSubmesh.material.userData.shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+    //splitMask = [1,0,0,0];
+
+    if (splitMask) flags |= VTS_MAT_FLAG_C4;
+
+    material = renderer.tileMaterials[flags];
+
+    if (!material) {
+        material = renderer.generateTileMaterial({ flags: flags, onRender: renderer.tileMaterial.userData.onRender });
+        renderer.tileMaterials[flags] = material;
     }
 
+    gpuSubmesh.material = material;
 
-    if (gpuSubmesh.material.userData.shader) {
-        //const m = gpuSubmesh.material.userData.shader.uniforms.uvTransform.value;
-        //m.elements[0] = 0.2;
-        //m.elements[4] = 0.2;
+    //if (!gpuSubmesh.material.userData.onRender) {
+    //    return;
+    //}
 
-        //const m = gpuSubmesh.material.userData.shader.uniforms.uvTransform.value;
-
-
-        //gpuSubmesh.material.needsUpdate = true;
-
-        //gpuSubmesh.material.userData.shader.uniforms.uvTransform.value = m.clone();
-    }
-
+    gpuSubmesh.onBeforeRender = gpuSubmesh.material.userData.onRender.bind(gpuSubmesh, gpuTexture, t, flags, splitMask);
 
     const bbox = gpuSubmesh.bbox;
 
     if (bbox) {
         gpuSubmesh.position.set( bbox.min[0] - cameraPos[0], bbox.min[1] - cameraPos[1], bbox.min[2] - cameraPos[2] );
     }
-
-    const renderer = this.map.renderer;
 
     renderer.addSceneObject(gpuSubmesh);
     return;
