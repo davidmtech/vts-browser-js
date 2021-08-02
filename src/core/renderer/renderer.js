@@ -112,6 +112,9 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.camera2.position.set(  0, 200, 0 );
     this.camera2.lookAt( new THREE.Vector3() );
 
+    let widthOrtho = 1024, heightOrtho = 768;
+    this.orthoCamera = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0.001, 1000 );
+
     this.models = new THREE.Group();
     this.models.frustumCulled = false;
     this.scene.add(this.models);
@@ -289,10 +292,129 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
      this.tileMaterials = new Array(64);
      this.tileMaterials[0] = this.tileMaterial;
 
+     this.bboxMaterial = this.generateBBoxMaterial();
+     this.bboxMesh2 = this.createBBox2();
 
-    var factor = 1;
-    this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
+     this.textMaterial = new THREE.ShaderMaterial( {
+         uniforms: {},
+         vertexShader: GpuShaders.bbox2VertexShader,
+         fragmentShader: GpuShaders.bboxFragmentShader
+     } );
+
+
+     this.textBuffer = this.createTextBuffer(3*2*256);
+     this.textBufferIndex = 0;
+
+     this.cleanTexts();
+     this.addText(100,100,0.5, 255, 0, 255, 50, "aa");
+
+     var factor = 1;
+     this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
 };
+
+
+Renderer.prototype.cleanTexts = function() {
+    this.textBufferIndex = 0;
+}
+
+
+Renderer.prototype.addText = function(x,y,z,r,g,b, size, text) {
+    const index = this.textBufferIndex;
+    const vertices = this.textBuffer.geometry.attributes.position.array;
+    const colors = this.textBuffer.geometry.attributes.color.array;
+
+    const sizeX = size - 1;
+    const sizeY = size;
+    const sizeX2 = Math.round(size*0.5);
+
+    //var texelX = 1 / 256;
+    //var texelY = 1 / 128;
+
+    const lx = this.draw.getTextSize(size, text) + 2;
+
+    //draw black line before text
+    let char = 0;
+    let charPosX = (char & 15) << 4;
+    let charPosY = (char >> 4) << 4;
+    let x1,x2,y1,y2,u1,u2,v1,v2;
+
+    x1 = x-2, y1 = y-2, u1 = (charPosX * texelX), v1 = (charPosY * texelY);
+    x2 = x-2 + lx, u2 = ((charPosX+15) * texelX);
+    y2 = y + sizeY+1, v2 = ((charPosY+15) * texelY);
+
+    //black box
+    for (let i = index, li = i+18; i < li; i+=3) {
+        colors[i] = 0;
+        colors[i+1] = 0;
+        colors[i+2] = 0;
+    }
+
+    //same color for all letters
+    for (let i = index + 18, li = i + text.length * 18; i < li; i+=3) {
+        colors[index] = r;
+        colors[index+1] = g;
+        colors[index+2] = b;
+    }
+
+    for (let i = -1, li = text.length; i < li; i++) {
+
+        if (i != -1) {
+            char = text.charCodeAt(i) - 32;
+            charPosX = (char & 15) << 4;
+            charPosY = (char >> 4) << 4;
+
+            switch(char) {
+            case 12:
+            case 14:
+            case 27: //:
+            case 28: //;
+            case 64: //'
+            case 73: //i
+            case 76: //l
+            case 84: //t
+
+                x1 = x, y1 = y,  u1 = (charPosX * texelX), y1 = (charPosY * texelY),
+                x2 = x + sizeX2, u2 = ((charPosX+8) * texelX),
+                y2 = y + sizeY, v2 = ((charPosY+16) * texelY);
+                x += sizeX2;
+                break;
+
+            default:
+
+                x1 = x, y1 = y,  u1 = (charPosX * texelX), y1 = (charPosY * texelY);
+                x2 = x + sizeX, u2 = ((charPosX+15) * texelX);
+                y2 = y + sizeY, v2 = ((charPosY+16) * texelY);
+                x += sizeX;
+                break;
+            }
+        }
+
+        vertices[index] = x1;
+        vertices[index+1] = y1;
+        vertices[index+2] = z;
+        vertices[index+3] = x2;
+        vertices[index+4] = y1;
+        vertices[index+5] = z;
+        vertices[index+6] = x2;
+        vertices[index+7] = y2;
+        vertices[index+8] = z;
+
+        vertices[index+9] = x2;
+        vertices[index+10] = y2;
+        vertices[index+11] = z;
+        vertices[index+12] = x1;
+        vertices[index+13] = y2;
+        vertices[index+14] = z;
+        vertices[index+15] = x1;
+        vertices[index+16] = y1;
+        vertices[index+17] = z;
+
+        index += 18;
+    }
+
+    this.textBufferIndex = index;
+};
+
 
 Renderer.prototype.generateMaterial = function(material, options) {
 
@@ -371,6 +493,38 @@ Renderer.prototype.generateTileMaterial = function(options) {
 
 }
 
+
+Renderer.prototype.generateBBoxMaterial = function() {
+
+    const points = new Array(32);
+
+    for (let i = 0; i < 32; i++) {
+        points[i] = 0;
+    }
+
+    const uniforms = {
+        uPoints : { value: points }
+    };
+
+    const material = new THREE.ShaderMaterial( {
+        uniforms: uniforms,
+        vertexShader: GpuShaders.bbox2VertexShader,
+        fragmentShader: GpuShaders.bboxFragmentShader
+
+    } );
+
+    material.userData.onRender = (function(v){
+
+        this.material.uniforms.uPoints.value = v;
+        this.material.uniforms.uPoints.needsUpdate = true;
+        this.material.uniformsNeedUpdate = true;
+
+    });
+
+    return material;
+
+}
+
 Renderer.prototype.startRender = function(options) {
 
     this.scene.updateMatrixWorld();
@@ -413,6 +567,54 @@ Renderer.prototype.createTexture = function(options) {
     return texture;
 };
 
+Renderer.prototype.createBBox = function(bbox) {
+
+    const box = new THREE.Box3();
+    //box.setFromCenterAndSize( new THREE.Vector3(0,0,0),
+    //                          new THREE.Vector3(1,1,1) );
+    //new THREE.Vector3( (bbox.max[0] - bbox.min[0]), (bbox.max[1] - bbox.min[1]), (bbox.max[2] - bbox.min[2])) );
+
+    const helper = new THREE.Box3Helper( box, 0x0000ff );
+    helper.frustumCulled = false;
+
+    return helper;
+};
+
+
+Renderer.prototype.createBBox2 = function(bbox) {
+
+    const geometry = new THREE.BufferGeometry();
+    const vertices = new Uint16Array([0,1,1,2,2,3,3,0,
+                                      4,5,5,6,6,7,7,4,
+                                      0,4,1,5,2,6,3,7]);
+
+    geometry.setAttribute( 'position', new THREE.Uint16BufferAttribute( vertices, 1 ) );
+
+    const lines = new THREE.LineSegments( geometry, this.bboxMaterial);
+    lines.frustumCulled = false;
+
+    return lines;
+};
+
+
+Renderer.prototype.createTextBuffer = function(size) {
+
+    const geometry = new THREE.BufferGeometry();
+    const vertices = new Float32Array(size*3);
+    const colors = new Uint8Array(size*3);
+
+    const att = new THREE.Float32BufferAttribute( vertices, 3, false )
+    geometry.setAttribute( 'position', att );
+
+    const att2 = new THREE.Uint8BufferAttribute( colors, 3, true )
+    geometry.setAttribute( 'color', att2 );
+
+    const mesh = new THREE.Mesh( geometry, this.textMaterial);
+    mesh.frustumCulled = false;
+
+    return mesh;
+};
+
 
 Renderer.prototype.createMesh = function(options) {
 /*
@@ -429,9 +631,7 @@ Renderer.prototype.createMesh = function(options) {
 
     if (options.vertices) {
         if (options.use16bit) {
-            const att = new THREE.Uint16BufferAttribute( options.vertices, 3 );
-            att.normalized = true;
-            geometry.setAttribute( 'position', att );
+            geometry.setAttribute( 'position', new THREE.Uint16BufferAttribute( options.vertices, 3, true ) );
         } else {
             geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( options.vertices, 3 )/*.onUpload( disposeArray )*/ );
         }
@@ -441,9 +641,7 @@ Renderer.prototype.createMesh = function(options) {
 
     if (uv) {
         if (options.use16bit) {
-            const att = new THREE.Uint16BufferAttribute( uv, 2 );
-            att.normalized = true;
-            geometry.setAttribute( 'uv', att );
+            geometry.setAttribute( 'uv', new THREE.Uint16BufferAttribute( uv, 2, true ) );
         } else {
             geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 )/*.onUpload( disposeArray )*/ );
         }
@@ -453,11 +651,7 @@ Renderer.prototype.createMesh = function(options) {
         geometry.setIndex(options.indices);
     }
 
-
-
     const mesh = new THREE.Mesh( geometry, this.tileMaterial);
-
-    mesh.position.set(0, 0, 0);
 
     const bbox = options.bbox;
 
@@ -465,12 +659,6 @@ Renderer.prototype.createMesh = function(options) {
         mesh.bbox = options.bbox;
         mesh.scale.set( bbox.max[0] - bbox.min[0], bbox.max[1] - bbox.min[1], bbox.max[2] - bbox.min[2] );
     }
-
-    //mesh.position.set(bbox.min[0], bbox.min[1], bbox.min[2]);
-    //mesh.scale.set( bbox.max[0] - bbox.min[0], bbox.max[1] - bbox.min[1], bbox.max[2] - bbox.min[2] );
-
-
-    //mesh.scale.set( 30,30,30 );
 
     mesh.frustumCulled = false;
 

@@ -288,4 +288,36 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
         '#endif\n'+
     '}';
 
+
+    GpuShaders.bbox2VertexShader =
+        //'attribute float position;\n'+
+        'uniform float uPoints[8*3];\n'+
+        'void main(){ \n'+
+            'int index = int(position) * 3; \n'+
+            'gl_Position =  projectionMatrix * modelViewMatrix * vec4(uPoints[index], uPoints[index+1], uPoints[index+2], 1.0);\n'+
+        '}';
+
+
+    GpuShaders.bboxFragmentShader = 'precision mediump float;\n'+
+        'void main() {\n'+
+            'gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n'+
+        '}';
+
+
+    GpuShaders.textVertexShader =
+        'varying vec3 vColor;\n'+
+        'void main(){ \n'+
+            'vColor = color;\n'+
+            'gl_Position =  projectionMatrix * modelViewMatrix * vec4(position.x, position.y, position.z, 1.0);\n'+
+        '}';
+
+
+    GpuShaders.textFragmentShader = 'precision mediump float;\n'+
+        'varying vec3 vColor;\n'+
+        'void main() {\n'+
+            'gl_FragColor.xyz = vColor;\n'+
+            'gl_FragColor.w = 1.0;\n'+
+        '}';
+
+
 export default GpuShaders;

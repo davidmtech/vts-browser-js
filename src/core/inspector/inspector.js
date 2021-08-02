@@ -35,8 +35,8 @@ var Inspector = function(core) {
         this.input.init();
     }
 
-    this.shakeCamera = false; 
-    this.drawReplayCamera = false; 
+    this.shakeCamera = false;
+    this.drawReplayCamera = false;
     this.drawRadar = false;
     this.radarLod = null;
     this.debugValue = 0;
@@ -53,8 +53,9 @@ Inspector.prototype.enableInspector = function() {
         this.replay.init();
         this.stylesheets.init();
 
-        //load image    
+        //load image
         if (!this.circleImage) {
+            /*
             this.circleImage = utils.loadImage(
                     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QAAAAAAAD5Q7t/AAAACW9GRnMAAAAgAAAA4ACD+EAUAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA/UlEQVRYw+2VPwqDMBTG3dz1Am56EnH2XLroETxGuwc3Z7cOdhY8QJpfSUBspUvStJAPPggvD973/uQligICAgL+DKViqygUV02hbaXLwJlio7gpyhNu2idzEXwwgfI8H+u6vnZdN/V9P3EuimLcCRlsiyArGcfxjWDLsmzyAGzc4aNFNDZ7/iw7AeQH4LNrh5WZYLgkJTaZCyHuVVVdkiSZ0zSdOWMzlaBFWkRrQ4A4Zk/A4wBie1MFYUMAz0wybCYAmR8FUAlzj6+2r18TgM2VAO8tOB1Cyk7mrofQ+zP0voheVjHtIBjDxjrmvCu7k1Xs/TP6ie84ICDAGR5uCYdPo0MWiAAAAABJRU5ErkJggg==',
                     //"http://maps.google.com/mapfiles/kml/shapes/placemarkcircle.png",
@@ -62,6 +63,7 @@ Inspector.prototype.enableInspector = function() {
                         this.circleTexture = this.core.getRendererInterface().createTexture({ 'source': this.circleImage });
                     }).bind(this)
                 );
+                */
         }
 
         this.core.on('map-update', this.onMapUpdate.bind(this));
@@ -106,7 +108,7 @@ Inspector.prototype.onMapUpdate = function() {
 
     if (this.shakeCamera) {
         map.redraw();
-    } 
+    }
 
     /*if (this.measureMode) {
         var renderer = this.core.getRenderer();
@@ -124,11 +126,11 @@ Inspector.prototype.onMapUpdate = function() {
 
     if (this.replay.drawCamera) {
         lines = this.replay.cameraLines;
-        slines = []; 
+        slines = [];
         //for (i = 0, li = lines.length; i < li; i++) {
           //  slines.push(map.convertCoordsFromPhysToCanvas(lines[i]));
         //}
-        
+
         renderer.drawLineString({
             points : lines,
             size : 2.0,
@@ -136,11 +138,11 @@ Inspector.prototype.onMapUpdate = function() {
             depthTest : false,
             screenSpace : false,
             blend : false
-        });            
+        });
 
         lines = this.replay.cameraLines3;
         for (i = 0, li = lines.length; i < li; i++) {
-            slines = []; 
+            slines = [];
             for (j = 0, lj = lines[i].length; j < lj; j++) {
                 //slines.push(map.convertCoordsFromPhysToCanvas(lines[i][j]));
                 slines.push(lines[i][j]);
@@ -153,12 +155,12 @@ Inspector.prototype.onMapUpdate = function() {
                 depthTest : false,
                 screenSpace : false,
                 blend : false
-            });   
+            });
         }
 
         lines = this.replay.cameraLines2;
         for (i = 0, li = lines.length; i < li; i++) {
-            slines = []; 
+            slines = [];
             for (j = 0, lj = lines[i].length; j < lj; j++) {
                 //slines.push(map.convertCoordsFromPhysToCanvas(lines[i][j]));
                 slines.push(lines[i][j]);
@@ -171,7 +173,7 @@ Inspector.prototype.onMapUpdate = function() {
                 depthTest : false,
                 screenSpace : false,
                 blend : false
-            });   
+            });
         }
 
 
@@ -179,11 +181,11 @@ Inspector.prototype.onMapUpdate = function() {
         var p1 = map.convertCoordsFromPhysToCameraSpace(this.replay.cameraLines[0]);
 
         //var map2 = this.core.getMap();
-    
+
         //var m2 = map2.camera.getRotationviewMatrix();
         var mv = mat4.create(this.replay.cameraMatrix);
         //mat4.inverse(m2, mv);
-    
+
         //matrix which tranforms mesh position and scale
         /*
         var mv = [
@@ -195,29 +197,29 @@ Inspector.prototype.onMapUpdate = function() {
         mv[12] = p1[0];
         mv[13] = p1[1];
         mv[14] = p1[2];
-    
-        //setup material 
-        var material = [ 
+
+        //setup material
+        var material = [
             255,128,128, 0, //ambient,
             0,0,0,0, //diffuse
-            0,0,0,0, //specular 
+            0,0,0,0, //specular
             0,0.5,0,0 //shininess, alpha,0,0
         ];
-    
+
         //multiply cube matrix with camera view matrix
         mat4.multiply(cameInfo.viewMatrix, mv, mv);
-    
+
         var norm = [
             0,0,0,
             0,0,0,
             0,0,0
         ];
-    
+
         //normal transformation matrix
         mat4.toInverseMat3(mv, norm);
-    
+
         renderer.setState(this.replay.frustumState);
-    
+
         //draw cube
         renderer.drawMesh({
             mesh : this.replay.frustumMesh,
@@ -230,7 +232,7 @@ Inspector.prototype.onMapUpdate = function() {
             }
         });
     }
-    
+
     if (this.drawRadar && this.circleTexture) {
         //var renderer = this.core.getRendererInterface();
         var pos = map.getPosition();
@@ -239,16 +241,16 @@ Inspector.prototype.onMapUpdate = function() {
 
         var cbuffer = new Array(count * count);
 
-/*        
+/*
         var coords = pos.getCoords();
 
         for (var j = 0; j < count; j++) {
             for (var i = 0; i < count; i++) {
                 var screenCoords = map.convertCoordsFromNavToCanvas([coords[0] + i*step - count*0.5*step,
                                                                        coords[1] + j*step - count*0.5*step, 0], "float", this.radarLod);
-        
+
                 cbuffer[j * count + i] = screenCoords;
-            }            
+            }
         }
 */
 
@@ -262,11 +264,11 @@ Inspector.prototype.onMapUpdate = function() {
 
                 var pos2 = map.movePositionCoordsTo(pos, math.degrees(a), l);
                 var coords = pos2.getCoords();
-                
+
                 var screenCoords = map.convertCoordsFromNavToCanvas([coords[0], coords[1], 0], 'float', this.radarLod);
 
                 cbuffer[j * count + i] = screenCoords;
-            }            
+            }
         }
 
 
@@ -276,7 +278,7 @@ Inspector.prototype.onMapUpdate = function() {
             for (i = 0; i < count; i++) {
                 lbuffer[i] =  cbuffer[j * count + i];
             }
-            
+
             renderer.drawLineString({
                 points : lbuffer,
                 size : 2.0,
@@ -284,7 +286,7 @@ Inspector.prototype.onMapUpdate = function() {
                 color : [0,255,255,255],
                 depthTest : false,
                 blend : false
-            });            
+            });
         }
 
 
@@ -292,7 +294,7 @@ Inspector.prototype.onMapUpdate = function() {
             for (j = 0; j < count; j++) {
                 lbuffer[j] =  cbuffer[j * count + i];
             }
-            
+
             renderer.drawLineString({
                 points : lbuffer,
                 size : 2.0,
@@ -300,7 +302,7 @@ Inspector.prototype.onMapUpdate = function() {
                 color : [0,255,255,255],
                 depthTest : false,
                 blend : false
-            });            
+            });
         }
 
         for (i = 0, li = cbuffer.length; i < li; i++) {

@@ -22,8 +22,8 @@ var MapMetanode = function(metatile, id, stream, divisionNode) {
     this.divisionNode = divisionNode;
 
     this.diskPos = new Array(3);
-    this.diskDistance = 1; 
-    this.diskNormal = new Array(3); 
+    this.diskDistance = 1;
+    this.diskNormal = new Array(3);
     this.diskAngle = 1;
     this.diskAngle2 = 1;
     this.diskAngle2A = 1;
@@ -52,11 +52,11 @@ MapMetanode.prototype.hasChild = function(index) {
 
 
 MapMetanode.prototype.hasChildById = function(id) {
-    var ix = id[1] - (this.id[1]<<1); 
+    var ix = id[1] - (this.id[1]<<1);
     var iy = id[2] - (this.id[2]<<1);
-    
+
     //ul,ur,ll,lr
-    return this.hasChild((iy<<1) + ix); 
+    return this.hasChild((iy<<1) + ix);
 };
 
 
@@ -129,20 +129,20 @@ struct Metanode {
     if (version < 5) {
         var extentsSize = (((this.id[0] + 2) * 6 + 7) >> 3);
         var extentsBytes = this.map.metanodeBuffer;//new Uint8Array(extentsSize);
-    
+
         for (var i = 0, li = extentsSize; i < li; i++) {
             extentsBytes[i] = streamData.getUint8(stream.index, true); stream.index += 1;
         }
-    
+
         var extentBits = this.id[0] + 2;
-    
+
         var minExtents = [0,0,0];
         var maxExtents = [0,0,0];
-    
+
         var index = 0;
         var spaceExtentSize = this.map.spaceExtentSize;
         var spaceExtentOffset = this.map.spaceExtentOffset;
-    
+
         for (i = 0; i < 3; i++) {
             minExtents[i] = this.parseExtentBits(extentsBytes, extentBits, index) * spaceExtentSize[i] + spaceExtentOffset[i];
             //minExtents[i] = this.parseExtentBits(extentsBytes, extentBits, index, 1.0);
@@ -151,18 +151,18 @@ struct Metanode {
             //maxExtents[i] = this.parseExtentBits(extentsBytes, extentBits, index, 1.0);
             index += extentBits;
         }
-    
+
         //check zero bbox
         var extentsBytesSum = 0;
         for (i = 0, li = extentsBytes.length; i < li; i++) {
             extentsBytesSum += extentsBytes[i];
         }
-        
+
         //extent bytes are empty and therefore bbox is empty also
         if (extentsBytesSum == 0 ) {
             //console.log("empty-node: id: " + JSON.stringify(this.id));
             //console.log("empty-node: surafce: " + this.metatile.surface.id);
-    
+
             minExtents[0] = Number.POSITIVE_INFINITY;
             minExtents[1] = Number.POSITIVE_INFINITY;
             minExtents[2] = Number.POSITIVE_INFINITY;
@@ -170,9 +170,9 @@ struct Metanode {
             maxExtents[1] = Number.NEGATIVE_INFINITY;
             maxExtents[2] = Number.NEGATIVE_INFINITY;
         }
-    
+
         this.bbox = new BBox(minExtents[0], minExtents[1], minExtents[2], maxExtents[0], maxExtents[1], maxExtents[2]);
-    }    
+    }
 
     //this.surrogatezHeight = 0;
 
@@ -219,7 +219,7 @@ struct Metanode {
     this.minZ2 = this.minZ;
     this.maxZ2 = this.maxZ;
 
-    
+
     if (this.metatile.version >= 3) {
         if (this.metatile.flags & (1<<7)) {
             this.sourceReference = streamData.getUint16(stream.index, true); stream.index += 2;
@@ -229,14 +229,14 @@ struct Metanode {
     }
 
     this.heightReady = this.hasNavtile();
-    
+
     this.alien = false;
 
     //var nodeSize2 = stream.index - lastIndex;
 
     //if (!this.map.config.mapSmartNodeParsing) {
     this.generateCullingHelpers();
-    //}    
+    //}
 };
 
 
@@ -260,10 +260,10 @@ MapMetanode.prototype.clone = function() {
     node.ready = this.ready;
     node.stream = this.stream;
     node.heightReady = this.heightReady;
-    
+
     //copy credits
     node.credits = new Array(this.credits.length);
-    
+
     for (var i = 0, li = this.credits.length; i < li; i++) {
         node.credits[i] = this.credits[i];
     }
@@ -275,12 +275,12 @@ MapMetanode.prototype.clone = function() {
 
 //    if (this.map.config.mapGeocentCulling) {
     node.diskPos = this.diskPos;
-    node.diskNormal = this.diskNormal; 
+    node.diskNormal = this.diskNormal;
     node.diskAngle = this.diskAngle;
     node.diskAngle2 = this.diskAngle2;
     node.diskAngle2A = this.diskAngle2A;
-    node.diskDistance = this.diskDistance; 
-    node.bbox2 = this.bbox2;  
+    node.diskDistance = this.diskDistance;
+    node.bbox2 = this.bbox2;
 
     node.divisionNode = this.divisionNode;
 
@@ -296,7 +296,7 @@ MapMetanode.prototype.clone = function() {
 
 MapMetanode.prototype.generateCullingHelpers = function(virtual) {
     this.ready = true;
-    
+
     var map = this.map;
     var draw = map.draw;
     var geocent = map.isGeocent;
@@ -314,10 +314,10 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
         var divisionNode;
         var llx, lly, urx, ury;
         var pos = draw.tmpVec3;
-        
+
         if (this.id[0] > map.measure.maxDivisionNodeDepth) {
             var pos2 = draw.tmpVec5;
-            
+
             divisionNode = map.measure.getSpatialDivisionNodeFromId(this.id);
 
             if (!divisionNode) {
@@ -325,7 +325,7 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
             }
 
             map.measure.getSpatialDivisionNodeAndExtents2(this.id, pos2, divisionNode);
-            //var node = pos2[0]; 
+            //var node = pos2[0];
             llx = pos2[1];
             lly = pos2[2];
             urx = pos2[3];
@@ -337,15 +337,15 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
                 var res = this.map.measure.getSpatialDivisionNodeAndExtents(this.id);
                 res = res;
             }*/
-            
+
         } else {
             var res = map.measure.getSpatialDivisionNodeAndExtents(this.id);
-            divisionNode = res ? res[0] : null; 
+            divisionNode = res ? res[0] : null;
 
             if (!divisionNode) {
                 return;
             }
-                        
+
             llx = res[1][0][0];
             lly = res[1][0][1];
             urx = res[1][1][0];
@@ -357,151 +357,151 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
         this.lly = lly;
         this.urx = urx;
         this.ury = ury;
-        
+
         var h = this.minZ;
         //var middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5, h];
         //var normal = [0,0,0];
-        
-        pos[0] = (urx + llx)* 0.5; 
-        pos[1] = (ury + lly)* 0.5; 
-        pos[2] = h; 
-        
+
+        pos[0] = (urx + llx)* 0.5;
+        pos[1] = (ury + lly)* 0.5;
+        pos[2] = h;
+
         divisionNode.getPhysicalCoordsFast(pos, true, this.diskPos, 0, 0);
-        
+
         if (geocent) {
-            this.diskDistance = vec3.length(this.diskPos); 
+            this.diskDistance = vec3.length(this.diskPos);
             vec3.normalize(this.diskPos, this.diskNormal);
         } else {
             this.diskNormal[0] = 0;
             this.diskNormal[1] = 0;
             this.diskNormal[2] = 1;
         }
-        //this.diskNormal = normal;   
+        //this.diskNormal = normal;
         var normal = this.diskNormal;
-        
-        
+
+
         //if (divisionNode.id[0] == 1 && divisionNode.id[1] ==  1 && divisionNode.id[2] == 0) {   //???? debug?????
           //  var res = this.map.getSpatialDivisionNodeAndExtents(this.id);
           //  node = node;
         //}
-        
-        pos[0] = urx; 
-        pos[1] = ury; 
-        pos[2] = h; 
+
+        pos[0] = urx;
+        pos[1] = ury;
+        pos[2] = h;
 
         /*if (this.id[0] == 17 && this.id[1] == 53306 && this.id[2] == 30754) {
             normal = normal;
         }*/
-        
+
         var bbox = this.bbox2;
 
         divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 0);
 
-        pos[1] = lly; 
+        pos[1] = lly;
         divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 3);
-        
-        pos[0] = llx; 
+
+        pos[0] = llx;
         divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 6);
-        
-        pos[1] = ury; 
+
+        pos[1] = ury;
         divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 9);
 
         var height;
 
         if (!geocent) {
             height = this.maxZ - h;
-            
+
             bbox[12] = bbox[0];
             bbox[13] = bbox[1];
             bbox[14] = bbox[2] + height;
-            
+
             bbox[15] = bbox[3];
             bbox[16] = bbox[4];
             bbox[17] = bbox[5] + height;
-        
+
             bbox[18] = bbox[6];
             bbox[19] = bbox[7];
             bbox[20] = bbox[8] + height;
-        
+
             bbox[21] = bbox[9];
             bbox[22] = bbox[10];
             bbox[23] = bbox[11] + height;
-            return;        
+            return;
         }
 
         var normalize;
         var dot = vec3.dot;
         var d1, d2, d3, d4, maxDelta;
 
-        if (map.config.mapPreciseBBoxTest || version >= 4) { 
-        //if (true) { 
+        if (map.config.mapPreciseBBoxTest || version >= 4) {
+        //if (true) {
             height = this.maxZ - h;
 
             if (this.id[0] <= 3) { //get aabbox for low lods
-                normalize = vec3.normalize2; 
+                normalize = vec3.normalize2;
 
                 normalize(bbox, 0, pos);
                 d1 = dot(normal, pos);
-                
+
                 normalize(bbox, 3, pos);
                 d2 = dot(normal, pos);
-        
+
                 normalize(bbox, 6, pos);
                 d3 = dot(normal, pos);
-        
+
                 normalize(bbox, 9, pos);
                 d4 = dot(normal, pos);
 
                 maxDelta = Math.min(d1, d2, d3, d4);
 
-                pos[0] = (urx + llx)* 0.5; 
-                pos[1] = ury; 
-                pos[2] = h; 
-                
+                pos[0] = (urx + llx)* 0.5;
+                pos[1] = ury;
+                pos[2] = h;
+
                 divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 12);
 
-                pos[1] = lly; 
+                pos[1] = lly;
                 divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 15);
 
-                pos[0] = urx; 
-                pos[1] = (ury + lly)* 0.5; 
+                pos[0] = urx;
+                pos[1] = (ury + lly)* 0.5;
                 divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 18);
 
-                pos[0] = llx; 
+                pos[0] = llx;
                 divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 21);
 
                 var mpos = this.diskPos;
                 var maxX = Math.max(bbox[0], bbox[3], bbox[6], bbox[9], bbox[12], bbox[15], bbox[18], bbox[21], mpos[0]);
                 var minX = Math.min(bbox[0], bbox[3], bbox[6], bbox[9], bbox[12], bbox[15], bbox[18], bbox[21], mpos[0]);
-                
+
                 var maxY = Math.max(bbox[1], bbox[4], bbox[7], bbox[10], bbox[13], bbox[16], bbox[19], bbox[22], mpos[1]);
                 var minY = Math.min(bbox[1], bbox[4], bbox[7], bbox[10], bbox[13], bbox[16], bbox[19], bbox[22], mpos[1]);
-                
+
                 var maxZ = Math.max(bbox[2], bbox[5], bbox[8], bbox[11], bbox[14], bbox[17], bbox[20], bbox[23], mpos[2]);
                 var minZ = Math.min(bbox[2], bbox[5], bbox[8], bbox[11], bbox[14], bbox[17], bbox[20], bbox[23], mpos[2]);
-                
+
                 if (this.id[0] <= 1) {
-                    pos[0] = urx + (llx-urx )* 0.25; 
-                    pos[1] = (ury + lly)* 0.5; 
-                    
+                    pos[0] = urx + (llx-urx )* 0.25;
+                    pos[1] = (ury + lly)* 0.5;
+
                     divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 12);
-    
-                    pos[0] = urx + (llx-urx )* 0.75; 
+
+                    pos[0] = urx + (llx-urx )* 0.75;
                     divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 15);
-    
-                    pos[0] = (urx + llx)* 0.5; 
-                    pos[1] = ury + (lly-ury )* 0.25; 
+
+                    pos[0] = (urx + llx)* 0.5;
+                    pos[1] = ury + (lly-ury )* 0.25;
                     divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 18);
-    
-                    pos[1] = ury + (lly-ury )* 0.75; 
+
+                    pos[1] = ury + (lly-ury )* 0.75;
                     divisionNode.getPhysicalCoordsFast(pos, true, bbox, 0, 21);
 
                     maxX =  Math.max(maxX, bbox[12], bbox[15], bbox[18], bbox[21]);
                     minX =  Math.min(minX, bbox[12], bbox[15], bbox[18], bbox[21]);
-                    
+
                     maxY =  Math.max(maxY, bbox[13], bbox[16], bbox[19], bbox[22]);
                     minY =  Math.min(minY, bbox[13], bbox[16], bbox[19], bbox[22]);
-                    
+
                     maxZ =  Math.max(maxZ, bbox[14], bbox[17], bbox[20], bbox[23]);
                     minZ =  Math.min(minZ, bbox[14], bbox[17], bbox[20], bbox[23]);
 
@@ -519,21 +519,21 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
                 bbox[21] = minX; bbox[22] = maxY; bbox[23] = maxZ;
             } else {
 
-                normalize = vec3.normalize3; 
+                normalize = vec3.normalize3;
                 dot = vec3.dot2;
 
                 normalize(bbox, 0, bbox, 12);
                 d1 = dot(normal, bbox, 12);
-                
+
                 normalize(bbox, 3, bbox, 15);
                 d2 = dot(normal, bbox, 15);
-        
+
                 normalize(bbox, 6, bbox, 18);
                 d3 = dot(normal, bbox, 18);
-        
+
                 normalize(bbox, 9, bbox, 21);
                 d4 = dot(normal, bbox, 21);
-    
+
                 maxDelta = Math.min(d1, d2, d3, d4);
 
                 if (this.id[0] <= 8) { //extend bbox because of lon curvature
@@ -558,38 +558,38 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
                     bbox[11] += (bbox[11] - pos[2]) * expand;
                 }
 
-                //extend bbox height by tile curvature 
-                height += draw.planetRadius - (draw.planetRadius * maxDelta);  
-                
+                //extend bbox height by tile curvature
+                height += draw.planetRadius - (draw.planetRadius * maxDelta);
+
                 bbox[12] = bbox[0] + bbox[12] * height;
                 bbox[13] = bbox[1] + bbox[13] * height;
                 bbox[14] = bbox[2] + bbox[14] * height;
-                
+
                 bbox[15] = bbox[3] + bbox[15] * height;
                 bbox[16] = bbox[4] + bbox[16] * height;
                 bbox[17] = bbox[5] + bbox[17] * height;
-            
+
                 bbox[18] = bbox[6] + bbox[18] * height;
                 bbox[19] = bbox[7] + bbox[19] * height;
                 bbox[20] = bbox[8] + bbox[20] * height;
-            
+
                 bbox[21] = bbox[9] + bbox[21] * height;
                 bbox[22] = bbox[10] + bbox[22] * height;
                 bbox[23] = bbox[11] + bbox[23] * height;
             }
-        
+
         } else {
-            normalize = vec3.normalize2; 
+            normalize = vec3.normalize2;
 
             normalize(bbox, 0, pos);
             d1 = dot(normal, pos);
-            
+
             normalize(bbox, 3, pos);
             d2 = dot(normal, pos);
-    
+
             normalize(bbox, 6, pos);
             d3 = dot(normal, pos);
-    
+
             normalize(bbox, 9, pos);
             d4 = dot(normal, pos);
 
@@ -610,9 +610,9 @@ MapMetanode.prototype.generateCullingHelpers = function(virtual) {
         this.diskAngle2A = Math.acos(maxDelta); //optimalization
 
         //shift center closer to earth
-        //var factor = this.bbox.maxSize * 0.2; 
-        //this.diskPos = [this.diskPos[0] - normal[0] * factor, this.diskPos[1]  - normal[1] * factor, this.diskPos[2] - normal[2] * factor];   
-    } 
+        //var factor = this.bbox.maxSize * 0.2;
+        //this.diskPos = [this.diskPos[0] - normal[0] * factor, this.diskPos[1]  - normal[1] * factor, this.diskPos[2] - normal[2] * factor];
+    }
 };
 
 
@@ -642,11 +642,33 @@ MapMetanode.prototype.getWorldMatrix = function(geoPos, matrix) {
 
 
 MapMetanode.prototype.drawBBox = function(cameraPos) {
+
     if (this.metatile.useVersion >= 4) {
         return this.drawBBox2(cameraPos);
     }
 
-    var renderer = this.map.renderer;
+    const renderer = this.map.renderer;
+
+    if (!this.helper) {
+        this.helper = renderer.createBBox(this.bbox)
+    }
+
+    /*
+    this.helper.position.set( this.bbox.min[0] - cameraPos[0], this.bbox.min[1] - cameraPos[1], this.bbox.min[2] - cameraPos[2] );
+    this.helper.scale.set( this.bbox.side(0), this.bbox.side(1), this.bbox.side(2) );
+    this.helper.updateMatrix();
+    this.helper.updateWorldMatrix();
+    */
+
+
+    this.helper.box.setFromCenterAndSize( this.helper.box.min.clone().set((this.bbox.min[0] + this.bbox.max[0])*0.5 - cameraPos[0],
+                                                                          (this.bbox.min[1] + this.bbox.max[1])*0.5 - cameraPos[1],
+                                                                          (this.bbox.min[2] + this.bbox.max[2])*0.5 - cameraPos[2]),
+                                          this.helper.box.min.clone().set(this.bbox.side(0), this.bbox.side(1), this.bbox.side(2) ) );
+
+    renderer.addSceneObject(this.helper);
+
+    /*
 
     renderer.gpu.useProgram(renderer.progBBox, ['aPosition']);
 
@@ -662,20 +684,21 @@ MapMetanode.prototype.drawBBox = function(cameraPos) {
 
     //draw bbox
     renderer.bboxMesh.draw(renderer.progBBox, 'aPosition');
+    */
 };
 
 
 MapMetanode.prototype.drawBBox2 = function() {
-    //var spoints = []; 
+    //var spoints = [];
     //for (var i = 0, li = this.bbox2.length; i < li; i++) {
         //var pos = this.bbox2[i];
         //pos = ["obj", pos[0], pos[1], "fix", pos[2], 0, 0, 0, 10, 90 ];
-        
+
     var bbox = this.bbox2;
     var buffer = this.map.draw.bboxBuffer;
     var camPos = this.map.camera.position;
-    var renderer = this.map.renderer;
-    var prog = renderer.progBBox2;
+    //var renderer = this.map.renderer;
+    //var prog = renderer.progBBox2;
 
     for (var i = 0, li = 8*3; i < li; i+=3) {
         //var pos = ["obj", bbox[i], bbox[i+1], "fix", bbox[i+2], 0, 0, 0, 10, 90 ];
@@ -685,19 +708,25 @@ MapMetanode.prototype.drawBBox2 = function() {
         buffer[i+1] = bbox[i+1] - camPos[1];
         buffer[i+2] = bbox[i+2] - camPos[2];
     }
-    
 
+
+    const renderer = this.map.renderer;
+
+    if (!this.helper) {
+        this.helper = renderer.bboxMesh2.clone();
+    }
+
+    this.helper.onBeforeRender = renderer.bboxMaterial.userData.onRender.bind(this.helper, buffer.slice());
+
+    renderer.addSceneObject(this.helper);
+
+    //this.helper.onBeforeRender = this.helper.material.userData.onRender.bind(this.helper, gpuTexture, t, flags, splitMask);
+
+
+    /*
     renderer.gpu.useProgram(prog, ['aPosition']);
 
     prog.setFloatArray('uPoints', buffer);
-
-    //var mvp = mat4.create();
-    //var mv = mat4.create();
-
-    //mat4.multiply(renderer.camera.getModelviewMatrix(), this.getWorldMatrix(cameraPos), mv);
-
-    //var proj = renderer.camera.getProjectionMatrix();
-    //mat4.multiply(proj, mv, mvp);
 
     var mvp = renderer.camera.getMvpMatrix();
 
@@ -705,13 +734,14 @@ MapMetanode.prototype.drawBBox2 = function() {
 
     //draw bbox
     renderer.bboxMesh2.draw(prog, 'aPosition');
+    */
 };
 
 MapMetanode.prototype.drawPlane = function(cameraPos, tile) {
     var renderer = this.map.renderer;
     var buffer = this.map.draw.planeBuffer;
     var points = this.plane;
-    
+
     if (!points) {
         return;
     }
@@ -722,19 +752,19 @@ MapMetanode.prototype.drawPlane = function(cameraPos, tile) {
     var mv = renderer.camera.getModelviewMatrix();
     var proj = renderer.camera.getProjectionMatrix();
     mat4.multiply(proj, mv, mvp);
-    
+
     var sx = cameraPos[0];
     var sy = cameraPos[1];
     var sz = cameraPos[2];
 
     for (var i = 0; i < 9; i++) {
         var index = i*3;
-        buffer[index] = points[index] - sx; 
-        buffer[index+1] = points[index+1] - sy; 
-        buffer[index+2] = points[index+2] - sz; 
+        buffer[index] = points[index] - sx;
+        buffer[index+1] = points[index+1] - sy;
+        buffer[index+2] = points[index+2] - sz;
     }
-    
-    var prog = renderer.progPlane; 
+
+    var prog = renderer.progPlane;
 
     prog.setMat4('uMV', mv);
     prog.setMat4('uProj', proj);
@@ -757,7 +787,7 @@ MapMetanode.prototype.drawPlane = function(cameraPos, tile) {
     prog.setVec4('uParams2', [0, 0, blend, 0]);
 
     renderer.gpu.bindTexture(renderer.heightmapTexture);
-    
+
     //draw bbox
     renderer.planeMesh.draw(renderer.progPlane, 'aPosition', 'aTexCoord');
 };
@@ -769,7 +799,7 @@ MapMetanode.prototype.getGridHeight = function(coords, data, dataWidth) {
     var y = coords[1]  - this.lly;
     var maxX = (dataWidth-1);
     var maxY = (dataWidth-1);
-    
+
     //data coords
     x = (maxX) * (x / (this.urx - this.llx));
     y = (maxY) * (y / (this.ury - this.lly));
@@ -786,7 +816,7 @@ MapMetanode.prototype.getGridHeight = function(coords, data, dataWidth) {
 
     var index = iy * dataWidth;
     var index2 = (iy == maxY) ? index : index + dataWidth;
-    var ix2 = (ix == maxX) ? ix : ix + 1; 
+    var ix2 = (ix == maxX) ? ix : ix + 1;
     var h00 = data[index + ix];
     var h01 = data[index + ix2];
     var h10 = data[index2 + ix];
@@ -799,4 +829,3 @@ MapMetanode.prototype.getGridHeight = function(coords, data, dataWidth) {
 };
 
 export default MapMetanode;
-
