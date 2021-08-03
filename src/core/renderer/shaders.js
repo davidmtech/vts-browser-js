@@ -305,17 +305,24 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
 
 
     GpuShaders.textVertexShader =
+        'uniform mat4 uProj;\n'+
+        'attribute vec3 color;\n'+
+        //'attribute vec2 uv;\n'+
         'varying vec3 vColor;\n'+
+        'varying vec2 vUv;\n'+
         'void main(){ \n'+
             'vColor = color;\n'+
-            'gl_Position =  projectionMatrix * modelViewMatrix * vec4(position.x, position.y, position.z, 1.0);\n'+
+            'vUv = uv;\n'+
+            'gl_Position =  uProj * vec4(position.x, position.y, position.z, 1.0);\n'+
         '}';
 
 
     GpuShaders.textFragmentShader = 'precision mediump float;\n'+
+        'uniform sampler2D map;\n'+
         'varying vec3 vColor;\n'+
+        'varying vec2 vUv;\n'+
         'void main() {\n'+
-            'gl_FragColor.xyz = vColor;\n'+
+            'gl_FragColor.xyz = vColor * texture2D(map, vUv.xy * vec2(1.0/256.0, 1.0/128.0)).xyz;\n'+
             'gl_FragColor.w = 1.0;\n'+
         '}';
 

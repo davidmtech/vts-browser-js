@@ -87,8 +87,14 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
     this.draw = {
 
-        getTextSize : (function(){}),
-        drawText : (function(){}),
+        getTextSize : (function(size, text){
+            return this.getTextSize(size, text);
+        }).bind(this),
+
+        drawText : (function(x, y, size, text, color, depth){
+            this.addText(x,y,depth, color[0]*255, color[1]*255, color[2]*255, size, text);
+        }).bind(this),
+
         drawBall : (function(){}),
 
         clearJobHBuffer : (function(){}),
@@ -107,6 +113,9 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.scene = new THREE.Scene();
     //this.scene.background = new THREE.Color( 0xaaaaaa );
     this.scene.background = new THREE.Color( 0xaa0000 );
+
+    this.scene2D = new THREE.Scene();
+
 
     this.camera2 = new THREE.PerspectiveCamera( 45, this.aspectRatio, 0.1, 10000);
     this.camera2.position.set(  0, 200, 0 );
@@ -295,18 +304,26 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
      this.bboxMaterial = this.generateBBoxMaterial();
      this.bboxMesh2 = this.createBBox2();
 
+     this.textTexture = (new THREE.TextureLoader()).load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAACACAMAAADTa0c4AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAAAA////pdmf3QAABIFJREFUeNrsnNuyqzAIhsP7v/Se6Yxra0L4OUVNCzetVqP5DAQItrVOiLg95739NnfOaR99RDj6esBw+CKZXiMK4PiuBkAcANoHAP3J5fzzAV2jePQIt6f4Ndb/MIChlVcCEFpAACZPfN4KUAF0/ufboDW3AuBMFgBwHTCfg2ftYgDUKBuA1ABuHKvA2P+5XdONIEt7BO2o2MdlAJoTQOsV6GEAswt0Zq/bsBhdeQQkqEDMwmIAnJHzA8i3ASkWRFKBbADyLGB3mlYD6DyhA4DfBlgsBDtirUPcBgC5woStYMgVtgKATWcB6DskKUEkGFLYrGw3+l3ydR16wKbbPDlWp4Xfo9vZwR1jtOMA6GkABrdvNmt1Vluy6pyvxu4Xt62fquyTggCTsIkCoIuv8gAA08w+ATBXAdSRY56xPDFPx/VPWFZp5v65kFMPgFjP70YASMfRsDn01xLPcwkRq1HLMoK647hR8v+nId74MQBjvIbUQePra42ZVXVcBCR3mIY89mYAlNGLflqA0V1seosCQNMg80B0bsLGAIDNwvFyiqu66ngVGGMGVBwyWwIwpty2DqEr/qf0Bq+DbjYkkcr4VUoOxiRjrYn3YY5SC4BQB/cF0Lq4kD1RCJ+tN4g6Jps5zfWu+QmSz9sUABkA0BIAXocmBwCJ99MDIASATkmtLQAIft4IgE/ZDStZ59yQbOQQAGZWYMbZ3FFCAGRHnwHQznegGAE+zwxNi8kALCOgS9tzAC4jYG1Qo0myRm0Ae/z8eleqewBoZLwfUswCsbT1KgBZD6QAzAEoXUe3K+xxVf2uLf5U3nBeMPRyACW/LtrwVX989id3PRQOG5Io6vh9XwC6stHIdGdJozun03lxNlwvH4u6UgDM8/LmJyx7ak12feEebaXmUwCOYJWk1JcYKsl74HL74wAaH93NqkE1FSKXc4cv0AjaPEEPgE4ru/ieWdvzVq/4psG3AYDFHlEAioQCuEgMgPjK1VDrqlkbTABAiQBGK38B0BlBSf9xtiAJQDM4NtDqMlaeyduTtkDjHgAtEQBj5ZGK2QE0aCcMAIxLSw0WVYlGDgOQXWE+afouAM0S398O4Nej3wIQf4cIHSfz9pbWugyep4MFIAFARvspbm8BcE2DOdvWnCJQAWFhJ/hKzh4AaB2A7NxedKmLPc+6PN4cL2S8GYC1QMIEQJvmFsJfxdvkEQAoLV4AogBS8/kNvdXlWe5GKhABvQUAZASDALJffY1XfsrToFXFbvYD1gBo6wC8LR7/uvj9CwHcfWuoUJItsVl5nwWAnhxxqsXatUq0OYCcaS/fkbK61u5H8jwAuUIEZXHNL1Jmub5oSKZWiDR9FttM4HEAigqRpn8TeB2AuWNiByAXSHCGbB7/3qYCfgCgPgADEEskbjCCaJDB/+kR6wP4P1Obl8jsBwDUB4yAxqKkthaATjX0KmCtDyCxm+yIMLjCbwBgrg94FYC3h8vLPPmfAVBSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlLy9fJPgAEAvWMULbGsSjwAAAAASUVORK5CYII=');
+     this.textTexture.magFilter = THREE.NearestFilter;
+     this.textTexture.minFilter = THREE.NearestFilter;
+     this.textTexture.flipY = false;
+
+
      this.textMaterial = new THREE.ShaderMaterial( {
-         uniforms: {},
-         vertexShader: GpuShaders.bbox2VertexShader,
-         fragmentShader: GpuShaders.bboxFragmentShader
+         uniforms: {
+            map : { value: this.textTexture },
+            uProj : { value : new THREE.Matrix4() }
+         },
+         vertexShader: GpuShaders.textVertexShader,
+         fragmentShader: GpuShaders.textFragmentShader
      } );
 
+     this.textMaterial.side = THREE.DoubleSide;
 
-     this.textBuffer = this.createTextBuffer(3*2*256);
+     this.textBuffers = [];
      this.textBufferIndex = 0;
-
-     this.cleanTexts();
-     this.addText(100,100,0.5, 255, 0, 255, 50, "aa");
+     this.textBufferSize = 3*2*256;
 
      var factor = 1;
      this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
@@ -314,23 +331,53 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
 
 Renderer.prototype.cleanTexts = function() {
+
+    for (let i = 0, li = this.textBufferIndex + 1; i < li; i++) {
+        let buffer = this.textBuffers[i];
+        if (buffer) {
+            buffer.index = 0;
+            buffer.index2 = 0;
+        }
+    }
+
     this.textBufferIndex = 0;
 }
 
 
 Renderer.prototype.addText = function(x,y,z,r,g,b, size, text) {
-    const index = this.textBufferIndex;
-    const vertices = this.textBuffer.geometry.attributes.position.array;
-    const colors = this.textBuffer.geometry.attributes.color.array;
+
+    const memorySize = (text.length + 1) * 18;
+
+    let buffer = this.textBuffers[this.textBufferIndex];
+
+    if (!buffer) {
+        buffer = { mesh:this.createTextBuffer(this.textBufferSize), index:0, index2:0 };
+        this.textBuffers[this.textBufferIndex] = buffer;
+    }
+
+    if (buffer.index + memorySize > this.textBufferSize) {
+        this.textBufferIndex++
+
+        buffer = this.textBuffers[this.textBufferIndex];
+
+        if (!buffer) {
+            buffer = { mesh:this.createTextBuffer(this.textBufferSize), index:0, index2:0 };
+            this.textBuffers[this.textBufferIndex] = buffer;
+        }
+    }
+
+    const vertices = buffer.mesh.geometry.attributes.position.array;
+    const colors = buffer.mesh.geometry.attributes.color.array;
+    const uvs = buffer.mesh.geometry.attributes.uv.array;
 
     const sizeX = size - 1;
     const sizeY = size;
     const sizeX2 = Math.round(size*0.5);
 
-    //var texelX = 1 / 256;
-    //var texelY = 1 / 128;
+    let index = buffer.index;
+    let index2 = buffer.index2;
 
-    const lx = this.draw.getTextSize(size, text) + 2;
+    const lx = this.getTextSize(size, text) + 2;
 
     //draw black line before text
     let char = 0;
@@ -338,9 +385,9 @@ Renderer.prototype.addText = function(x,y,z,r,g,b, size, text) {
     let charPosY = (char >> 4) << 4;
     let x1,x2,y1,y2,u1,u2,v1,v2;
 
-    x1 = x-2, y1 = y-2, u1 = (charPosX * texelX), v1 = (charPosY * texelY);
-    x2 = x-2 + lx, u2 = ((charPosX+15) * texelX);
-    y2 = y + sizeY+1, v2 = ((charPosY+15) * texelY);
+    x1 = x-2, y1 = y-2, u1 = charPosX, v1 = charPosY;
+    x2 = x-2 + lx, u2 = charPosX+15;
+    y2 = y + sizeY+1, v2 = charPosY+15;
 
     //black box
     for (let i = index, li = i+18; i < li; i+=3) {
@@ -351,9 +398,9 @@ Renderer.prototype.addText = function(x,y,z,r,g,b, size, text) {
 
     //same color for all letters
     for (let i = index + 18, li = i + text.length * 18; i < li; i+=3) {
-        colors[index] = r;
-        colors[index+1] = g;
-        colors[index+2] = b;
+        colors[i] = r;
+        colors[i+1] = g;
+        colors[i+2] = b;
     }
 
     for (let i = -1, li = text.length; i < li; i++) {
@@ -373,17 +420,17 @@ Renderer.prototype.addText = function(x,y,z,r,g,b, size, text) {
             case 76: //l
             case 84: //t
 
-                x1 = x, y1 = y,  u1 = (charPosX * texelX), y1 = (charPosY * texelY),
-                x2 = x + sizeX2, u2 = ((charPosX+8) * texelX),
-                y2 = y + sizeY, v2 = ((charPosY+16) * texelY);
+                x1 = x, y1 = y,  u1 = charPosX, v1 = charPosY,
+                x2 = x + sizeX2, u2 = charPosX+8,
+                y2 = y + sizeY, v2 = charPosY+16;
                 x += sizeX2;
                 break;
 
             default:
 
-                x1 = x, y1 = y,  u1 = (charPosX * texelX), y1 = (charPosY * texelY);
-                x2 = x + sizeX, u2 = ((charPosX+15) * texelX);
-                y2 = y + sizeY, v2 = ((charPosY+16) * texelY);
+                x1 = x, y1 = y,  u1 = charPosX, v1 = charPosY;
+                x2 = x + sizeX, u2 = charPosX+15;
+                y2 = y + sizeY, v2 = charPosY+16;
                 x += sizeX;
                 break;
             }
@@ -409,10 +456,57 @@ Renderer.prototype.addText = function(x,y,z,r,g,b, size, text) {
         vertices[index+16] = y1;
         vertices[index+17] = z;
 
+        uvs[index2] = u1;
+        uvs[index2+1] = v1;
+        uvs[index2+2] = u2;
+        uvs[index2+3] = v1;
+        uvs[index2+4] = u2;
+        uvs[index2+5] = v2;
+
+        uvs[index2+6] = u2;
+        uvs[index2+7] = v2;
+        uvs[index2+8] = u1;
+        uvs[index2+9] = v2;
+        uvs[index2+10] = u1;
+        uvs[index2+11] = v1;
+
         index += 18;
+        index2 += 12;
     }
 
-    this.textBufferIndex = index;
+    buffer.index = index;
+    buffer.index2 = index2;
+};
+
+
+Renderer.prototype.getTextSize = function(size, text) {
+
+    var sizeX = size - 1;
+    var sizeX2 = Math.round(size*0.5);
+    var x = 0;
+
+    for (var i = 0, li = text.length; i < li; i++) {
+        var char = text.charCodeAt(i) - 32;
+
+        switch(char) {
+        case 12:
+        case 14:
+        case 27: //:
+        case 28: //;7
+        case 64: //'
+        case 73: //i
+        case 76: //l
+        case 84: //t
+            x += sizeX2;
+            break;
+
+        default:
+            x += sizeX;
+            break;
+        }
+    }
+
+    return x;
 };
 
 
@@ -532,9 +626,12 @@ Renderer.prototype.startRender = function(options) {
 
     this.camera2.position.fromArray(this.camera.position);
     this.camera2.setRotationFromMatrix( new THREE.Matrix4().fromArray(this.camera.rotationview).invert());
+    this.camera2.fov = this.camera.fov * 2;
     this.camera2.near = this.camera.near;
     this.camera2.far = this.camera.far;
     this.camera2.updateProjectionMatrix();
+
+    this.cleanTexts();
 }
 
 Renderer.prototype.addSceneObject = function(object) {
@@ -545,16 +642,26 @@ Renderer.prototype.addSceneObject = function(object) {
 
 Renderer.prototype.finishRender = function(options) {
 
+    //this.scene.clear();
     this.gpu2.render( this.scene, this.camera2 );
 
+    if (this.textBuffers.length && this.textBuffers[0].index > 0) {
+        this.scene2D.clear();
+
+        for (let i = 0, li = this.textBufferIndex + 1; i < li; i++) {
+            const buffer = this.textBuffers[i];
+            buffer.mesh.geometry.attributes.position.needsUpdate = true;
+            buffer.mesh.geometry.attributes.color.needsUpdate = true;
+            buffer.mesh.geometry.attributes.uv.needsUpdate = true;
+
+            buffer.mesh.geometry.setDrawRange(0, Math.floor(buffer.index / 3));
+            this.scene2D.add(buffer.mesh);
+        }
+
+        this.gpu2.render( this.scene2D, this.orthoCamera );
+    }
 }
 
-
-Renderer.prototype.createTexture = function(options) {
-
-    this.renderer.camera2.setPosition();
-
-}
 
 Renderer.prototype.createTexture = function(options) {
 
@@ -602,12 +709,16 @@ Renderer.prototype.createTextBuffer = function(size) {
     const geometry = new THREE.BufferGeometry();
     const vertices = new Float32Array(size*3);
     const colors = new Uint8Array(size*3);
+    const uvs = new Uint8Array(size*2);
 
     const att = new THREE.Float32BufferAttribute( vertices, 3, false )
     geometry.setAttribute( 'position', att );
 
     const att2 = new THREE.Uint8BufferAttribute( colors, 3, true )
     geometry.setAttribute( 'color', att2 );
+
+    const att3 = new THREE.Uint8BufferAttribute( uvs, 2, false )
+    geometry.setAttribute( 'uv', att3 );
 
     const mesh = new THREE.Mesh( geometry, this.textMaterial);
     mesh.frustumCulled = false;
@@ -734,13 +845,14 @@ Renderer.prototype.resizeGL = function(width, height, skipCanvas, skipPaint) {
     this.camera2.aspect = width / height;
     this.camera2.updateProjectionMatrix();
 
-    /*
-    this.camera2D.left = width / -2;
-    this.camera2D.right = width / 2;
-    this.camera2D.top = height / -2;
-    this.camera2D.bottom = height / 2;
-    this.camera2D.updateProjectionMatrix();
-    */
+    this.orthoCamera.left = width / -2;
+    this.orthoCamera.right = width / 2;
+    this.orthoCamera.top = height / -2;
+    this.orthoCamera.bottom = height / 2;
+    this.orthoCamera.updateProjectionMatrix();
+
+    this.textMaterial.uniforms.uProj.value = (new THREE.Matrix4()).fromArray(m),
+    this.textMaterial.uniforms.uProj.needsUpdate = true;
 
    if (!this.gpu2) {
        this.gpu2 = new THREE.WebGLRenderer( { antialias: false } );

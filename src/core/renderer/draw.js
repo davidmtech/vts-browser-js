@@ -568,6 +568,9 @@ RendererDraw.prototype.drawText = function(x, y, size, text, color, depth, useSt
 
 
 RendererDraw.prototype.getTextSize = function(size, text) {
+
+    debugger;
+
     var sizeX = size - 1;
     var sizeX2 = Math.round(size*0.5);
     var x = 0;
