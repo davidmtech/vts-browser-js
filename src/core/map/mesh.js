@@ -75,7 +75,8 @@ MapMesh.prototype.killSubmeshes = function(killedByCache) {
 MapMesh.prototype.killGpuSubmeshes = function(killedByCache) {
     var size = 0;
     for (var i = 0, li = this.gpuSubmeshes.length; i < li; i++) {
-        this.gpuSubmeshes[i].kill();
+        //this.gpuSubmeshes[i].kill();
+        this.gpuSubmeshes[i].geometry.dispose();
         size += this.gpuSubmeshes[i].gpuSize;
     }
 
@@ -403,6 +404,7 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
 
     const submesh = this.submeshes[index];
     const gpuSubmesh = this.gpuSubmeshes[index];
+    const drawWireframe = this.map.draw.debug.drawWireframe;
 
     if (!gpuSubmesh || !texture) {
         return;
@@ -420,25 +422,93 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
 
     let flags = 0;
     let material = null;
+    let params, paramsC8;
 
-    //splitMask = [1,0,0,0];
+    if (drawWireframe == 1) {
+        gpuSubmesh.material = renderer.wireferameMaterial;
+        gpuSubmesh.onBeforeRender = (function(){});
 
-    if (splitMask) flags |= VTS_MAT_FLAG_C4;
+        /*if (!gpuSubmesh.userData.wiredMesh) {
+            gpuSubmesh.userData.wiredMesh = renderer.createWiredMesh(gpuSubmesh);
+            gpuSubmesh.userData.wiredMesh.renderOrder = 10;
+        }
 
-    material = renderer.tileMaterials[flags];
+        renderer.addSceneObject(gpuSubmesh.userData.wiredMesh);
 
-    if (!material) {
-        material = renderer.generateTileMaterial({ flags: flags, onRender: renderer.tileMaterial.userData.onRender });
-        renderer.tileMaterials[flags] = material;
+        return;*/
+
+    } else {
+
+        if (drawWireframe == 2 || drawWireframe == 3) {
+            flags |= VTS_MAT_FLAG_FLAT;
+        }
+
+        switch(type) {
+        case VTS_MATERIAL_INTERNAL:
+        case VTS_MATERIAL_INTERNAL_NOFOG:
+            flags |= VTS_MAT_FLAG_UVS;
+            break;
+        case VTS_MATERIAL_FLAT:
+            flags |= VTS_MAT_FLAG_FLAT;
+            break;
+        }
+
+        //splitMask = [1,0,0,0];
+
+        if (splitMask) {
+            if (splitMask.length == 4) {
+                flags |= VTS_MAT_FLAG_C4;
+            } else {
+                flags |= VTS_MAT_FLAG_C8;
+
+                const p = this.map.camera.position;
+                const s = splitSpace;
+
+                params = new Array(16);
+                paramsC8 = new Array(16);
+
+                const m = paramsC8;
+
+                m[0] = s[0][0] - p[0]; m[1] = s[0][1] - p[1]; m[2] = s[0][2] - p[2]; //c
+                m[4] = s[1][0] - s[0][0]; m[5] = s[1][1] - s[0][1]; m[6] = s[1][2] - s[0][2]; //px
+                m[8] = s[2][0] - s[1][0]; m[9] = s[2][1] - s[1][1]; m[10] = s[2][2] - s[1][2]; //py
+                m[12] = s[4][0] - s[0][0]; m[13] = s[4][1] - s[0][1]; m[14] = s[4][2] - s[0][2]; m[15] = 0; //pz
+
+                const bmin = submesh.bbox.min, bmax = submesh.bbox.max;
+
+                m[3] = bmin[0] - p[0];
+                m[7] = bmin[1] - p[1];
+                m[11] = bmin[2] - p[2];
+
+                const m2 = params;
+
+                m2[0] = 0, m2[1] = 0, m2[2] = bmax[0] - bmin[0], m2[3] = bmax[1] - bmin[1];
+                m2[4] = 0, m2[5] = 0, m2[6] = 0, m2[7] = 0;
+                m2[8] = 0, m2[9] = 0, m2[10] = 0, m2[11] = 0;
+                m2[12] = bmax[2] - bmin[2], m2[13] = bmin[0], m2[14] = bmin[1], m2[15] = bmin[2];
+
+            }
+        }
+
+        material = renderer.tileMaterials[flags];
+
+        if (!material) {
+            material = renderer.generateTileMaterial({ flags: flags, onRender: renderer.tileMaterial.userData.onRender });
+            renderer.tileMaterials[flags] = material;
+        }
+
+        if (drawWireframe == 2) {
+            material.polygonOffset = true;
+            material.polygonOffsetFactor = 1;
+        } else {
+            material.polygonOffset = false;
+        }
+
+        gpuSubmesh.material = material;
+        gpuSubmesh.onBeforeRender = gpuSubmesh.material.userData.onRender.bind(gpuSubmesh, gpuTexture, t, flags, splitMask, params, paramsC8);
+
     }
 
-    gpuSubmesh.material = material;
-
-    //if (!gpuSubmesh.material.userData.onRender) {
-    //    return;
-    //}
-
-    gpuSubmesh.onBeforeRender = gpuSubmesh.material.userData.onRender.bind(gpuSubmesh, gpuTexture, t, flags, splitMask);
 
     const bbox = gpuSubmesh.bbox;
 
@@ -447,6 +517,20 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
     }
 
     renderer.addSceneObject(gpuSubmesh);
+
+    if (drawWireframe == 2) {
+        if (!gpuSubmesh.userData.wiredMesh) {
+            gpuSubmesh.userData.wiredMesh = renderer.createWiredMesh(gpuSubmesh);
+            gpuSubmesh.userData.wiredMesh.renderOrder = 10;
+        }
+
+        if (bbox) {
+            gpuSubmesh.userData.wiredMesh.position.set( bbox.min[0] - cameraPos[0], bbox.min[1] - cameraPos[1], bbox.min[2] - cameraPos[2] );
+        }
+
+        renderer.addSceneObject(gpuSubmesh.userData.wiredMesh);
+    }
+
     return;
 
     /*

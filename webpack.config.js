@@ -35,11 +35,12 @@ var plugins = [
       'VTS_MATERIAL_EXTERNAL':        6,
       'VTS_MATERIAL_EXTERNAL_NOFOG':  7,
 
-      'VTS_MAT_FLAG_C4':  (1<<0),
-      'VTS_MAT_FLAG_C8':  (1<<1),
-      'VTS_MAT_FLAG_FLAT':  (1<<2),
-      'VTS_MAT_FLAG_FOG':  (1<<3),
-      'VTS_MAT_FLAG_MASK':  (1<<4),
+      'VTS_MAT_FLAG_UVS':  (1<<0),
+      'VTS_MAT_FLAG_C4':  (1<<1),
+      'VTS_MAT_FLAG_C8':  (1<<2),
+      'VTS_MAT_FLAG_FLAT':  (1<<3),
+      'VTS_MAT_FLAG_FOG':  (1<<4),
+      'VTS_MAT_FLAG_MASK':  (1<<5),
 
       'VTS_PIPELINE_BASIC':           0,
       'VTS_PIPELINE_HMAP':            1,

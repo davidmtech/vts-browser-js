@@ -898,6 +898,8 @@ MapSubmesh.prototype.getWorldMatrixSE = function(geoPos, matrix) {
 MapSubmesh.prototype.drawBBox = function(cameraPos) {
     var renderer = this.map.renderer;
 
+    return;
+
     renderer.gpu.useProgram(renderer.progBBox, ['aPosition']);
 
     var mvp = mat4.create();

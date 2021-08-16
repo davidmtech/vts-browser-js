@@ -14,6 +14,7 @@ GpuShaders.tileVertexShader =
     '#ifdef clip8\n'+
         'varying vec3 vClipCoord;\n'+
 
+        'uniform mat4 uParams;\n'+  //[zfactor, fogDensity, scale.xy][camVec.xyzw][transform.xyzw][scale.z, trans.xyz]
         'uniform mat4 uParamsC8;\n'+  //c,x,y,z
 
         'float getLinePointParametricDist(vec3 c, vec3 v, vec3 p) {\n'+
@@ -38,8 +39,12 @@ GpuShaders.tileVertexShader =
     'uniform vec4 uvTrans;\n'+
     'varying vec2 vUv;\n'+
 
+    '#ifdef uvs\n'+
+        'attribute vec2 uv2;\n'+
+    '#endif\n'+
+
                              //0-3                            4-7          8-11            12-15
-    //'uniform uParams;\n'+  //[zfactor, fogDensity, scale.xy][camVec.xyzw][transform.xyzw][scale.z, trans.xyz]
+    //'uniform mat4 uParams;\n'+  //[zfactor, fogDensity, scale.xy][camVec.xyzw][transform.xyzw][scale.z, trans.xyz]
 
     '#ifdef applySE\n'+
         'uniform mat4 uParamsSE;\n'+
@@ -103,7 +108,11 @@ GpuShaders.tileVertexShader =
         'vUv = vec2(uv.x * uvTrans.x + uvTrans.z, uv.y * uvTrans.y + uvTrans.w);\n' +
 
         '#ifdef clip4\n'+
-            'vClipCoord.xy = uv.xy;\n'+
+            '#ifdef uvs\n'+
+                'vClipCoord.xy = uv2.xy;\n'+
+            '#else\n'+
+                'vClipCoord.xy = uv.xy;\n'+
+            '#endif\n'+
         '#endif\n'+
 
         '#ifdef clip8\n'+
@@ -227,14 +236,14 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
             '#ifdef flatShadeVarFallback\n'+
                 'vec4 flatShadeData = vec4(1.0);\n'+
             '#else\n'+
-                '#ifdef GL_OES_standard_derivatives\n'+
+                //clip8'#ifdef GL_OES_standard_derivatives\n'+
                     'vec3 nx = dFdx(vBarycentric);\n'+
                     'vec3 ny = dFdy(vBarycentric);\n'+
                     'vec3 normal=normalize(cross(nx,ny));\n'+
                     'vec4 flatShadeData = vec4(vec3(max(0.0,normal.z*(204.0/255.0))+(32.0/255.0)),1.0);\n'+
-                '#else\n'+
-                    'vec4 flatShadeData = vec4(1.0);\n'+
-                '#endif\n'+
+                //'#else\n'+
+                //    'vec4 flatShadeData = vec4(1.0);\n'+
+                //'#endif\n'+
             '#endif\n'+
 
         '#endif\n'+

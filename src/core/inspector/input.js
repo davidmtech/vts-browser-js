@@ -95,7 +95,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
                 switch(keyCode) {
                 case 68:
                 case 100:
-                    
+
                     inspector.enableInspector();
                     this.diagnosticMode = true; hit = true; break;  //key D pressed
                 }
@@ -206,7 +206,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
 
                 case 87:
                 case 119:
-                    
+
                     if (debug.drawWireframe == 3) {
                         debug.drawWireframe = 1;
                     } else {
@@ -232,7 +232,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
 
                 case 77:
                 case 109:
-                    map.loaderSuspended = !map.loaderSuspended;            
+                    map.loaderSuspended = !map.loaderSuspended;
                     // eslint-disable-next-line
                     console.log('loader state ' + map.loaderSuspended);
 
@@ -294,7 +294,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
                 }
 
                 hit = true;
-            } 
+            }
         }
 
         if (this.diagnosticMode && inspector.drawRadar && !this.shiftDown && !press) {
@@ -486,7 +486,7 @@ InspectorInput.prototype.setParameter = function(key, value) {
             inspector.radarLod = parseInt(value);
             if (isNaN(inspector.radarLod)) {
                 inspector.radarLod = null;
-            } 
+            }
             break;
 
     }
@@ -495,4 +495,3 @@ InspectorInput.prototype.setParameter = function(key, value) {
 };
 
 export default InspectorInput;
-

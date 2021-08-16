@@ -2,8 +2,8 @@
 import {vec3 as vec3_, mat4 as mat4_} from '../utils/matrix';
 //import GpuDevice_ from './gpu/device';
 //import GpuTexture_ from './gpu/texture';
-//import GpuFont_ from './gpu/font';
-import GpuShaders_ from './shaders';
+import RendererFont_ from './font';
+import RendererShaders_ from './shaders';
 
 import * as THREE from './libs/three.module.js';
 
@@ -16,12 +16,12 @@ import RenderRMap_ from './rmap';
 const vec3 = vec3_, mat4 = mat4_;
 //var GpuDevice = GpuDevice_;
 //var GpuTexture = GpuTexture_;
-//var GpuFont = GpuFont_;
+const RendererFont = RendererFont_;
 const Camera = Camera_;
 const RenderInit = RenderInit_;
 const RenderDraw = RenderDraw_;
 const RenderRMap = RenderRMap_;
-const GpuShaders = GpuShaders_;
+const RendererShaders = RendererShaders_;
 
 var matCounter = 1;
 
@@ -97,6 +97,8 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
         drawBall : (function(){}),
 
+        drawGpuJobs : (function(){}),
+
         clearJobHBuffer : (function(){}),
         clearJobBuffer : (function(){}),
     }
@@ -114,6 +116,7 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     //this.scene.background = new THREE.Color( 0xaaaaaa );
     this.scene.background = new THREE.Color( 0xaa0000 );
 
+    this.scene2 = new THREE.Scene();
     this.scene2D = new THREE.Scene();
 
 
@@ -274,7 +277,7 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
      this.tileMaterial = this.generateTileMaterial({
 
-         onRender: (function(texture, t, flags, splitMask){
+         onRender: (function(texture, t, flags, splitMask, params, paramsC8){
 
              //if (this.material.userData.shader) {
                  //this.material.userData.shader.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
@@ -290,6 +293,16 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
                      this.material.uniforms.uClip.needsUpdate = true;
                  }
 
+                 if (flags & VTS_MAT_FLAG_C8){
+                     this.material.uniforms.uClip.value = splitMask.slice();
+                     this.material.uniforms.uClip.needsUpdate = true;
+
+                     this.material.uniforms.uParams.value.fromArray(params);
+                     this.material.uniforms.uParams.needsUpdate = true;
+
+                     this.material.uniforms.uParamsC8.value.fromArray(paramsC8);
+                     this.material.uniforms.uParamsC8.needsUpdate = true;
+                 }
 
                  this.material.uniformsNeedUpdate = true;
              //}
@@ -315,8 +328,8 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
             map : { value: this.textTexture },
             uProj : { value : new THREE.Matrix4() }
          },
-         vertexShader: GpuShaders.textVertexShader,
-         fragmentShader: GpuShaders.textFragmentShader
+         vertexShader: RendererShaders.textVertexShader,
+         fragmentShader: RendererShaders.textFragmentShader
      } );
 
      this.textMaterial.side = THREE.DoubleSide;
@@ -324,6 +337,10 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
      this.textBuffers = [];
      this.textBufferIndex = 0;
      this.textBufferSize = 3*2*256;
+
+     this.wireferameMaterial = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true, /*depthTest:false*/
+
+     });
 
      var factor = 1;
      this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
@@ -560,22 +577,31 @@ Renderer.prototype.generateTileMaterial = function(options) {
     //str += '#define TMIN ' + (0.5-this.map.config.mapSplitMargin) + '\n' + '#define TMAX ' + (0.5+this.map.config.mapSplitMargin) + '\n';
 
     if (options.flags) {
+
         if (options.flags & VTS_MAT_FLAG_C4){
             defines.clip4 = true;
             defines.TMIN = (0.5-this.config.mapSplitMargin);
             defines.TMAX = (0.5+this.config.mapSplitMargin);
             uniforms.uClip = { value: [1,1,1,1] };
-         }
-        if (options.flags & VTS_MAT_FLAG_C8) defines.clip8 = true;
-        if (options.flags & VTS_MAT_FLAG_FLAT) defines.flatShade = true;
+        }
+
+        if (options.flags & VTS_MAT_FLAG_C8){
+            defines.clip8 = true;
+            uniforms.uClip = { value: [1,1,1,1, 1,1,1,1] };
+            uniforms.uParams = { value: new THREE.Matrix4() };
+            uniforms.uParamsC8 = { value: new THREE.Matrix4() };
+        }
+
+        if (options.flags & VTS_MAT_FLAG_FLAT) defines.flatShade = true, defines.flatShadeVar = true;
+        if (options.flags & VTS_MAT_FLAG_UVS) defines.uvs = true;
     }
 
     const material = new THREE.ShaderMaterial( {
 
         defines : defines,
         uniforms: uniforms,
-        vertexShader: GpuShaders.tileVertexShader,
-        fragmentShader: GpuShaders.tileFragmentShader
+        vertexShader: RendererShaders.tileVertexShader,
+        fragmentShader: RendererShaders.tileFragmentShader
 
     } );
 
@@ -602,8 +628,8 @@ Renderer.prototype.generateBBoxMaterial = function() {
 
     const material = new THREE.ShaderMaterial( {
         uniforms: uniforms,
-        vertexShader: GpuShaders.bbox2VertexShader,
-        fragmentShader: GpuShaders.bboxFragmentShader
+        vertexShader: RendererShaders.bbox2VertexShader,
+        fragmentShader: RendererShaders.bboxFragmentShader
 
     } );
 
@@ -643,7 +669,36 @@ Renderer.prototype.addSceneObject = function(object) {
 Renderer.prototype.finishRender = function(options) {
 
     //this.scene.clear();
+
+    if (this.core.map.draw.debug.drawWireframe == 1) {
+        this.scene.background = new THREE.Color( 0xf9f9f9 );
+    } else {
+        this.scene.background = new THREE.Color( 0x000000 );
+    }
+
+
     this.gpu2.render( this.scene, this.camera2 );
+
+    /*
+    const drawWireframe = this.core.map.draw.debug.drawWireframe;
+
+    if (drawWireframe == 1 || drawWireframe == 2) {
+
+        const models = this.models.children;
+
+        for (let i = 0, li = models.length; i < li; i++) {
+            const model = models[i];
+
+            if (model.geometry) {
+                const model2 = new THREE.Mesh(model.geometry, this.wireferameMaterial);
+
+                this.scene2.clear();
+                this.scene2.add(model2);
+                this.gpu2.render(this.scene2, this.camera2 );
+            }
+
+        }
+    }*/
 
     if (this.textBuffers.length && this.textBuffers[0].index > 0) {
         this.scene2D.clear();
@@ -668,11 +723,26 @@ Renderer.prototype.createTexture = function(options) {
     const texture = new THREE.Texture(options.image);
     texture.width = options.width;
     texture.height = options.height;
+    //texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.NearestFilter;
+    texture.gpuSize = texture.width * texture.height * 4;
+    texture.needsUpdate = true;
+
+
+    return texture;
+};
+
+Renderer.prototype.createDataTexture = function(options) {
+
+    const texture = new THREE.DataTexture( options.data, options.width, options.height, THREE.RGBFormat );
+    //texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.NearestFilter;
     texture.gpuSize = texture.width * texture.height * 4;
     texture.needsUpdate = true;
 
     return texture;
 };
+
 
 Renderer.prototype.createBBox = function(bbox) {
 
@@ -726,6 +796,18 @@ Renderer.prototype.createTextBuffer = function(size) {
     return mesh;
 };
 
+Renderer.prototype.createWiredMesh = function(mesh) {
+
+    const mesh2 = new THREE.Mesh(mesh.geometry, this.wireferameMaterial);//gpuSubmesh.clone();
+    //gpuSubmesh.userData.wiredMesh.material = renderer.wireferameMaterial;
+    //mesh2.onBeforeRender = (function(){});
+    mesh2.frustumCulled = false;
+    mesh2.bbox = mesh.bbox;
+    mesh2.scale.set(mesh.scale.x,mesh.scale.y,mesh.scale.z);
+
+
+    return mesh2;
+};
 
 Renderer.prototype.createMesh = function(options) {
 /*
@@ -753,8 +835,16 @@ Renderer.prototype.createMesh = function(options) {
     if (uv) {
         if (options.use16bit) {
             geometry.setAttribute( 'uv', new THREE.Uint16BufferAttribute( uv, 2, true ) );
+
+            if (options.uvs && options.uvs2) {
+                geometry.setAttribute( 'uv2', new THREE.Uint16BufferAttribute( options.uvs2, 2, true ) );
+            }
         } else {
             geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 )/*.onUpload( disposeArray )*/ );
+
+            if (options.uvs && options.uvs2) {
+                geometry.setAttribute( 'uv2', new THREE.Float32BufferAttribute( options.uvs2, 2 ) );
+            }
         }
     }
 
@@ -1441,7 +1531,7 @@ Renderer.prototype.getBitmap = function(url, filter, tiled, hash, useHash) {
 Renderer.prototype.getFont = function(url) {
     var font = this.fonts[url];
     if (!font) {
-        font = new GpuFont(this.gpu, this.core, null, null, url);
+        font = new RendererFont(this.gpu, this.core, null, null, url);
         this.fonts[url] = font;
     }
 

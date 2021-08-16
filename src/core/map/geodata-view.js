@@ -2,13 +2,13 @@
 import {mat4 as mat4_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
 import {utils as utils_} from '../utils/utils';
-//import GpuGroup_ from '../renderer/gpu/group';
+import RenderGroup_ from '../renderer/group';
 import MapGeodataProcessor_ from './geodata-processor/processor';
 
 //get rid of compiler mess
-var mat4 = mat4_, math = math_, utils = utils_;
-//var GpuGroup = GpuGroup_;
-var MapGeodataProcessor = MapGeodataProcessor_;
+const mat4 = mat4_, math = math_, utils = utils_;
+const RenderGroup = RenderGroup_;
+const MapGeodataProcessor = MapGeodataProcessor_;
 
 var MapGeodataView = function(map, geodata, extraInfo) {
     this.map = map;
@@ -92,7 +92,7 @@ MapGeodataView.prototype.processPackedCommands = function(buffer, index) {
                 str = utils.unint8ArrayToString(new Uint8Array(buffer.buffer, index, length)); index+= length;
                 data = JSON.parse(str);
 
-                this.currentGpuGroup = new GpuGroup(data['id'], data['bbox'], data['origin'], this.gpu, this.renderer);
+                this.currentGpuGroup = new RenderGroup(data['id'], data['bbox'], data['origin'], this.gpu, this.renderer);
                 this.gpuGroups.push(this.currentGpuGroup);
 
                 //console.log('VTS_WORKERCOMMAND_GROUP_BEGIN ' + (this.tile ? JSON.stringify(this.tile.id) : '[free]'));
@@ -237,7 +237,7 @@ MapGeodataView.prototype.directParse = function(data) {
     for (var i = 0, li = nodes.length; i < li; i++) {
 
         //VTS_WORKERCOMMAND_GROUP_BEGIN
-        this.currentGpuGroup = new GpuGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
+        this.currentGpuGroup = new RenerGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
         this.gpuGroups.push(this.currentGpuGroup);
 
         this.directParseNode(nodes[i], 0);
@@ -249,7 +249,7 @@ MapGeodataView.prototype.directParse = function(data) {
 
 
 MapGeodataView.prototype.directBinParse = function(path) {
-    this.currentGpuGroup = new GpuGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
+    this.currentGpuGroup = new RenderGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
     this.gpuGroups.push(this.currentGpuGroup);
     this.currentGpuGroup.binPath = path;
 };
