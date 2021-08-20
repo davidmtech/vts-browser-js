@@ -404,25 +404,29 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
 
     const submesh = this.submeshes[index];
     const gpuSubmesh = this.gpuSubmeshes[index];
-    const drawWireframe = this.map.draw.debug.drawWireframe;
+    let drawWireframe = this.map.draw.debug.drawWireframe;
 
-    if (!gpuSubmesh || !texture) {
+    if (!gpuSubmesh) { // || !texture) {
         return;
     }
 
-    let gpuTexture = null;
+    let gpuTexture = null, t = null;
 
     if (texture) {
         gpuTexture = texture.getGpuTexture();
+        t = texture.getTransform();
     }
 
     const renderer = this.map.renderer;
 
-    const t = texture.getTransform();
-
     let flags = 0;
     let material = null;
     let params, paramsC8;
+
+    if (this.map.draw.drawChannel == 1) {
+        type = VTS_MATERIAL_DEPTH;
+        drawWireframe = 0;
+    }
 
     if (drawWireframe == 1) {
         gpuSubmesh.material = renderer.wireferameMaterial;
@@ -444,6 +448,9 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
         }
 
         switch(type) {
+        case VTS_MATERIAL_DEPTH:
+            flags |= VTS_MAT_FLAG_DEPTH;
+            break;
         case VTS_MATERIAL_INTERNAL:
         case VTS_MATERIAL_INTERNAL_NOFOG:
             flags |= VTS_MAT_FLAG_UVS;
@@ -486,7 +493,6 @@ MapMesh.prototype.drawSubmesh = function (cameraPos, index, texture, type, alpha
                 m2[4] = 0, m2[5] = 0, m2[6] = 0, m2[7] = 0;
                 m2[8] = 0, m2[9] = 0, m2[10] = 0, m2[11] = 0;
                 m2[12] = bmax[2] - bmin[2], m2[13] = bmin[0], m2[14] = bmin[1], m2[15] = bmin[2];
-
             }
         }
 

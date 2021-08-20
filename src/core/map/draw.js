@@ -567,9 +567,9 @@ MapDraw.prototype.drawToTexture = function(texture) {
 
 MapDraw.prototype.drawHitmap = function() {
     this.drawChannel = 1;
-    this.renderer.switchToFramebuffer('depth');
+    //this.renderer.switchToFramebuffer('depth');
     this.map.renderSlots.processRenderSlots();
-    this.renderer.switchToFramebuffer('base');
+    //this.renderer.switchToFramebuffer('base');
 
     if (this.renderer.hitmapMode > 2) {
         this.renderer.copyHitmap();
@@ -581,6 +581,7 @@ MapDraw.prototype.drawHitmap = function() {
 
 
 MapDraw.prototype.drawGeodataHitmap = function() {
+    return;
     this.renderer.gpu.setState(this.drawTileState);
     this.renderer.switchToFramebuffer('geo');
     this.renderer.draw.drawGpuJobs();

@@ -111,7 +111,6 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
     this.helper = new THREE.Box3Helper( this.box, 0x0000ff );
 
-
     this.scene = new THREE.Scene();
     //this.scene.background = new THREE.Color( 0xaaaaaa );
     this.scene.background = new THREE.Color( 0xaa0000 );
@@ -119,13 +118,13 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
     this.scene2 = new THREE.Scene();
     this.scene2D = new THREE.Scene();
 
-
     this.camera2 = new THREE.PerspectiveCamera( 45, this.aspectRatio, 0.1, 10000);
     this.camera2.position.set(  0, 200, 0 );
     this.camera2.lookAt( new THREE.Vector3() );
 
     let widthOrtho = 1024, heightOrtho = 768;
-    this.orthoCamera = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0.001, 1000 );
+    //this.orthoCamera = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0.001, 1000 );
+    this.orthoCamera = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0, 1000 );
 
     this.models = new THREE.Group();
     this.models.frustumCulled = false;
@@ -284,9 +283,11 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
                  //this.material.userData.shader.uniforms.map.value = texture;
                  //this.material.userData.shader.uniforms.map.needsUpdate = true;
 
-                 this.material.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
-                 this.material.uniforms.map.value = texture;
-                 this.material.uniforms.map.needsUpdate = true;
+                 if (texture) {
+                     this.material.uniforms.uvTrans.value.set(t[0],t[1],t[2],t[3]);
+                     this.material.uniforms.map.value = texture;
+                     this.material.uniforms.map.needsUpdate = true;
+                 }
 
                  if (flags & VTS_MAT_FLAG_C4){
                      this.material.uniforms.uClip.value = splitMask.slice();
@@ -311,7 +312,7 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
 
      });
 
-     this.tileMaterials = new Array(64);
+     this.tileMaterials = new Array(128);
      this.tileMaterials[0] = this.tileMaterial;
 
      this.bboxMaterial = this.generateBBoxMaterial();
@@ -338,9 +339,17 @@ var Renderer = function(core, div, onUpdate, onResize, config) {
      this.textBufferIndex = 0;
      this.textBufferSize = 3*2*256;
 
-     this.wireferameMaterial = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true, /*depthTest:false*/
+     this.wireferameMaterial = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true, /*depthTest:false*/ });
 
-     });
+     this.testScreenPlane = new THREE.Mesh( new THREE.PlaneGeometry( this.hitmapSize*0.25, this.hitmapSize*0.25 ), new THREE.MeshBasicMaterial( { /*color: 0xffffff,*/ depthTest: false, depthWrite: false, side: THREE.DoubleSide } ));
+     this.testScreenPlane.material.map = this.textTexture;
+     //this.testScreenPlane.needsUpdate = true;
+
+     this.textureRenderTarget = this.createRenderTarget( this.hitmapSize, this.hitmapSize, false);
+
+     //this.testScreenPlane.material.uniforms.map.value = this.textureRenderTarget.texture;
+     this.testScreenPlane.material.map = this.textureRenderTarget.texture;
+
 
      var factor = 1;
      this.resizeGL(Math.floor(this.curSize[0]*factor), Math.floor(this.curSize[1]*factor));
@@ -527,6 +536,28 @@ Renderer.prototype.getTextSize = function(size, text) {
 };
 
 
+Renderer.prototype.createRenderTarget = function(width, height, depthTexture) {
+
+    const target = new THREE.WebGLRenderTarget( width, height );
+
+/*
+    target.texture.format = THREE.RGBAFormat;
+    target.texture.minFilter = THREE.NearestFilter;
+    target.texture.magFilter = THREE.NearestFilter;
+    target.texture.generateMipmaps = false;
+    target.stencilBuffer = true;
+    target.depthBuffer = true;
+
+    if (depthTexture) {
+        target.depthTexture = new THREE.DepthTexture();
+        target.depthTexture.format = THREE.DepthStencilFormat;
+        target.depthTexture.type = THREE.UnsignedInt248Type;
+    }
+*/
+    return target;
+};
+
+
 Renderer.prototype.generateMaterial = function(material, options) {
 
     material.onBeforeCompile = function ( shader ) {
@@ -577,6 +608,10 @@ Renderer.prototype.generateTileMaterial = function(options) {
     //str += '#define TMIN ' + (0.5-this.map.config.mapSplitMargin) + '\n' + '#define TMAX ' + (0.5+this.map.config.mapSplitMargin) + '\n';
 
     if (options.flags) {
+
+        if (options.flags & VTS_MAT_FLAG_DEPTH){
+            defines.depth = true;
+        }
 
         if (options.flags & VTS_MAT_FLAG_C4){
             defines.clip4 = true;
@@ -668,7 +703,13 @@ Renderer.prototype.addSceneObject = function(object) {
 
 Renderer.prototype.finishRender = function(options) {
 
-    //this.scene.clear();
+    if (this.core.map.draw.drawChannel == 1) {
+        this.scene.background = new THREE.Color( 0xffffff );
+        this.gpu2.setRenderTarget( this.textureRenderTarget );
+        this.gpu2.render( this.scene, this.camera2 );
+        this.gpu2.setRenderTarget( null );
+        return;
+    }
 
     if (this.core.map.draw.debug.drawWireframe == 1) {
         this.scene.background = new THREE.Color( 0xf9f9f9 );
@@ -676,8 +717,9 @@ Renderer.prototype.finishRender = function(options) {
         this.scene.background = new THREE.Color( 0x000000 );
     }
 
-
+    this.gpu2.setRenderTarget( null );
     this.gpu2.render( this.scene, this.camera2 );
+
 
     /*
     const drawWireframe = this.core.map.draw.debug.drawWireframe;
@@ -700,6 +742,7 @@ Renderer.prototype.finishRender = function(options) {
         }
     }*/
 
+
     if (this.textBuffers.length && this.textBuffers[0].index > 0) {
         this.scene2D.clear();
 
@@ -715,6 +758,11 @@ Renderer.prototype.finishRender = function(options) {
 
         this.gpu2.render( this.scene2D, this.orthoCamera );
     }
+
+    this.scene2D.clear();
+    this.scene2D.add(this.testScreenPlane);
+    this.gpu2.render( this.scene2D, this.orthoCamera );
+
 }
 
 
@@ -892,6 +940,7 @@ Renderer.prototype.kill = function() {
 
     this.killed = true;
 
+    /*
     if (this.heightmapMesh) this.heightmapMesh.kill();
     if (this.heightmapTexture) this.heightmapTexture.kill();
     if (this.skydomeMesh) this.skydomeMesh.kill();
@@ -908,8 +957,9 @@ Renderer.prototype.kill = function() {
     if (this.font) this.font.kill();
     if (this.plines) this.plines.kill();
     if (this.plineJoints) this.plineJoints.kill();
-
     this.gpu.kill();
+    */
+
     //this.div.removeChild(this.gpu.getCanvas());
 };
 
@@ -1265,6 +1315,8 @@ Renderer.prototype.hitTestGeoLayers = function(screenX, screenY, secondTexture) 
 
 
 Renderer.prototype.switchToFramebuffer = function(type, texture) {
+    return;
+
     var gl = this.gpu.gl, size, width, height;
 
     switch(type) {
@@ -1388,11 +1440,15 @@ Renderer.prototype.hitTest = function(screenX, screenY) {
     x = Math.floor(screenX * (this.hitmapSize / this.curSize[0]));
     y = Math.floor(screenY * (this.hitmapSize / this.curSize[1]));
 
+
     //get pixel value from framebuffer
-    var pixel = this.hitmapTexture.readFramebufferPixels(x, this.hitmapSize - y - 1, 1, 1);
+    const pixel = new Uint8Array( 4 );
+    this.gpu2.readRenderTargetPixels( this.textureRenderTarget, x, this.hitmapSize - y - 1, 1, 1, pixel );
 
     //convert rgb values into depth
     var depth = (pixel[0] * (1.0/255)) + (pixel[1]) + (pixel[2]*255.0) + (pixel[3]*65025.0);// + (pixel[3]*16581375.0);
+
+    console.log('' + pixel[0] + ' ' + pixel[1] + ' ' + pixel[2]);
 
     var surfaceHit = !(pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 255 && pixel[3] == 255);
 

@@ -36,8 +36,10 @@ GpuShaders.tileVertexShader =
         'varying vec3 vBarycentric;\n'+
     '#endif\n'+
 
-    'uniform vec4 uvTrans;\n'+
-    'varying vec2 vUv;\n'+
+    '#ifndef depth\n'+
+        'uniform vec4 uvTrans;\n'+
+        'varying vec2 vUv;\n'+
+    '#endif\n'+
 
     '#ifdef uvs\n'+
         'attribute vec2 uv2;\n'+
@@ -74,11 +76,9 @@ GpuShaders.tileVertexShader =
         '#endif\n'+
 
         'gl_Position = projectionMatrix * camSpacePos;\n'+
-        /*
-        'float camDist = length(camSpacePos.xyz);\n'+
-        */
 
         '#ifdef depth\n'+
+            'float camDist = length(camSpacePos.xyz);\n'+
             'vDepth = camDist;\n'+
         '#endif\n'+
 
@@ -105,7 +105,10 @@ GpuShaders.tileVertexShader =
         */
 
         //'vUv = uv;\n'+
-        'vUv = vec2(uv.x * uvTrans.x + uvTrans.z, uv.y * uvTrans.y + uvTrans.w);\n' +
+
+        '#ifndef depth\n'+
+            'vUv = vec2(uv.x * uvTrans.x + uvTrans.z, uv.y * uvTrans.y + uvTrans.w);\n' +
+        '#endif\n'+
 
         '#ifdef clip4\n'+
             '#ifdef uvs\n'+
@@ -159,7 +162,9 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
 
     '#endif\n'+
 
-    'varying vec2 vUv;\n'+
+    '#ifndef depth\n'+
+        'varying vec2 vUv;\n'+
+    '#endif\n'+
 
     'uniform sampler2D map;\n'+
 
@@ -259,9 +264,14 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
 
         '#else\n'+
 
-            'gl_FragColor = texture2D(map, vUv.xy);\n'+
-            //'gl_FragColor = vec4(vUv.x,vUv.y,1.0,1.0);\n'+
-            'gl_FragColor.w = 1.0;\n'+
+            '#ifdef depth\n'+
+                'gl_FragColor = fract(vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0) * vDepth) + (-0.5/255.0);\n'+
+            '#else\n'+
+                'gl_FragColor = texture2D(map, vUv.xy);\n'+
+                //'gl_FragColor = vec4(vUv.x,vUv.y,1.0,1.0);\n'+
+                'gl_FragColor.w = 1.0;\n'+
+            '#endif\n'+
+
 
             /*
             'vec4 fogColor = vec4(uParams2.xyz, 1.0);\n'+

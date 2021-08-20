@@ -41,6 +41,7 @@ var plugins = [
       'VTS_MAT_FLAG_FLAT':  (1<<3),
       'VTS_MAT_FLAG_FOG':  (1<<4),
       'VTS_MAT_FLAG_MASK':  (1<<5),
+      'VTS_MAT_FLAG_DEPTH':  (1<<6),
 
       'VTS_PIPELINE_BASIC':           0,
       'VTS_PIPELINE_HMAP':            1,
