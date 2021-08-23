@@ -703,6 +703,10 @@ Renderer.prototype.addSceneObject = function(object) {
 
 Renderer.prototype.finishRender = function(options) {
 
+    if (this.onBeforeFinish) {
+        this.onBeforeFinish();
+    }
+
     if (this.core.map.draw.drawChannel == 1) {
         this.scene.background = new THREE.Color( 0xffffff );
         this.gpu2.setRenderTarget( this.textureRenderTarget );
@@ -759,9 +763,10 @@ Renderer.prototype.finishRender = function(options) {
         this.gpu2.render( this.scene2D, this.orthoCamera );
     }
 
-    this.scene2D.clear();
+
+    /*this.scene2D.clear();
     this.scene2D.add(this.testScreenPlane);
-    this.gpu2.render( this.scene2D, this.orthoCamera );
+    this.gpu2.render( this.scene2D, this.orthoCamera );*/
 
 }
 

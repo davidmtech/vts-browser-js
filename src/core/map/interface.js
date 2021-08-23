@@ -21,7 +21,7 @@ var MapInterface = function(map) {
 
 MapInterface.prototype.setPosition = function(position) {
     this.map.setPosition(position);
-    return this;    
+    return this;
 };
 
 
@@ -32,7 +32,7 @@ MapInterface.prototype.getPosition = function() {
 
 MapInterface.prototype.setView = function(view, forceRefresh, posToFixed) {
     this.map.setView(view, forceRefresh, posToFixed);
-    return this;    
+    return this;
 };
 
 
@@ -123,38 +123,38 @@ MapInterface.prototype.addFreeLayer = function(id, options) {
 
 
 MapInterface.prototype.removeFreeLayer = function(id) {
-    this.map.removeFreeLayer(id); 
+    this.map.removeFreeLayer(id);
 };
 
 
 /* MapInterface.prototype.setFreeLayerOptions = function(id, options) {
-    this.map.setFreeLayerOptions(id, options); 
+    this.map.setFreeLayerOptions(id, options);
 };
 
 
 MapInterface.prototype.getFreeLayerOptions = function(id) {
-    return this.map.getFreeLayerOptions(id); 
+    return this.map.getFreeLayerOptions(id);
 }; */
 
 
 MapInterface.prototype.addBoundLayer = function(id, options) {
     var layer = new MapBoundLayer(this.map, options, id);
-    this.map.addBoundLayer(id, layer); 
+    this.map.addBoundLayer(id, layer);
 };
 
 
 MapInterface.prototype.removeBoundLayer = function(id) {
-    this.map.removeBoundLayer(id); 
+    this.map.removeBoundLayer(id);
 };
 
 
 /* MapInterface.prototype.setBoundLayerOptions = function(id, options) {
-    this.map.setBoundLayerOptions(id, options); 
+    this.map.setBoundLayerOptions(id, options);
 };
 
 
 MapInterface.prototype.getBoundLayerOptions = function(id) {
-    return this.map.setBoundLayerOptions(id); 
+    return this.map.setBoundLayerOptions(id);
 };*/
 
 MapInterface.prototype.convertPositionViewMode = function(position, mode) {
@@ -272,7 +272,7 @@ MapInterface.prototype.getSurfaceAreaGeometry = function(coords, radius, mode, l
     if (!res[0]) {
         return this.map.core.once('map-update', this.getSurfaceAreaGeometry.bind(this, coords, radius, mode, limit, callback, loadTextures), 1);
     } else {
-        var buffer = res[1], ret = [], map = this.map;        
+        var buffer = res[1], ret = [], map = this.map;
 
         if (map.tree) {
             map.storedTilesRes = [];
@@ -299,6 +299,10 @@ MapInterface.prototype.getAzimuthCorrection = function(coords, coords2) {
 
 MapInterface.prototype.getNED = function(coords, onlyMatrix) {
     return this.map.measure.getNewNED(coords, (onlyMatrix === false) ? false : true);
+};
+
+MapInterface.prototype.getNED2 = function(coords, onlyMatrix) {
+    return this.map.measure.getNewNED2(coords, (onlyMatrix === false) ? false : true);
 };
 
 
@@ -368,31 +372,31 @@ MapInterface.prototype.redraw = function() {
 
 MapInterface.prototype.addRenderSlot = function(id, callback, enabled) {
     this.map.renderSlots.addRenderSlot(id, callback, enabled);
-    return this;    
+    return this;
 };
 
 
 MapInterface.prototype.moveRenderSlotBefore = function(whichId, whereId) {
     this.map.renderSlots.moveRenderSlotBefore(whichId, whereId);
-    return this;    
+    return this;
 };
 
 
 MapInterface.prototype.moveRenderSlotAfter = function(whichId, whereId) {
     this.map.renderSlots.moveRenderSlotAfter(whichId, whereId);
-    return this;    
+    return this;
 };
 
 
 MapInterface.prototype.removeRenderSlot = function(id) {
     this.map.renderSlots.removeRenderSlot(id);
-    return this;    
+    return this;
 };
 
 
 MapInterface.prototype.setRenderSlotEnabled = function(id, state) {
     this.map.renderSlots.setRenderSlotEnabled(id, state);
-    return this;    
+    return this;
 };
 
 
@@ -448,14 +452,14 @@ MapInterface.prototype.getStats = function(switches) {
     for (var i = 0, li = this.map.geodataProcessors; i < li; i++) {
         if (this.map.geodataProcessors[i].busy) {
             busyWorkers++;
-        }        
+        }
     }
 
     return {
         'bestMeshTexelSize' : this.map.bestMeshTexelSize,
-        'bestGeodataTexelSize' : this.map.bestGeodataTexelSize, 
+        'bestGeodataTexelSize' : this.map.bestGeodataTexelSize,
         'downloading' : this.map.loader.downloading.length,
-        'lastDownload' : this.map.loader.lastDownloadTime, 
+        'lastDownload' : this.map.loader.lastDownloadTime,
         'surfaces' : this.map.tree.surfaceSequence.length,
         'freeLayers' : this.map.freeLayerSequence.length,
         'texelSizeFit' : this.map.texelSizeFit,

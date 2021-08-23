@@ -16,6 +16,9 @@ var RendererInterface = function(renderer) {
     this.gpu = renderer.gpu;
 };
 
+RendererInterface.prototype.getRaw = function() {
+    return this.renderer;
+};
 
 RendererInterface.prototype.clear = function(options) {
     if (options != null) {

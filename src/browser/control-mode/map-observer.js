@@ -210,6 +210,9 @@ ControlModeMapObserver.prototype.doubleclick = function(event) {
         pos.setHeight(mapCoords[2]);
         //pos = map.convertPositionHeightMode(pos, "fix");
         //pos.setPositionHeight(0);
+
+        console.log(JSON.stringify(mapCoords));
+
         if (this.browser.controlMode.altKey) {
 
             var pos = map.getPosition();
