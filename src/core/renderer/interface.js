@@ -2,7 +2,7 @@
 //import GpuTexture_ from './gpu/texture';
 //import GpuMesh_ from './gpu/mesh';
 //import GpuProgram_ from './gpu/program';
-import {Octree as Octree_, OctreeRaycaster as OctreeRaycaster_} from './octree.js';
+import {Octree as Octree_, OctreeRaycaster as OctreeRaycaster_} from './raycaster.js';
 
 //get rid of compiler mess
 //var GpuTexture = GpuTexture_;

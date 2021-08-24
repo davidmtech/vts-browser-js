@@ -8,8 +8,8 @@ import RendererShaders_ from './shaders';
 import * as THREE from './libs/three.module.js';
 
 import Camera_ from './camera';
-import RenderInit_ from './init';
-import RenderDraw_ from './draw';
+//import RenderInit_ from './init';
+//import RenderDraw_ from './draw';
 import RenderRMap_ from './rmap';
 
 //get rid of compiler mess
@@ -18,8 +18,8 @@ const vec3 = vec3_, mat4 = mat4_;
 //var GpuTexture = GpuTexture_;
 const RendererFont = RendererFont_;
 const Camera = Camera_;
-const RenderInit = RenderInit_;
-const RenderDraw = RenderDraw_;
+//const RenderInit = RenderInit_;
+//const RenderDraw = RenderDraw_;
 const RenderRMap = RenderRMap_;
 const RendererShaders = RendererShaders_;
 

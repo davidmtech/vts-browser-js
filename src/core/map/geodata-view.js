@@ -2,11 +2,13 @@
 import {mat4 as mat4_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
 import {utils as utils_} from '../utils/utils';
+import MapOctree_ from './octree';
 import RenderGroup_ from '../renderer/group';
 import MapGeodataProcessor_ from './geodata-processor/processor';
 
 //get rid of compiler mess
 const mat4 = mat4_, math = math_, utils = utils_;
+const MapOctree = MapOctree_;
 const RenderGroup = RenderGroup_;
 const MapGeodataProcessor = MapGeodataProcessor_;
 
@@ -252,6 +254,8 @@ MapGeodataView.prototype.directBinParse = function(path) {
     this.currentGpuGroup = new RenderGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
     this.gpuGroups.push(this.currentGpuGroup);
     this.currentGpuGroup.binPath = path;
+    this.currentGpuGroup.octreeParser = new MapOctree(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
+    this.currentGpuGroup.octreeParser.binPath = path;
 };
 
 
