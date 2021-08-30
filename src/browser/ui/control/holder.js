@@ -2,10 +2,10 @@
 import UIElement_ from '../element/element';
 
 //get rid of compiler mess
-var UIElement = UIElement_;
+const UIElement = UIElement_;
 
 
-var UIControlHolder = function(ui, html, visible, visibleLock, parentElement) {
+const UIControlHolder = function(ui, html, visible, visibleLock, parentElement) {
     this.ui = ui;
     this.html = html;
     this.elementsById = [];
@@ -33,11 +33,11 @@ var UIControlHolder = function(ui, html, visible, visibleLock, parentElement) {
 UIControlHolder.prototype.setHtml = function(html) {
     this.element.innerHTML = html;
 
-    var allElements = this.element.getElementsByTagName('*');
+    const allElements = this.element.getElementsByTagName('*');
 
     //store all elements with id attribute to the table
-    for (var i = 0, li = allElements.length; i < li; i++) {
-        var id = allElements[i].getAttribute('id');
+    for (let i = 0, li = allElements.length; i < li; i++) {
+        const id = allElements[i].getAttribute('id');
 
         if (id !== null) {
             //store element to the table
@@ -79,11 +79,8 @@ export default UIControlHolder;
 
 /*
 //prevent minification
-UIControlHolder.prototype["setHtml"] = UIControlHolder.prototype.setHtml; 
-UIControlHolder.prototype["getElement"] = UIControlHolder.prototype.getElement; 
-UIControlHolder.prototype["setVisible"] = UIControlHolder.prototype.setVisible; 
-UIControlHolder.prototype["getVisible"] = UIControlHolder.prototype.getVisible; 
+UIControlHolder.prototype["setHtml"] = UIControlHolder.prototype.setHtml;
+UIControlHolder.prototype["getElement"] = UIControlHolder.prototype.getElement;
+UIControlHolder.prototype["setVisible"] = UIControlHolder.prototype.setVisible;
+UIControlHolder.prototype["getVisible"] = UIControlHolder.prototype.getVisible;
 */
-
-
-

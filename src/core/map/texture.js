@@ -2,22 +2,22 @@
 import MapSubtexture_ from './subtexture';
 
 //get rid of compiler mess
-var MapSubtexture = MapSubtexture_;
+const MapSubtexture = MapSubtexture_;
 
 
-var MapTexture = function(map, path, type, extraBound, extraInfo, tile, internal) {
+const MapTexture = function(map, path, type, extraBound, extraInfo, tile, internal) {
     this.map = map;
     this.stats = map.stats;
     this.tile = tile; // used only for stats
     this.internal = internal; // used only for stats
-    
+
     if (tile) {
-        this.mainTexture = tile.resources.getSubtexture(this, path, type, tile, internal); 
+        this.mainTexture = tile.resources.getSubtexture(this, path, type, tile, internal);
     } else {
-        this.mainTexture = new MapSubtexture(map, path, type, tile, internal); 
+        this.mainTexture = new MapSubtexture(map, path, type, tile, internal);
     }
 
-    this.maskTexture = null; 
+    this.maskTexture = null;
 
     this.loadState = 0;
     this.loadErrorTime = null;
@@ -36,8 +36,8 @@ var MapTexture = function(map, path, type, extraBound, extraInfo, tile, internal
     this.fileSize = 0;
 
     if (extraInfo && extraInfo.layer) {
-        var layer = extraInfo.layer;
-        
+        const layer = extraInfo.layer;
+
         if (layer.availability) {
             this.checkType = layer.availability.type;
             switch (this.checkType) {
@@ -45,7 +45,7 @@ var MapTexture = function(map, path, type, extraBound, extraInfo, tile, internal
             case VTS_TEXTURECHECK_CODE: this.checkValue = layer.availability.codes; break;
             case VTS_TEXTURECHECK_SIZE: this.checkValue = layer.availability.size; break;
             }
-        }       
+        }
     }
 };
 
@@ -54,10 +54,10 @@ MapTexture.prototype.kill = function() {
     this.mainTexture.killImage();
     this.mainTexture.killGpuTexture();
     this.mainTexture = null;
-    
+
     if (this.maskTexture) {
-        this.maskTexture.killImage(); 
-        this.maskTexture.killGpuTexture(); 
+        this.maskTexture.killImage();
+        this.maskTexture.killGpuTexture();
     }
 };
 
@@ -66,7 +66,7 @@ MapTexture.prototype.killImage = function() {
     this.mainTexture.killImage();
 
     if (this.maskTexture) {
-        this.maskTexture.killImage(); 
+        this.maskTexture.killImage();
     }
 };
 
@@ -75,7 +75,7 @@ MapTexture.prototype.killGpuTexture = function() {
     this.mainTexture.killGpuTexture();
 
     if (this.maskTexture) {
-        this.maskTexture.killGpuTexture(); 
+        this.maskTexture.killGpuTexture();
     }
 };
 
@@ -87,25 +87,25 @@ MapTexture.prototype.setBoundTexture = function(tile, layer, hmap) {
             this.extraBound.hmap = hmap;
 
             if (!tile.hmap) {
-                var path = tile.resourceSurface.getHMapUrl(tile.id, true);
+                const path = tile.resourceSurface.getHMapUrl(tile.id, true);
                 tile.hmap = tile.resources.getTexture(path, null, null, {tile: tile, hmap: hmap}, this.tile, this.internal);
             }
 
-            this.extraBound.texture = tile.hmap; 
+            this.extraBound.texture = tile.hmap;
 
         } else if (layer) {
             this.extraBound.sourceTile = tile;
             this.extraBound.layer = layer;
-            
+
             if (!tile.boundTextures[layer.id]) {
                 tile.boundLayers[layer.id] = layer;
-                var path = layer.getUrl(tile.id);
+                const path = layer.getUrl(tile.id);
                 tile.boundTextures[layer.id] = tile.resources.getTexture(path, null, null, {tile: tile, layer: layer}, this.tile, this.internal);
             }
 
-            this.extraBound.texture = tile.boundTextures[layer.id]; 
+            this.extraBound.texture = tile.boundTextures[layer.id];
         }
-        
+
         this.extraBound.transform = this.map.draw.drawTiles.getTileTextureTransform(tile, this.extraBound.tile);
         this.map.markDirty();
     }
@@ -113,9 +113,9 @@ MapTexture.prototype.setBoundTexture = function(tile, layer, hmap) {
 
 
 MapTexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
-    var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
+    const doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
-/*   
+/*
    if (this.mapLoaderUrl == "https://ecn.t3.tiles.virtualearth.net/tiles/a1202310323212333.jpeg?g=5549") {
        this.mapLoaderUrl = this.mapLoaderUrl;
    }
@@ -124,8 +124,8 @@ MapTexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
         return false;
     }
 
-    var parent;
-   
+    let parent;
+
     if (this.extraBound) {
         if (this.extraBound.texture) {
             while (this.extraBound.texture.extraBound || this.extraBound.texture.checkStatus == -1) {
@@ -147,33 +147,34 @@ MapTexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
                         return false;
                     }
                 }
- 
+
                 this.setBoundTexture(parent, this.extraBound.layer);
             }
-            
-            var ready = this.extraBound.texture.isReady(doNotLoad, priority, doNotCheckGpu);
-            
+
+            let ready = this.extraBound.texture.isReady(doNotLoad, priority, doNotCheckGpu);
+
             if (ready && this.checkMask) {
                 this.extraBound.tile.resetDrawCommands = (this.extraBound.texture.getMaskTexture() != null);
                 this.checkMask = false;
             }
 
             return ready;
-            
+
         } else {
-            this.setBoundTexture(this.extraBound.sourceTile, this.extraBound.layer, this.extraBound.hmap);        
+            this.setBoundTexture(this.extraBound.sourceTile, this.extraBound.layer, this.extraBound.hmap);
             return this.isReady(doNotLoad, priority, doNotCheckGpu);
         }
-        
+
+        // eslint-disable-next-line
         return false;
     }
 
     /*
     if (!this.extraBound && this.extraInfo && !this.maskTexture) {
-        var layer = this.extraInfo.layer;
-        
+        const layer = this.extraInfo.layer;
+
         if (layer && layer.maskUrl && this.checkType != "metatile") {
-            var path = layer.getMaskUrl(this.tile.id);
+            const path = layer.getMaskUrl(this.tile.id);
             this.maskTexture = this.tile.resources.getTexture(path, null, null, null, this.tile, this.internal);
         }
     }*/
@@ -184,32 +185,32 @@ MapTexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
         if (this.checkStatus != 2) {
             if (this.checkStatus == 0) {
                 if (this.extraInfo && this.extraInfo.tile) {
-                    var metaresources = this.extraInfo.tile.boundmetaresources;
+                    let metaresources = this.extraInfo.tile.boundmetaresources;
                     if (!metaresources) {
                         metaresources = this.map.resourcesTree.findAgregatedNode(this.extraInfo.tile.id, 8);
                         this.extraInfo.tile.boundmetaresources = metaresources;
                     }
-                        
-                    var layer = this.extraInfo.layer;
-                    var path = this.extraInfo.metaPath;
-						
+
+                    const layer = this.extraInfo.layer;
+                    let path = this.extraInfo.metaPath;
+
                     if(!this.extraInfo.metaPath) {
-                        path = layer.getMetatileUrl(metaresources.id);	
+                        path = layer.getMetatileUrl(metaresources.id);
                         this.extraInfo.metaPath = path;
                     }
-						
-                    var texture = metaresources.getTexture(path, true, null, null, this.tile, this.internal);
-                        
+
+                    const texture = metaresources.getTexture(path, true, null, null, this.tile, this.internal);
+
                     if (this.maskTexture) {
                         if (this.maskTexture.isReady(doNotLoad, priority, doNotCheckGpu, this)) {
                             this.checkStatus = 2;
                         }
                     } else {
                         if (texture.isReady(doNotLoad, priority, doNotCheckGpu)) {
-                            var tile = this.extraInfo.tile;
-                            var value = texture.getHeightMapValue(tile.id[1] & 255, tile.id[2] & 255);
+                            const tile = this.extraInfo.tile;
+                            const value = texture.getHeightMapValue(tile.id[1] & 255, tile.id[2] & 255);
                             this.checkStatus = (value & 128) ? 2 : -1;
-                                
+
                             if (this.checkStatus == 2) {
                                 if (!(value & 64)) { //load mask
                                     path = layer.getMaskUrl(tile.id);
@@ -224,7 +225,7 @@ MapTexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
                     }
                 }
             }
-                
+
             if (this.checkStatus == -1) {
                 if (!this.extraBound) {
                     parent = this.extraInfo.tile.parent;
@@ -249,29 +250,29 @@ MapTexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
                         this.map.markDirty();
                         return false;
                     }
-                        
-                    this.setBoundTexture(parent, this.extraBound.layer);        
+
+                    this.setBoundTexture(parent, this.extraBound.layer);
                 }
             }
 
             return false;
         }
-        
+
         break;
     }
 
-    var maskState = true;
+    let maskState = true;
 
     if (this.maskTexture) {
         maskState = this.maskTexture.isReady(doNotLoad, priority, doNotCheckGpu, this);
     }
-    
+
 
     return this.mainTexture.isReady(doNotLoad, priority, doNotCheckGpu, this) && maskState;
 };
 
 MapTexture.prototype.isMaskPosible = function() {
-    var texture = this;
+    let texture = this;
 
     if (this.extraBound) {
         if (this.extraBound.texture) {
@@ -287,7 +288,7 @@ MapTexture.prototype.isMaskPosible = function() {
 };
 
 MapTexture.prototype.isMaskInfoReady = function() {
-    var texture = this;
+    let texture = this;
 
     if (this.extraBound) {
         if (this.extraBound.texture) {
@@ -312,7 +313,7 @@ MapTexture.prototype.getGpuTexture = function() {
             return this.extraBound.texture.getGpuTexture();
         }
         return null;
-    } 
+    }
 
     return this.mainTexture.getGpuTexture();
 };
@@ -323,7 +324,7 @@ MapTexture.prototype.getMaskTexture = function() {
         if (this.extraBound.texture) {
             return this.extraBound.texture.getMaskTexture();
         }
-    } 
+    }
 
     return this.maskTexture;
 };
@@ -335,12 +336,12 @@ MapTexture.prototype.getGpuMaskTexture = function() {
             return this.extraBound.texture.getGpuMaskTexture();
         }
         return null;
-    } 
+    }
 
     if (this.maskTexture) {
         return this.maskTexture.getGpuTexture();
     }
-    
+
     return null;
 };
 
@@ -369,11 +370,10 @@ MapTexture.prototype.getTransform = function() {
             return this.extraBound.transform;
         }
         return null;
-    } 
+    }
 
     return [1,1,0,0];
 };
 
 
 export default MapTexture;
-

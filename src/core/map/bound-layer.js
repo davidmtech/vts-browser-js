@@ -4,12 +4,12 @@ import {utils as utils_} from '../utils/utils';
 import {utilsUrl as utilsUrl_} from '../utils/url';
 
 //get rid of compiler mess
-var utils = utils_;
-var utilsUrl = utilsUrl_;
-var MapCredit = MapCredit_;
+const utils = utils_;
+const utilsUrl = utilsUrl_;
+const MapCredit = MapCredit_;
 
 
-var MapBoundLayer = function(map, json, id) {
+const MapBoundLayer = function(map, json, id) {
     this.map = map;
     this.id = id;
     this.currentAlpha = 1.0;
@@ -35,22 +35,22 @@ var MapBoundLayer = function(map, json, id) {
              // "codes": [301, 302, 404]
             'type' : 'negative-size',
             'size': 2521
-        };  
+        };
     }
-    
+
     if (typeof json === 'string') {
         this.jsonUrl = this.map.url.processUrl(json);
         this.baseUrl = utilsUrl.getBase(this.jsonUrl);
         this.baseUrlSchema = utilsUrl.getSchema(this.jsonUrl);
         this.baseUrlOrigin = utilsUrl.getOrigin(this.jsonUrl);
-        
-        var onLoaded = (function(data){
-            this.parseJson(data);            
+
+        const onLoaded = (function(data){
+            this.parseJson(data);
             this.ready = true;
             this.map.refreshView();
         }).bind(this);
-        
-        var onError = (function(){ }).bind(this);
+
+        const onError = (function(){ }).bind(this);
 
         utils.loadJSON(this.jsonUrl, onLoaded, onError, null, (utils.useCredentials ? (this.jsonUrl.indexOf(this.map.url.baseUrl) != -1) : false), this.map.core.xhrParams);
         //utils.loadJSON(this.url, onLoaded, onError, null, utils.useCredentials);
@@ -58,7 +58,7 @@ var MapBoundLayer = function(map, json, id) {
         this.parseJson(json);
         this.ready = true;
     }
-    
+
 };
 
 
@@ -85,12 +85,12 @@ MapBoundLayer.prototype.parseJson = function(json) {
         case 'classification': this.dataType = VTS_TEXTURETYPE_CLASS;  break;
     }
 
-    this.specificity = Math.pow(2,this.lodRange[0]) / ((this.tileRange[1][0] - this.tileRange[1][0]+1)*(this.tileRange[1][1] - this.tileRange[1][1]+1));    
+    this.specificity = Math.pow(2,this.lodRange[0]) / ((this.tileRange[1][0] - this.tileRange[1][0]+1)*(this.tileRange[1][1] - this.tileRange[1][1]+1));
 
     this.availability = json['availability'] ? {} : null;
 
     if (this.availability) {
-        var p = json['availability'];
+        const p = json['availability'];
 
         switch(p['type']) {
             case 'negative-type': this.availability.type = VTS_TEXTURECHECK_TYPE; break;
@@ -117,23 +117,23 @@ MapBoundLayer.prototype.parseJson = function(json) {
         break;
 
     case 'object':
-        
+
         if (!Array.isArray(this.credits)) {
-            var credits = this.credits;
+            const credits = this.credits;
             this.credits = [];
-                
-            for (var key in credits){
+
+            for (let key in credits){
                 this.map.addCredit(key, new MapCredit(this.map, credits[key]));
                 this.credits.push(key);
             }
         }
 
         /*
-        for (var i = 0, li = this.credits.length; i < li; i++) {
-            var credit = this.map.getCreditById(this.credits[i]);
-                //this.creditsNumbers.push(credit ? credit.id : null); 
+        for (let i = 0, li = this.credits.length; i < li; i++) {
+            const credit = this.map.getCreditById(this.credits[i]);
+                //this.creditsNumbers.push(credit ? credit.id : null);
         }*/
-        
+
         break;
     }
 };
@@ -173,7 +173,7 @@ MapBoundLayer.prototype.processUrl = function(url, fallback) {
     }
 
     url = url.trim();
-    
+
     if (url.indexOf('://') != -1) { //absolute
         return url;
     } else if (url.indexOf('//') == 0) {  //absolute without schema
@@ -181,20 +181,20 @@ MapBoundLayer.prototype.processUrl = function(url, fallback) {
     } else if (url.indexOf('/') == 0) {  //absolute without host
         return this.baseUrlOrigin + url;
     } else {  //relative
-        return this.baseUrl + url; 
+        return this.baseUrl + url;
     }
 };
 
 
 MapBoundLayer.prototype.hasTile = function(id) {
-    var shift = id[0] - this.lodRange[0];
+    const shift = id[0] - this.lodRange[0];
 
     if (shift < 0) {
         return false;
     }
 
-    var x = id[1] >> shift;
-    var y = id[2] >> shift;
+    const x = id[1] >> shift;
+    const y = id[2] >> shift;
 
     if (id[0] < this.lodRange[0] || id[0] > this.lodRange[1] ||
         x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
@@ -207,14 +207,14 @@ MapBoundLayer.prototype.hasTile = function(id) {
 
 
 MapBoundLayer.prototype.hasTileOrInfluence = function(id) {
-    var shift = id[0] - this.lodRange[0];
+    const shift = id[0] - this.lodRange[0];
 
     if (shift < 0) {
         return false;
     }
 
-    var x = id[1] >> shift;
-    var y = id[2] >> shift;
+    const x = id[1] >> shift;
+    const y = id[2] >> shift;
 
     if (x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
         y < this.tileRange[0][1] || y > this.tileRange[1][1] ) {
@@ -241,5 +241,3 @@ MapBoundLayer.prototype.getMaskUrl = function(id, skipBaseUrl) {
 
 
 export default MapBoundLayer;
-
-

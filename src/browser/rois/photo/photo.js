@@ -2,12 +2,13 @@
 import {utils as utils_} from '../../../core/utils/utils';
 import {math as math_} from '../../../core/utils/math';
 import {mat4 as mat4_} from '../../../core/utils/matrix';
+import {Roi as Roi_} from '../roi';
 
 //get rid of compiler mess
-var utils = utils_;
-var math = math_;
-var mat4 = mat4_;
-
+const utils = utils_;
+const math = math_;
+const mat4 = mat4_;
+const  Roi = Roi_;
 
 /**
  * Photo class - specific Roi type class for rendering simple photo.
@@ -15,7 +16,7 @@ var mat4 = mat4_;
  * @final
  * @extends {Roi}
  */
-var RoiPhoto = function(config, core, options) {
+const RoiPhoto = function(config, core, options) {
     this.cubeTree = [];
 
     // config properties
@@ -55,14 +56,14 @@ RoiPhoto.prototype.processConfig = function() {
         return;
     }
 
-    var err = null;
+    let err = null;
     if (typeof this.config['photo'] !== 'object'
         || this.config['photo'] === null) {
         err = new Error('Missing (or type error) photo key in config JSON');
-    } else if (!this.config['photo']['orientation'] instanceof Array
+    } else if (!(this.config['photo']['orientation'] instanceof Array)
         || this.config['photo']['orientation'].length !== 3) {
         err = new Error('Missing (or type error) photo.orientation in config JSON');
-    } else if (!this.config['photo']['imageSize'] instanceof Array
+    } else if (!(this.config['photo']['imageSize'] instanceof Array)
         || this.config['photo']['imageSize'].length !== 2) {
         err = new Error('Missing (or type error) photo.imageSize in config JSON');
     } else if (typeof this.config['photo']['imageUrl'] !== 'string'
@@ -84,7 +85,7 @@ RoiPhoto.prototype.initFinalize = function() {
     this.super.initFinalize.call(this);
 
     // load texture
-    this.image = utils.loadImage(this.imageUrl, function(data) {
+    this.image = utils.loadImage(this.imageUrl, function(/*data*/) {
         this.texture = this.renderer.createTexture({source : this.image});
         this.image = null;
     }.bind(this), function(err) {
@@ -95,8 +96,8 @@ RoiPhoto.prototype.initFinalize = function() {
 
     // orient photo
     this.orientationMatrix = math.rotationMatrix(2, math.radians(-this.photoOrientation[2]));
-    var rotateY = math.rotationMatrix(1, math.radians(-this.photoOrientation[1]));
-    var rotateX = math.rotationMatrix(0, math.radians(-this.photoOrientation[0]));
+    const rotateY = math.rotationMatrix(1, math.radians(-this.photoOrientation[1]));
+    const rotateX = math.rotationMatrix(0, math.radians(-this.photoOrientation[0]));
     mat4.multiply(this.orientationMatrix, rotateY, this.orientationMatrix);
     mat4.multiply(this.orientationMatrix, rotateX, this.orientationMatrix);
 };
@@ -127,39 +128,39 @@ RoiPhoto.prototype.draw = function() {
     }
 
     //  projection-view matrix from map.getCamera()
-    var cam = this.map.getCameraInfo();
-    var pv = cam.viewProjectionMatrix;
+    //const cam = this.map.getCameraInfo();
+    //const pv = cam.viewProjectionMatrix;
 
-    var mvp = mat4.create();
+    const mvp = mat4.create();
     mat4.identity(mvp);
 
-    var trn = translationMatrix(-0.5, -0.5, 0);
+    const trn = math.translationMatrix(-0.5, -0.5, 0);
     mat4.multiply(trn, mvp, mvp);
 
-    var rot = math.rotationMatrix(0, math.radians(180));
+    const rot = math.rotationMatrix(0, math.radians(180));
     mat4.multiply(rot, mvp, mvp);
 
-    var w = window;
-    var d = document;
-    var e = d.documentElement;
-    var g = d.getElementsByTagName('body')[0];
-    var x = w.innerWidth || e.clientWidth || g.clientWidth;
-    var y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+    const w = window;
+    const d = document;
+    const e = d.documentElement;
+    const g = d.getElementsByTagName('body')[0];
+    const x = w.innerWidth || e.clientWidth || g.clientWidth;
+    const y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
 
-    var sclFacs = [2.2, 2.2];
+    const sclFacs = [2.2, 2.2];
     sclFacs[0] = sclFacs[1] * (y/x);
     if (this.imageSize[0] > this.imageSize[1]) {
         sclFacs[0] = sclFacs[0]*(this.imageSize[0]/this.imageSize[1]);
     } else {
         sclFacs[1] = sclFacs[1]*(this.imageSize[1]/this.imageSize[0]);
     }
-    var scl = math.scaleMatrix(sclFacs[0],sclFacs[1],1);
+    const scl = math.scaleMatrix(sclFacs[0],sclFacs[1],1);
     //mat4.multiply(tile.mat, mvp, mvp);
     mat4.multiply(scl, mvp, mvp);
 
     // draw tile
-    opts = {};
+    const opts = {};
     opts["mvp"] = mvp;
     opts["texture"] = this.texture;
     opts["color"] = [255, 255, 255, this.alpha*255];

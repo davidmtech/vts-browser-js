@@ -1,6 +1,6 @@
 
 
-var InspectorInput = function(inspector) {
+const InspectorInput = function(inspector) {
     this.inspector = inspector;
     this.core = inspector.core;
 };
@@ -41,24 +41,24 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
         event = window.event;
     }
 
-    var map = this.core.getMap();
-    var inspector = this.inspector;
+    const map = this.core.getMap();
+    const inspector = this.inspector;
 
     if (!map) {
         return;
     }
 
-    var debug = map.draw.debug;
+    const debug = map.draw.debug;
 
     this.altDown = event.altKey;
     this.ctrlDown = event.ctrlKey;
     this.shiftDown = event.shiftKey;
 
-    var hit = false;
-    var blockHit = true;
+    let hit = false;
+    let blockHit = true;
 
     if (event) {
-        var keyCode;
+        let keyCode;
 
         if (window.event) {         // eg. IE
             keyCode = window.event.keyCode;
@@ -113,7 +113,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
                         //map.config.mapDegradeHorizon = !map.config.mapDegradeHorizon;
                         //this.measureMode = !this.measureMode;
                         //this.measurePoints = [];
-                        //var pos = this.core.hitTest(this.mouseX, this.mouseY, "all");
+                        //const pos = this.core.hitTest(this.mouseX, this.mouseY, "all");
                         //console.log("hit pos: " + pos[0] + " " + pos[1] + " " + pos[2] + " " + pos[3] + " d " + pos[4]); //key T pressed
 
                     break; //key C pressed
@@ -128,7 +128,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
 
                     //case 84: //key T pressed
                     //case 116:
-                        /*var pos = this.core.hitTest(this.mouseX, this.mouseY, "all");
+                        /*const pos = this.core.hitTest(this.mouseX, this.mouseY, "all");
                         console.log("hit pos: " + pos[0] + " " + pos[1] + " " + pos[2] + " " + pos[3] + " d " + pos[4]); //key T pressed
                         this.core.logTile(pos);*/
                         //break;
@@ -138,7 +138,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
                     debug.heightmapOnly = !debug.heightmapOnly;
 
                         /*
-                        var pos = map.getPosition();
+                        const pos = map.getPosition();
                         pos.setHeight(pos.setHeight() * 0.9);
                         map.setPosition(pos);*/
 
@@ -146,25 +146,26 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
 
                 case 81:
                 case 113:
-                    var pos = map.getPosition();
-                    // eslint-disable-next-line
-                    console.log('pos-before: ' + JSON.stringify(pos.pos));
-                    map.convert.convertPositionViewMode(pos, (pos.getViewMode() == 'obj') ? 'subj' : 'obj');
-                    // eslint-disable-next-line
-                    console.log('new mode: ' + pos.getViewMode());
-                    // eslint-disable-next-line
-                    console.log('pos-after: ' + JSON.stringify(pos.pos));
-                    map.setPosition(pos);
-                    /*this.core.saveScreenshot(pos);*/
+                    {
+                        const pos = map.getPosition();
+                        // eslint-disable-next-line
+                        console.log('pos-before: ' + JSON.stringify(pos.pos));
+                        map.convert.convertPositionViewMode(pos, (pos.getViewMode() == 'obj') ? 'subj' : 'obj');
+                        // eslint-disable-next-line
+                        console.log('new mode: ' + pos.getViewMode());
+                        // eslint-disable-next-line
+                        console.log('pos-after: ' + JSON.stringify(pos.pos));
+                        map.setPosition(pos);
+                        /*this.core.saveScreenshot(pos);*/
 
-                    if (this.altDown && pos.getViewMode() != 'obj') {
-                        map.camera.near = 0.1;
-                    } else {
-                        map.camera.near = 2;
+                        if (this.altDown && pos.getViewMode() != 'obj') {
+                            map.camera.near = 0.1;
+                        } else {
+                            map.camera.near = 2;
+                        }
+
+                        inspector.preventDefault(event);
                     }
-
-                    inspector.preventDefault(event);
-
                     break;  //key Q pressed
 
                 case 80:
@@ -210,7 +211,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
                     if (debug.drawWireframe == 3) {
                         debug.drawWireframe = 1;
                     } else {
-                        var value = debug.drawWireframe + 1;
+                        const value = debug.drawWireframe + 1;
                         debug.drawWireframe = value > 2 ? 0 : value;
                     }
                     break; //key W pressed
@@ -247,7 +248,7 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
                     debug.drawFog = !debug.drawFog; hit = true; break; //key X pressed
 
                 case 89:
-                case 120:
+                case 121:
                     map.config.mapSplitLods = !map.config.mapSplitLods; hit = true; break; //key Y pressed
 
                 case 82:
@@ -409,9 +410,9 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
             case 119:
                 debug.drawPolyWires = !debug.drawPolyWires; break; //key W pressed
 
-            case 90:
+            /*case 90:
             case 122:
-                map.config.mapPreciseDistanceTest = !map.config.mapPreciseDistanceTest; break; //key Z pressed
+                map.config.mapPreciseDistanceTest = !map.config.mapPreciseDistanceTest; break; //key Z pressed*/
 
             case 75:
             case 107:
@@ -439,41 +440,44 @@ InspectorInput.prototype.onKeyUp = function(event, press) {
 
 
 InspectorInput.prototype.setParameter = function(key, value) {
-    var map = this.core.getMap();
-    var inspector = this.inspector;
+    const map = this.core.getMap();
+    const inspector = this.inspector;
 
     if (!map) {
         return;
     }
 
-    var debug = map.draw.debug;
-    var getBool = (function(a){ return (value === true || value == 'true' || value == '1') });
+    const debug = map.draw.debug;
+    const getBool = (function(a){ return (a === true || a == 'true' || a == '1') });
 
     switch(key) {
         case 'debugMode': this.diagnosticMode = true; break;
         case 'debugBBox':
             debug.drawBBoxes = true;
+            // eslint-disable-next-line
         case 'debugNBBox':
-            if (key == 'debugNBBox') debug.drawNBBoxes = true;
-            var has = (function(a){ return (value.indexOf(a)!=-1); });
-            if (has('L')) debug.drawLods = true;
-            if (has('P')) debug.drawPositions = true;
-            if (has('T')) debug.drawTextureSize = true;
-            if (has('F')) debug.drawFaceCount = true;
-            if (has('G')) debug.drawGeodataOnly = true;
-            if (has('D')) debug.drawDistance = true;
-            if (has('N')) debug.drawNodeInfo = true;
-            if (has('V')) debug.drawSpaceBBox = true;
-            if (has('M')) debug.drawMeshBBox = true;
-            if (has('I')) debug.drawIndices = true;
-            if (has('U')) debug.drawOctants = true;
-            if (has('B')) debug.drawBoundLayers = true;
-            if (has('S')) debug.drawSurfaces = true;
-            if (has('Z')) debug.drawSurfaces2 = true;
-            if (has('C')) debug.drawCredits = true;
-            if (has('O')) debug.drawOrder = true;
-            if (has('E')) debug.debugTextSize = 3.0;
-            if (has('K')) debug.drawGPixelSize = true;
+            {
+                if (key == 'debugNBBox') debug.drawNBBoxes = true;
+                const has = (function(a){ return (value.indexOf(a)!=-1); });
+                if (has('L')) debug.drawLods = true;
+                if (has('P')) debug.drawPositions = true;
+                if (has('T')) debug.drawTextureSize = true;
+                if (has('F')) debug.drawFaceCount = true;
+                if (has('G')) debug.drawGeodataOnly = true;
+                if (has('D')) debug.drawDistance = true;
+                if (has('N')) debug.drawNodeInfo = true;
+                if (has('V')) debug.drawSpaceBBox = true;
+                if (has('M')) debug.drawMeshBBox = true;
+                if (has('I')) debug.drawIndices = true;
+                if (has('U')) debug.drawOctants = true;
+                if (has('B')) debug.drawBoundLayers = true;
+                if (has('S')) debug.drawSurfaces = true;
+                if (has('Z')) debug.drawSurfaces2 = true;
+                if (has('C')) debug.drawCredits = true;
+                if (has('O')) debug.drawOrder = true;
+                if (has('E')) debug.debugTextSize = 3.0;
+                if (has('K')) debug.drawGPixelSize = true;
+            }
             break;
         case 'debugLBox': debug.drawLabelBoxes = getBool(value); break;
         case 'debugNoEarth': debug.drawEarth = !getBool(value); break;

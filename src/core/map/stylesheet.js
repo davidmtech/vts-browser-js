@@ -2,10 +2,10 @@
 import {utils as utils_} from '../utils/utils';
 
 //get rid of compiler mess
-var utils = utils_;
+const utils = utils_;
 
 
-var MapStylesheet = function(map, id, url, freeLayer) {
+const MapStylesheet = function(map, id, url, freeLayer) {
     this.generateLines = true;
     this.map = map;
     this.renderer = this.map.renderer;
@@ -51,8 +51,8 @@ MapStylesheet.prototype.setData = function(data) {
 };
 
 MapStylesheet.prototype.checkFonts = function() {
-    var ready = true;
-    for (var key in this.fonts) {
+    let ready = true;
+    for (let key in this.fonts) {
         ready = (ready && this.renderer.getFont(this.fonts[key]).isReady());
     }
 

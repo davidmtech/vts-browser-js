@@ -2,7 +2,7 @@
 /**
  * @constructor
  */
-var RoiProcessQueue = function(options) {
+const RoiProcessQueue = function(options) {
     this.options = options;
 
     // queue
@@ -11,16 +11,16 @@ var RoiProcessQueue = function(options) {
     // options properties
     this.opsPerTick = 1;
 
-    if (typeof this.options === 'object' && this.options !== null) {
+    if (typeof this.options === 'object' && this.options !== null) {
         this.opsPerTick = this.options.opsPerTick || 1;
     }
 };
 
 
 RoiProcessQueue.prototype.tick = function() {
-    for (var i = 0; i < this.opsPerTick; i++) {
+    for (let i = 0; i < this.opsPerTick; i++) {
         if (this.enqueued.length) {
-            var task = this.enqueued.pop();
+            const task = this.enqueued.pop();
             task();
         } else {
             break;
@@ -33,7 +33,7 @@ RoiProcessQueue.prototype.enqueue = function(task) {
     if (typeof task !== 'function') {
         return;
     }
-    for (var i in this.enqueued) {
+    for (let i in this.enqueued) {
         if (this.enqueued[i] === task) {
             this.enqueued.splice(i, 1);
             break;
@@ -53,7 +53,7 @@ RoiProcessQueue.prototype.denqueue = function(task) {
         return;
     }
 
-    for (var i in this.enqueued) {
+    for (let i in this.enqueued) {
         if (this.enqueued[i] === task) {
             this.enqueued.splice(i, 1);
             break;
@@ -63,4 +63,3 @@ RoiProcessQueue.prototype.denqueue = function(task) {
 
 
 export default RoiProcessQueue;
-

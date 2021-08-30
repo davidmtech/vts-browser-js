@@ -1,25 +1,18 @@
 
-import {vec3 as vec3_, mat4 as mat4_} from '../utils/matrix';
-import BBox_ from './bbox';
-import {math as math_} from '../utils/math';
-import {utils as utils_} from '../utils/utils';
-import {utilsUrl as utilsUrl_} from '../utils/url';
-import MapResourceNode_ from '../map/resource-node';
-import MapGeodataImportVTSTree_ from '../map/geodata-import/vts-tree.js';
+import {vec3 as vec3_, mat4 as mat4_} from '../../../utils/matrix';
+import BBox_ from '../../bbox';
+import {math as math_} from '../../../utils/math';
+import {utils as utils_} from '../../../utils/utils';
+import MapResourceNode_ from '../../../map/resource-node';
 
 //get rid of compiler mess
-var vec3 = vec3_, mat4 = mat4_;
-var BBox = BBox_;
-var math = math_;
-var utils = utils_;
-var MapResourceNode = MapResourceNode_;
-var MapGeodataImportVTSTree = MapGeodataImportVTSTree_;
+const vec3 = vec3_, mat4 = mat4_;
+const BBox = BBox_;
+const math = math_;
+const utils = utils_;
+const MapResourceNode = MapResourceNode_;
 
-var utilsUrl = utilsUrl_;
-
-var localTest = false;
-
-var RenderGroup = function(id, bbox, origin, gpu, renderer) {
+const WebGLGroup = function(id, bbox, origin, gpu, renderer) {
     this.id = id;
     this.bbox = null;
     this.origin = origin || [0,0,0];
@@ -49,9 +42,9 @@ var RenderGroup = function(id, bbox, origin, gpu, renderer) {
 };
 
 //destructor
-RenderGroup.prototype.kill = function() {
-    for (var i = 0, li = this.jobs.length; i < li; i++) {
-        var job = this.jobs[i];
+WebGLGroup.prototype.kill = function() {
+    for (let i = 0, li = this.jobs.length; i < li; i++) {
+        const job = this.jobs[i];
 
         switch(job.type) {
         case VTS_JOB_FLAT_LINE:
@@ -86,13 +79,13 @@ RenderGroup.prototype.kill = function() {
     }
 
     //remove geometries
-    for (var key in this.geometries) {
-        var geometries = this.geometries[key];
-        var globalGeometry = this.renderer.geometries[key];
+    for (let key in this.geometries) {
+        const geometries = this.geometries[key];
+        const globalGeometry = this.renderer.geometries[key];
         this.geometries[key] = null;
 
         //remove geometry from glbal stack
-        for (i = 0, li = geometries.length; i < li; i++) {
+        for (let i = 0, li = geometries.length; i < li; i++) {
             if (geometries[i] == globalGeometry) {
                 this.renderer.geometries[key] = null;
             }
@@ -107,17 +100,17 @@ RenderGroup.prototype.kill = function() {
 };
 
 
-RenderGroup.prototype.getSize = function() {
+WebGLGroup.prototype.getSize = function() {
     return this.size;
 };
 
 
-RenderGroup.prototype.getZbufferOffset = function() {
+WebGLGroup.prototype.getZbufferOffset = function() {
     return this.size;
 };
 
-RenderGroup.prototype.addGeometry = function(data) {
-    var id = data['id'];
+WebGLGroup.prototype.addGeometry = function(data) {
+    const id = data['id'];
 
     if (!this.geometries[id]) {
         this.geometries[id] = [data];
@@ -128,17 +121,17 @@ RenderGroup.prototype.addGeometry = function(data) {
     this.renderer.geometries[id] = data;
 };
 
-RenderGroup.prototype.convertColor = function(c) {
-    var f = 1.0/255;
+WebGLGroup.prototype.convertColor = function(c) {
+    const f = 1.0/255;
     return [c[0]*f, c[1]*f, c[2]*f, c[3]*f];
 };
 
-RenderGroup.prototype.addLineJob = function(data) {
-    var gl = this.gl;
+WebGLGroup.prototype.addLineJob = function(data) {
+    const gl = this.gl;
 
-    var vertices = data.vertexBuffer;
+    const vertices = data.vertexBuffer;
 
-    var job = {};
+    const job = {};
 
     if (data.type == VTS_WORKER_TYPE_POLYGON) {
         job.type = VTS_JOB_POLYGON;
@@ -146,7 +139,7 @@ RenderGroup.prototype.addLineJob = function(data) {
         job.type = VTS_JOB_FLAT_LINE;
     }
 
-    job.program = this.renderer.progLine;
+    job.program = this.gpu.progLine;
     job.color = this.convertColor(data['color']);
     job.zIndex = data['z-index'] + 256;
     job.clickEvent = data['click-event'];
@@ -173,7 +166,7 @@ RenderGroup.prototype.addLineJob = function(data) {
     }
 
     if (job.advancedHit) {
-        job.program2 = this.renderer.progELine;
+        job.program2 = this.gpu.progELine;
 
         if (!job.program2.isReady()) {
             return;
@@ -188,9 +181,9 @@ RenderGroup.prototype.addLineJob = function(data) {
     job.vertexPositionBuffer.numItems = vertices.length / 3;
 
     if (job.advancedHit) {
-        job.program = this.renderer.progLine;
+        job.program = this.gpu.progLine;
 
-        var elements = data.elementBuffer;
+        const elements = data.elementBuffer;
 
         job.vertexElementBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, job.vertexElementBuffer);
@@ -206,13 +199,13 @@ RenderGroup.prototype.addLineJob = function(data) {
 };
 
 
-RenderGroup.prototype.addExtentedLineJob = function(data) {
-    var gl = this.gl;
+WebGLGroup.prototype.addExtentedLineJob = function(data) {
+    const gl = this.gl;
 
-    var vertices = data.vertexBuffer;
-    var normals = data.normalBuffer;
+    const vertices = data.vertexBuffer;
+    const normals = data.normalBuffer;
 
-    var job = {};
+    const job = {};
     job.type = data['type'];
 
 
@@ -242,12 +235,14 @@ RenderGroup.prototype.addExtentedLineJob = function(data) {
     job.ready = true;
     job.bbox = this.bbox;
 
+    let background;
+
     if (data['texture'] != null) {
-        var texture = data['texture'];
-        var bitmap = texture[0];
+        const texture = data['texture'];
+        const bitmap = texture[0];
         job.texture = [this.renderer.getBitmap(bitmap['url'], bitmap['filter'] || 'linear', bitmap['tiled'] || false),
             texture[1], texture[2], texture[3], texture[4]];
-        var background = this.convertColor(data['background']);
+        background = this.convertColor(data['background']);
 
         if (background[3] != 0) {
             job.background = background;
@@ -255,10 +250,10 @@ RenderGroup.prototype.addExtentedLineJob = function(data) {
     }
 
     switch(job.type) {
-    case VTS_JOB_FLAT_TLINE:   job.program = (background[3] != 0) ? this.renderer.progTBLine : this.renderer.progTLine;  break;
-    case VTS_JOB_FLAT_RLINE:   job.program = this.renderer.progRLine;  break;
-    case VTS_JOB_PIXEL_LINE:   job.program = this.renderer.progLine3;  break;
-    case VTS_JOB_PIXEL_TLINE:  job.program = (background[3] != 0) ? this.renderer.progTPBLine : this.renderer.progTPLine; break;
+    case VTS_JOB_FLAT_TLINE:   job.program = (background[3] != 0) ? this.gpu.progTBLine : this.gpu.progTLine;  break;
+    case VTS_JOB_FLAT_RLINE:   job.program = this.gpu.progRLine;  break;
+    case VTS_JOB_PIXEL_LINE:   job.program = this.gpu.progLine3;  break;
+    case VTS_JOB_PIXEL_TLINE:  job.program = (background[3] != 0) ? this.gpu.progTPBLine : this.gpu.progTPLine; break;
     }
 
     if (!job.program.isReady()) {
@@ -267,10 +262,10 @@ RenderGroup.prototype.addExtentedLineJob = function(data) {
 
     if (job.advancedHit) {
         switch(job.type) {
-        case VTS_JOB_FLAT_TLINE:   job.program2 = this.renderer.progETLine;  break;
-        case VTS_JOB_FLAT_RLINE:   job.program2 = this.renderer.progERLine;  break;
-        case VTS_JOB_PIXEL_LINE:   job.program2 = this.renderer.progELine3;  break;
-        case VTS_JOB_PIXEL_TLINE:  job.program2 = this.renderer.progETPLine; break;
+        case VTS_JOB_FLAT_TLINE:   job.program2 = this.gpu.progETLine;  break;
+        case VTS_JOB_FLAT_RLINE:   job.program2 = this.gpu.progERLine;  break;
+        case VTS_JOB_PIXEL_LINE:   job.program2 = this.gpu.progELine3;  break;
+        case VTS_JOB_PIXEL_TLINE:  job.program2 = this.gpu.progETPLine; break;
         }
 
         if (!job.program2.isReady()) {
@@ -293,7 +288,7 @@ RenderGroup.prototype.addExtentedLineJob = function(data) {
     job.vertexNormalBuffer.numItems = normals.length / 4;
 
     if (job.advancedHit) {
-        var elements = data.elementBuffer;
+        const elements = data.elementBuffer;
 
         job.vertexElementBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, job.vertexElementBuffer);
@@ -309,7 +304,7 @@ RenderGroup.prototype.addExtentedLineJob = function(data) {
 };
 
 
-RenderGroup.prototype.processReduce = function(job) {
+WebGLGroup.prototype.processReduce = function(job) {
     if (job.reduce) {
         switch(job.reduce[0]) {
             case 'tilt':       job.reduce[0] = 1; break;
@@ -354,20 +349,24 @@ RenderGroup.prototype.processReduce = function(job) {
 };
 
 
-RenderGroup.prototype.addLineLabelJob = function(data) {
-    var gl = this.gl;
+WebGLGroup.prototype.addLineLabelJob = function(data) {
+    const gl = this.gl;
+    let singleBuffer;
+    let singleBuffer2;
+    let vertices;
+    let texcoords;
 
     if (data.singleBuffer) {
-        var singleBuffer = data.singleBuffer;
-        var singleBuffer2 = data.singleBuffer2;
+        singleBuffer = data.singleBuffer;
+        singleBuffer2 = data.singleBuffer2;
     } else {
-        var vertices = data.vertexBuffer;
-        var texcoords = data.texcoordsBuffer;
+        vertices = data.vertexBuffer;
+        texcoords = data.texcoordsBuffer;
     }
 
-    var job = {};
+    const job = {};
     job.type = VTS_JOB_LINE_LABEL;
-    job.program = this.renderer.progText;
+    job.program = this.gpu.progText;
     job.color = this.convertColor(data['color']);
     job.color2 = this.convertColor(data['color2']);
     job.outline = data['outline'];
@@ -399,14 +398,14 @@ RenderGroup.prototype.addLineLabelJob = function(data) {
     this.processReduce(job);
 
     job.files = data['files'] || [];
-    var fonts = data['fonts'] || ['#default'];
+    const fonts = data['fonts'] || ['#default'];
     job.fonts = fonts;
 
-    for (var i = 0, li = fonts.length; i < li; i++) {
+    for (let i = 0, li = fonts.length; i < li; i++) {
         fonts[i] = this.renderer.fonts[fonts[i]];
     }
 
-    job.program = this.renderer.progText2;
+    job.program = this.gpu.progText2;
 
     if (!job.program.isReady()) {
         return;
@@ -442,19 +441,19 @@ RenderGroup.prototype.addLineLabelJob = function(data) {
 };
 
 
-RenderGroup.prototype.addIconJob = function(data, label, tile) {
-    var gl = this.gl;
+WebGLGroup.prototype.addIconJob = function(data, label, tile) {
+    const gl = this.gl;
 
-    var vertices = data.vertexBuffer;
-    var texcoords = data.texcoordsBuffer;
-    var origins = data.originBuffer;
-    var singleBuffer = data.singleBuffer;
-    var s = data['stick'];
-    var f = 1.0/255;
+    const vertices = data.vertexBuffer;
+    const texcoords = data.texcoordsBuffer;
+    const origins = data.originBuffer;
+    const singleBuffer = data.singleBuffer;
+    const s = data['stick'];
+    const f = 1.0/255;
 
-    var job = { tile: tile };
+    const job = { tile: tile };
     job.type = label ? VTS_JOB_LABEL : VTS_JOB_ICON;
-    job.program = this.renderer.progIcon;
+    job.program = this.gpu.progIcon;
     job.color = this.convertColor(data['color']);
     job.zIndex = data['z-index'] + 256;
     job.visibility = data['visibility'];
@@ -484,7 +483,7 @@ RenderGroup.prototype.addIconJob = function(data, label, tile) {
     }
 
     if (label !== true) {
-        var icon = data['icon'];
+        const icon = data['icon'];
         job.texture = this.renderer.getBitmap(null, icon['filter'] || 'linear', icon['tiled'] || false, icon['hash'], true);
         job.files = [];
     } else {
@@ -494,7 +493,7 @@ RenderGroup.prototype.addIconJob = function(data, label, tile) {
         job.origin = data['origin'];
         job.files = data['files'] || [];
         job.index = data['index'] || 0;
-        var fonts = data['fonts'] || ['#default'];
+        const fonts = data['fonts'] || ['#default'];
         job.fonts = fonts;
         job.gamma = [job.outline[2] * 1.4142 / job.size, job.outline[3] * 1.4142 / job.size];
 
@@ -502,11 +501,11 @@ RenderGroup.prototype.addIconJob = function(data, label, tile) {
             job.origin = new Float32Array(job.origin);
         }
 
-        for (var i = 0, li = fonts.length; i < li; i++) {
+        for (let i = 0, li = fonts.length; i < li; i++) {
             fonts[i] = this.renderer.fonts[fonts[i]];
         }
 
-        job.program = this.renderer.progIcon2;
+        job.program = this.gpu.progIcon2;
     }
 
     if (job.visibility != null && !Array.isArray(job.visibility)) {
@@ -559,13 +558,13 @@ RenderGroup.prototype.addIconJob = function(data, label, tile) {
 };
 
 
-RenderGroup.prototype.addPack = function(data) {
+WebGLGroup.prototype.addPack = function() {
     if (!this.subjobs.length) {
         this.subjobs = null;
         return;
     }
 
-    var job = {
+    const job = {
         type : VTS_JOB_PACK,
         subjobs: this.subjobs,
         culling : 180,
@@ -574,16 +573,16 @@ RenderGroup.prototype.addPack = function(data) {
     };
 
     //extract no overlap, remove it form subjobs
-    for (var i = 0, li = job.subjobs.length; i < li; i++) {
-        var subjob = job.subjobs[i];
+    for (let i = 0, li = job.subjobs.length; i < li; i++) {
+        const subjob = job.subjobs[i];
 
         if (subjob.noOverlap) {
 
             if (!job.noOverlap) {
                 job.noOverlap = subjob.noOverlap;
             } else {
-                var o = job.noOverlap;
-                var o2 = subjob.noOverlap;
+                const o = job.noOverlap;
+                const o2 = subjob.noOverlap;
 
                 if (o2[0] < o[0]) o[0] = o2[0];
                 if (o2[1] < o[1]) o[1] = o2[1];
@@ -634,8 +633,8 @@ RenderGroup.prototype.addPack = function(data) {
 };
 
 
-RenderGroup.prototype.addVSPoint = function(data, tile){
-    var job = { tile: tile };
+WebGLGroup.prototype.addVSPoint = function(data, tile){
+    const job = { tile: tile };
     job.type = VTS_JOB_VSPOINT;
     job.zIndex = data['z-index'] + 256;
     job.visibility = data['visibility'];
@@ -656,13 +655,13 @@ RenderGroup.prototype.addVSPoint = function(data, tile){
 };
 
 
-RenderGroup.prototype.storeVSJobs = function(data){
+WebGLGroup.prototype.storeVSJobs = function(data){
     this.vsjob.vswitch.push([data.viewExtent, this.vsjobs]);
     this.vsjobs = [];
 };
 
 
-RenderGroup.prototype.addVSwitch = function(){
+WebGLGroup.prototype.addVSwitch = function(){
     if (this.vsjob) {
         this.jobs.push(this.vsjob);
     }
@@ -670,8 +669,8 @@ RenderGroup.prototype.addVSwitch = function(){
     this.vsjobs = null;
 };
 
-RenderGroup.prototype.addMeshJob = function(data, lod) {
-    var job = {};
+WebGLGroup.prototype.addMeshJob = function(data) {
+    const job = {};
 
     job.type = VTS_JOB_MESH;
     job.path = data['path'];
@@ -681,7 +680,7 @@ RenderGroup.prototype.addMeshJob = function(data, lod) {
     job.resources = new MapResourceNode(this.renderer.core.map, null, null);
 
     if (job.path) {
-        var stmp = job.path.split(".");
+        const stmp = job.path.split(".");
         if (stmp.length > 1) {
             stmp.pop();
             job.texturePath = stmp.join('.');
@@ -694,21 +693,21 @@ RenderGroup.prototype.addMeshJob = function(data, lod) {
 };
 
 
-RenderGroup.prototype.copyBuffer = function(buffer, source, index) {
-    var tmp = new Uint8Array(buffer.buffer);
+WebGLGroup.prototype.copyBuffer = function(buffer, source, index) {
+    const tmp = new Uint8Array(buffer.buffer);
     tmp.set(new Uint8Array(source.buffer, index, buffer.byteLength));
     return buffer;
 };
 
 
-RenderGroup.prototype.addRenderJob2 = function(buffer, index, tile, direct) {
-    var data, str, length, tmp, type;
+WebGLGroup.prototype.addRenderJob2 = function(buffer, index, tile, direct) {
+    let data, str, length, type, view;
 
     if (direct) {
         type = direct.type;
         data = direct.data;
     } else {
-        var view = new DataView(buffer.buffer);
+        view = new DataView(buffer.buffer);
         type = buffer[index]; index += 1;
 
         if (type != VTS_WORKER_TYPE_PACK_BEGIN && type != VTS_WORKER_TYPE_PACK_END &&
@@ -828,40 +827,40 @@ RenderGroup.prototype.addRenderJob2 = function(buffer, index, tile, direct) {
             break;
 
         case VTS_WORKER_TYPE_NODE_BEGIN:
+            {
+                const node = data;
+                node.nodes = [];
+                node.jobs = [];
+                node.parent = this.currentNode;
 
-            var node = data;
-            node.nodes = [];
-            node.jobs = [];
-            node.parent = this.currentNode;
+                if (node.volume) {
+                    const p = node.volume.points;
+                    const points = [
+                        p[0][0],p[0][1],p[0][2],
+                        p[1][0],p[1][1],p[1][2],
+                        p[2][0],p[2][1],p[2][2],
+                        p[3][0],p[3][1],p[3][2],
+                        p[4][0],p[4][1],p[4][2],
+                        p[5][0],p[5][1],p[5][2],
+                        p[6][0],p[6][1],p[6][2],
+                        p[7][0],p[7][1],p[7][2]
+                    ];
 
-            if (node.volume) {
-                var p = node.volume.points;
-                var points = [
-                    p[0][0],p[0][1],p[0][2],
-                    p[1][0],p[1][1],p[1][2],
-                    p[2][0],p[2][1],p[2][2],
-                    p[3][0],p[3][1],p[3][2],
-                    p[4][0],p[4][1],p[4][2],
-                    p[5][0],p[5][1],p[5][2],
-                    p[6][0],p[6][1],p[6][2],
-                    p[7][0],p[7][1],p[7][2]
-                ];
+                    node.volume.points2 = points;
+                }
 
-                node.volume.points2 = points;
+                if (this.rootNode) {
+                    this.currentNode.nodes.push(node);
+                    this.currentNode = node;
+                } else {
+                    this.rootNode = node;
+                    this.currentNode = node;
+
+                    this.oldJobs = this.jobs;
+                }
+
+                this.jobs = node.jobs;
             }
-
-            if (this.rootNode) {
-                this.currentNode.nodes.push(node);
-                this.currentNode = node;
-            } else {
-                this.rootNode = node;
-                this.currentNode = node;
-
-                this.oldJobs = this.jobs;
-            }
-
-            this.jobs = node.jobs;
-
             break;
 
         case VTS_WORKER_TYPE_NODE_END:
@@ -892,7 +891,7 @@ RenderGroup.prototype.addRenderJob2 = function(buffer, index, tile, direct) {
 };
 
 
-RenderGroup.prototype.addRenderJob = function(data, tile) {
+WebGLGroup.prototype.addRenderJob = function(data, tile) {
     switch(data['type']) {
     case 'polygon':
     case 'flat-line':     this.addLineJob(data); break;
@@ -917,7 +916,7 @@ RenderGroup.prototype.addRenderJob = function(data, tile) {
     }
 };
 
-
+/*
 function drawLineString(options, renderer) {
     if (options == null || typeof options !== 'object') {
         return this;
@@ -927,33 +926,33 @@ function drawLineString(options, renderer) {
         return this;
     }
 
-    var points = options['points'];
-    var color = options['color'] || [255,255,255,255];
-    var depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
-    var size = options['size'] || 2;
-    var screenSpace = (options['screenSpace'] != null) ? options['screenSpace'] : true;
-    var depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
-    var blend = (options['blend'] != null) ? options['blend'] : false;
-    var writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
-    var useState = (options['useState'] != null) ? options['useState'] : false;
+    const points = options['points'];
+    const depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
+    const size = options['size'] || 2;
+    const screenSpace = (options['screenSpace'] != null) ? options['screenSpace'] : true;
+    const depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
+    const blend = (options['blend'] != null) ? options['blend'] : false;
+    const writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
+    const useState = (options['useState'] != null) ? options['useState'] : false;
+    let color = options['color'] || [255,255,255,255];
 
     color = [ color[0] * (1.0/255), color[1] * (1.0/255), color[2] * (1.0/255), color[3] * (1.0/255) ];
 
-    renderer.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, blend, writeDepth, useState);
+    renderer.gpu.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, blend, writeDepth, useState);
     return this;
-};
+}
+*/
 
-
-RenderGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize) {
+WebGLGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize) {
     if (this.id != null) {
         if (this.renderer.layerGroupVisible[this.id] === false) {
             return;
         }
     }
 
-    var renderer = this.renderer;
-    var renderCounter = [[renderer.geoRenderCounter, mv, mvp, this]];
-    var map = renderer.core.map;
+    const renderer = this.renderer;
+    const renderCounter = [[renderer.geoRenderCounter, mv, mvp, this]];
+    const map = renderer.core.map;
     this.map = map;
 
     if (this.binPath) {
@@ -963,12 +962,12 @@ RenderGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize
     }
 
     if (applyOrigin) {
-        var mvp2 = mat4.create();
-        var mv2 = mat4.create();
-        var pos = this.renderer.position;
+        const mvp2 = mat4.create();
+        const mv2 = mat4.create();
+        const pos = this.renderer.position;
 
         /*
-        var transform = this.renderer.layerGroupTransform[this.id];
+        const transform = this.renderer.layerGroupTransform[this.id];
 
         if (transform != null) {
             origin = transform[1];
@@ -976,7 +975,7 @@ RenderGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize
             mat4.multiply(math.translationMatrix(origin[0], origin[1], origin[2]), transform[0], mv2);
             mat4.multiply(mv, mv2, mv2);
         } else {*/
-            var origin = this.origin;
+            let origin = this.origin;
             origin = [origin[0] - pos[0], origin[1] - pos[1], origin[2]];
             mat4.multiply(mv, math.translationMatrix(origin[0], origin[1], origin[2]), mv2);
         /*}*/
@@ -986,19 +985,19 @@ RenderGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize
         mvp = mvp2;
     }
 
-    var cameraPos = renderer.cameraPosition;
-    var jobZBuffer = renderer.jobZBuffer;
-    var jobZBufferSize = renderer.jobZBufferSize;
-    var jobZBuffer2 = renderer.jobZBuffer2;
-    var jobZBuffer2Size = renderer.jobZBuffer2Size;
+    const cameraPos = renderer.cameraPosition;
+    const jobZBuffer = renderer.jobZBuffer;
+    const jobZBufferSize = renderer.jobZBufferSize;
+    //const jobZBuffer2 = renderer.jobZBuffer2;
+    //const jobZBuffer2Size = renderer.jobZBuffer2Size;
 
-    var onlyHitable = renderer.onlyHitLayers;
+    const onlyHitable = renderer.onlyHitLayers;
 
-    for (var i = 0, li = this.jobs.length; i < li; i++) {
-        var job = this.jobs[i];
+    for (let i = 0, li = this.jobs.length; i < li; i++) {
+        const job = this.jobs[i];
 
         if ((job.type == VTS_JOB_ICON || job.type == VTS_JOB_LABEL) && job.visibility > 0) {
-            var center = job.center;
+            const center = job.center;
             if (vec3.length([center[0]-cameraPos[0],
                 center[1]-cameraPos[1],
                 center[2]-cameraPos[2]]) > job.visibility) {
@@ -1016,7 +1015,7 @@ RenderGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize
         job.tiltAngle = tiltAngle;
         job.texelSize = texelSize;
 
-        var zIndex = job.zIndex;
+        const zIndex = job.zIndex;
 
         jobZBuffer[zIndex][jobZBufferSize[zIndex]] = job;
         jobZBufferSize[zIndex]++;
@@ -1024,4 +1023,4 @@ RenderGroup.prototype.draw = function(mv, mvp, applyOrigin, tiltAngle, texelSize
 };
 
 
-export default RenderGroup;
+export default WebGLGroup;

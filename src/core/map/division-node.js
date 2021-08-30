@@ -1,5 +1,5 @@
 
-var MapDivisionNode = function(map, id, srs, extents, heightRange, partitioning) {
+const MapDivisionNode = function(map, id, srs, extents, heightRange, partitioning) {
     this.map = map;
     this.id = id;
     this.srs = this.map.getMapsSrs(srs);

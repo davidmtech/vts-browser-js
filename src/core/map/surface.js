@@ -6,15 +6,15 @@ import {utils as utils_} from '../utils/utils';
 import {utilsUrl as utilsUrl_} from '../utils/url';
 
 //get rid of compiler mess
-var MapCredit = MapCredit_;
-var MapStylesheet = MapStylesheet_;
-var MapSurfaceTree = MapSurfaceTree_;
-var BBox = BBox_;
-var utils = utils_;
-var utilsUrl = utilsUrl_;
+const MapCredit = MapCredit_;
+const MapStylesheet = MapStylesheet_;
+const MapSurfaceTree = MapSurfaceTree_;
+const BBox = BBox_;
+const utils = utils_;
+const utilsUrl = utilsUrl_;
 
 
-var MapSurface = function(map, json, type) {
+const MapSurface = function(map, json, type) {
     this.map = map;
     this.id = null;
     this.type = 'basic';
@@ -64,13 +64,13 @@ var MapSurface = function(map, json, type) {
         this.baseUrlSchema = utilsUrl.getSchema(this.jsonUrl);
         this.baseUrlOrigin = utilsUrl.getOrigin(this.jsonUrl);
 
-        var onLoaded = (function(data){
+        const onLoaded = (function(data){
             this.parseJson(data);
             this.ready = true;
             this.map.refreshView();
         }).bind(this);
 
-        var onError = (function(){ }).bind(this);
+        const onError = (function(){ }).bind(this);
 
         utils.loadJSON(this.jsonUrl, onLoaded, onError, null,(utils.useCredentials ? (this.jsonUrl.indexOf(this.map.url.baseUrl) != -1) : false), this.map.core.xhrParams);
         //utils.loadJSON(this.url, onLoaded, onError, null, utils.useCredentials);
@@ -104,11 +104,11 @@ MapSurface.prototype.parseJson = function(json) {
     this.displaySize = json['displaySize'] || 1024;
     this.hitable = this.geodata ? (json['hitable'] || false) : false;
 
-    var i, li;
+    let i, li;
 
     if (json['extents']) {
-        var ll = json['extents']['ll'];
-        var ur = json['extents']['ur'];
+        const ll = json['extents']['ll'];
+        const ur = json['extents']['ur'];
         this.extents = new BBox(ll[0], ll[1], ll[2], ur[0], ur[1], ur[2]);
     } else {
         this.extents = new BBox(0,0,0,1,1,1);
@@ -125,17 +125,17 @@ MapSurface.prototype.parseJson = function(json) {
     case 'object':
 
         if (!Array.isArray(this.credits)) {
-            var credits = this.credits;
+            const credits = this.credits;
             this.credits = [];
 
-            for (var key in credits){
+            for (let key in credits){
                 this.map.addCredit(key, new MapCredit(this.map, credits[key]));
                 this.credits.push(key);
             }
         }
 
         for (i = 0, li = this.credits.length; i < li; i++) {
-            var credit = this.map.getCreditById(this.credits[i]);
+            const credit = this.map.getCreditById(this.credits[i]);
             this.creditsNumbers.push(credit ? credit.id : null);
         }
 
@@ -150,7 +150,7 @@ MapSurface.prototype.parseJson = function(json) {
 
     //load stylesheet
     if (this.geodata) {
-        var style = json['style'];
+        let style = json['style'];
 
         if (typeof this.credits === 'string') {
             style = this.processUrl(style, '');
@@ -245,14 +245,14 @@ MapSurface.prototype.processUrl = function(url, fallback) {
 
 
 MapSurface.prototype.hasTile = function(id) {
-    var shift = id[0] - this.lodRange[0];
+    const shift = id[0] - this.lodRange[0];
 
     if (shift < 0) {
         return false;
     }
 
-    var x = id[1] >> shift;
-    var y = id[2] >> shift;
+    const x = id[1] >> shift;
+    const y = id[2] >> shift;
 
     if (id[0] < this.lodRange[0] || id[0] > this.lodRange[1] ||
         x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
@@ -265,15 +265,15 @@ MapSurface.prototype.hasTile = function(id) {
 
 
 MapSurface.prototype.hasTile2 = function(id) {
-    var shift = id[0] - this.lodRange[0];
-    var above = (shift < 0);
+    let shift = id[0] - this.lodRange[0];
+    const above = (shift < 0);
 
     if (id[0] < this.lodRange[0]) {
         shift = -shift;
-        var x1 = this.tileRange[0][0] >> shift;
-        var y1 = this.tileRange[0][1] >> shift;
-        var x2 = this.tileRange[1][0] >> shift;
-        var y2 = this.tileRange[1][1] >> shift;
+        const x1 = this.tileRange[0][0] >> shift;
+        const y1 = this.tileRange[0][1] >> shift;
+        const x2 = this.tileRange[1][0] >> shift;
+        const y2 = this.tileRange[1][1] >> shift;
 
         if (id[0] > this.lodRange[1] ||
             id[1] < x1 || id[1] > x2 ||
@@ -281,8 +281,8 @@ MapSurface.prototype.hasTile2 = function(id) {
             return [false , false];
         }
     } else {
-        var x = id[1] >> shift;
-        var y = id[2] >> shift;
+        const x = id[1] >> shift;
+        const y = id[2] >> shift;
 
         if (id[0] > this.lodRange[1] ||
             x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
@@ -300,11 +300,11 @@ MapSurface.prototype.hasMetatile = function(id) {
         return false;
     }
 
-    var shift = id[0] - this.lodRange[0];
+    let shift = id[0] - this.lodRange[0];
 
     if (shift >= 0) {
-        var x = id[1] >> shift;
-        var y = id[2] >> shift;
+        const x = id[1] >> shift;
+        const y = id[2] >> shift;
 
         if (x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
             y < this.tileRange[0][1] || y > this.tileRange[1][1] ) {
@@ -328,7 +328,7 @@ MapSurface.prototype.setStyle = function(style) {
         return;
     }
 
-    var id = style;
+    let id = style;
 
     if (typeof id !== 'object') {
         id = this.processUrl(id, '');

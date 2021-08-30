@@ -7,15 +7,15 @@ import MapGeodata_ from './geodata';
 import MapPointCloud_ from './pointcloud';
 
 //get rid of compiler mess
-var MapTexture = MapTexture_;
-var MapSubtexture = MapSubtexture_;
-var MapMetatile = MapMetatile_;
-var MapMesh = MapMesh_;
-var MapGeodata = MapGeodata_;
-var MapPointCloud = MapPointCloud_;
+const MapTexture = MapTexture_;
+const MapSubtexture = MapSubtexture_;
+const MapMetatile = MapMetatile_;
+const MapMesh = MapMesh_;
+const MapGeodata = MapGeodata_;
+const MapPointCloud = MapPointCloud_;
 
 
-var MapResourceNode = function(map, parent, id) {
+const MapResourceNode = function(map, parent, id) {
     this.map = map;
     this.id = id;
     this.parent = parent;
@@ -33,7 +33,7 @@ var MapResourceNode = function(map, parent, id) {
 
 MapResourceNode.prototype.kill = function() {
     //kill children
-    for (var i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
         if (this.children[i] != null) {
             this.children[i].kill();
         }
@@ -41,13 +41,13 @@ MapResourceNode.prototype.kill = function() {
 
     this.children = [null, null, null, null];
 
-    var parent = this.parent;
+    const parent = this.parent;
     this.parent = null;
 
     if (parent != null) {
         parent.removeChild(this);
     }
-    
+
     //kill resources?
 };
 
@@ -56,9 +56,9 @@ MapResourceNode.prototype.addChild = function(index) {
     if (this.children[index]) {
         return;
     }
-    
-    var id = this.id;
-    var childId = [id[0] + 1, id[1] << 1, id[2] << 1];
+
+    const id = this.id;
+    const childId = [id[0] + 1, id[1] << 1, id[2] << 1];
 
     switch (index) {
     case 1: childId[1]++; break;
@@ -79,7 +79,7 @@ MapResourceNode.prototype.removeChildByIndex = function(index) {
 
 
 MapResourceNode.prototype.removeChild = function(tile) {
-    for (var i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
         if (this.children[i] == tile) {
             this.children[i].kill();
             this.children[i] = null;
@@ -91,13 +91,13 @@ MapResourceNode.prototype.removeChild = function(tile) {
 // Meshes ---------------------------------
 
 MapResourceNode.prototype.getMesh = function(path, tile) {
-    var mesh = this.meshes[path];
-    
+    let mesh = this.meshes[path];
+
     if (!mesh) {
         mesh = new MapMesh(this.map, path, tile);
         this.meshes[path] = mesh;
     }
-    
+
     return mesh;
 };
 
@@ -107,14 +107,14 @@ MapResourceNode.prototype.getMesh = function(path, tile) {
 MapResourceNode.prototype.getPointCloud = function(path, tile, offset, size) {
     if (!this.pointclouds) this.pointclouds = {};
 
-    var path2 = offset ? path+'@'+offset : path;
-    var pointcloud = this.pointclouds[path2];
-    
+    const path2 = offset ? path+'@'+offset : path;
+    let pointcloud = this.pointclouds[path2];
+
     if (!pointcloud) {
         pointcloud = new MapPointCloud(this.map, path, tile, offset, size);
         this.pointclouds[path2] = pointcloud;
     }
-    
+
     return pointcloud;
 };
 
@@ -122,13 +122,13 @@ MapResourceNode.prototype.getPointCloud = function(path, tile, offset, size) {
 // Geodata ---------------------------------
 
 MapResourceNode.prototype.getGeodata = function(path, extraInfo) {
-    var geodata = this.geodata[path];
-    
+    let geodata = this.geodata[path];
+
     if (!geodata) {
         geodata = new MapGeodata(this.map, path, extraInfo);
         this.geodata[path] = geodata;
     }
-    
+
     return geodata;
 };
 
@@ -136,24 +136,24 @@ MapResourceNode.prototype.getGeodata = function(path, extraInfo) {
 // Textures ---------------------------------
 
 MapResourceNode.prototype.getTexture = function(path, type, extraBound, extraInfo, tile, internal) {
-    var texture;
+    let texture;
     if (extraInfo && (extraInfo.layer || extraInfo.hmap)) {
-        var id = path + (extraInfo.hmap ? '' : extraInfo.layer.id);
+        const id = path + (extraInfo.hmap ? '' : extraInfo.layer.id);
         texture = this.textures[id];
-        
+
         if (!texture) {
             texture = new MapTexture(this.map, path, type, extraBound, extraInfo, tile, internal);
             this.textures[id] = texture;
         }
     } else {
         texture = this.textures[path];
-        
+
         if (!texture) {
             texture = new MapTexture(this.map, path, type, extraBound, extraInfo, tile, internal);
             this.textures[path] = texture;
         }
     }
-    
+
     return texture;
 };
 
@@ -162,12 +162,12 @@ MapResourceNode.prototype.getTexture = function(path, type, extraBound, extraInf
 
 MapResourceNode.prototype.getSubtexture = function(texture, path, type, extraBound, extraInfo, tile, internal) {
     texture = this.subtextures[path];
-    
+
     if (!texture) {
         texture = new MapSubtexture(this.map, path, type, extraBound, extraInfo, tile, internal);
         this.subtextures[path] = texture;
     }
-    
+
     return texture;
 };
 
@@ -180,7 +180,7 @@ MapResourceNode.prototype.addMetatile = function(path, metatile) {
 
 
 MapResourceNode.prototype.removeMetatile = function(metatile) {
-    for (var key in this.metatiles) {
+    for (let key in this.metatiles) {
         if (this.metatiles[key] == metatile) {
             delete this.metatiles[key];
         }
@@ -189,14 +189,15 @@ MapResourceNode.prototype.removeMetatile = function(metatile) {
 
 
 MapResourceNode.prototype.getMetatile = function(surface, allowCreation, tile) {
-    var metatiles = this.metatiles, metatile; 
-    for (var key in metatiles) {
+    const metatiles = this.metatiles;
+    let metatile;
+    for (let key in metatiles) {
         if (metatiles[key].surface == surface) {
             return metatiles[key];
-        } 
+        }
     }
-    
-    var path = surface.getMetaUrl(this.id);
+
+    const path = surface.getMetaUrl(this.id);
 
     if (metatiles[path]) {
         metatile = metatiles[path].clone(surface);
@@ -207,7 +208,7 @@ MapResourceNode.prototype.getMetatile = function(surface, allowCreation, tile) {
     if (allowCreation) {
         metatile = new MapMetatile(this, surface, tile);
         this.addMetatile(path, metatile);
-        return metatile; 
+        return metatile;
     } else {
         return null;
     }
@@ -215,5 +216,3 @@ MapResourceNode.prototype.getMetatile = function(surface, allowCreation, tile) {
 
 
 export default MapResourceNode;
-
-

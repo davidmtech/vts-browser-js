@@ -1,5 +1,5 @@
 
-var UIEvent = function(type, element, event) {
+const UIEvent = function(type, element, event) {
     this.type = type;
     this.event = event;
     this.element = element;
@@ -11,40 +11,41 @@ UIEvent.prototype.getMouseButton = function() {
     case 'touchstart':
     case 'touchend':
     case 'touchmove':
+        {
+            const touches = this.event['touches'];
 
-        var touches = this.event['touches'];
-            
-        if (touches) {
-            switch(touches.length) {
-            case 1: return 'left';
-            case 2: return 'right';
-            case 3: return 'middle';
+            if (touches) {
+                switch(touches.length) {
+                case 1: return 'left';
+                case 2: return 'right';
+                case 3: return 'middle';
+                }
             }
+
+            return '';
         }
 
-        return '';   
-
     default:
-    
+
         if (this.event.which) { // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
                 //right = e.which == 3;
-        
+
             switch(this.event.which) {
             case 1: return 'left';
             case 2: return 'middle';
             case 3: return 'right';
             }
-        
+
         } else if (this.event.button) { // IE, Opera
                 //right = e.button == 2;
-        
+
             switch(this.event.button) {
             case 1: return 'left';
             case 2: return 'right';
             case 3: return 'middle';
             }
         }
-    
+
     }
 
     return '';
@@ -52,26 +53,29 @@ UIEvent.prototype.getMouseButton = function() {
 
 
 UIEvent.prototype.getMouseCoords = function(absolute) {
-    var pos = [0,0];
+    let pos = [0,0];
 
     switch (this.type) {
     case 'touchstart':
     case 'touchend':
     case 'touchmove':
+        {
+            const touches = this.event['touches'];
+            if (!touches || touches.length == 0) {
+                break;
+            }
 
-        var touches = this.event['touches'];
-        if (!touches || touches.length == 0) {
-            break;
+            let i, li;
+
+            for (i = 0, li = touches.length; i < li; i++) {
+                const pos2 = this.getEventCoords(this.event['touches'][i], absolute);
+                pos[0] += pos2[0];
+                pos[1] += pos2[1];
+            }
+
+            pos[0] /= li;
+            pos[1] /= li;
         }
-            
-        for (var i = 0, li = touches.length; i < li; i++) {
-            var pos2 = this.getEventCoords(this.event['touches'][i], absolute);
-            pos[0] += pos2[0];   
-            pos[1] += pos2[1];   
-        }
-            
-        pos[0] /= li;
-        pos[1] /= li;
         break;
 
     case 'mousedown':
@@ -100,7 +104,7 @@ UIEvent.prototype.getEventCoords = function(event, absolute) {
         return [ event['clientX'],
                  event['clientY'] ];
     } else {
-        var rect = this.element.getPageRect();
+        const rect = this.element.getPageRect();
 
         return [ event['pageX'] - rect.left,
                  event['pageY'] - rect.top ];
@@ -125,7 +129,7 @@ UIEvent.prototype.getDragZoom = function() {
     case 'drag':
         return this.event['zoom'];
     }
-    
+
     return 1.0;
 };
 
@@ -135,7 +139,7 @@ UIEvent.prototype.getDragTouches = function() {
     case 'drag':
         return this.event['touches'];
     }
-    
+
     return 0;
 };
 
@@ -165,7 +169,7 @@ UIEvent.prototype.getKeyCode = function() {
     case 'keyup':
     case 'keydown':
     case 'keypress':
-        
+
         if (this.event.keyCode) {         // eg. IE
             return this.event.keyCode;
         } else if (this.event.which) {   // eg. Firefox
@@ -174,17 +178,17 @@ UIEvent.prototype.getKeyCode = function() {
             return this.event.charCode;
         }
     }
-    
+
     return null;
 };
 
 
 UIEvent.prototype.getDragButton = function(button) {
     switch(button) {
-    case 'left': 
+    case 'left':
     case 'right':
     case 'middle':
-            
+
         switch(this.getTouchesCount()) {
         case -1: return this.event[button];
         case 0: return false;
@@ -192,7 +196,7 @@ UIEvent.prototype.getDragButton = function(button) {
         case 2: return button == 'right';
         case 3: return button == 'middle';
         }
-        
+
     }
 
     return false;
@@ -202,17 +206,18 @@ UIEvent.prototype.getDragButton = function(button) {
 UIEvent.prototype.getWheelDelta = function() {
     switch (this.type) {
     case 'mousewheel':
+        {
+            let delta = 0;
 
-        var delta = 0;
+            if (this.event.wheelDelta) {
+                delta = this.event.wheelDelta / 120;
+            }
+            if (this.event.detail) {
+                delta = -this.event.detail / 3;
+            }
 
-        if (this.event.wheelDelta) {
-            delta = this.event.wheelDelta / 120;
+            return delta;
         }
-        if (this.event.detail) {
-            delta = -this.event.detail / 3;
-        }
-
-        return delta;
     }
 
     return 0;
@@ -224,15 +229,16 @@ UIEvent.prototype.getTouchesCount = function() {
     case 'touchstart':
     case 'touchend':
     case 'touchmove':
+        {
+            let touches = this.event['touches'];
+            if (!touches) {
+                break;
+            }
 
-        var touches = this.event['touches'];
-        if (!touches) {
-            break;
+            return this.event['touches'].length;
         }
-            
-        return this.event['touches'].length;    
     }
-    
+
     return -1;
 };
 
@@ -242,7 +248,7 @@ UIEvent.prototype.getTouchParameter = function(name) {
     case 'drag':
         return this.event[name];
     }
-    
+
     return null;
 };
 
@@ -252,25 +258,26 @@ UIEvent.prototype.getTouchCoords = function(index, absolute) {
     case 'touchstart':
     case 'touchend':
     case 'touchmove':
+        {
+            const touches = this.event['touches'];
+            if (!touches) {
+                break;
+            }
 
-        var touches = this.event['touches'];
-        if (!touches) {
-            break;
-        }
-            
-        var event = this.event['touches'][index];    
-        if (!event) {
-            break;
-        }
+            const event = this.event['touches'][index];
+            if (!event) {
+                break;
+            }
 
-        if (this.element.getPageRect == null || absolute) {
-            return [ event['clientX'],
-                     event['clientY'] ];
-        } else {
-            var rect = this.element.getPageRect();
+            if (this.element.getPageRect == null || absolute) {
+                return [ event['clientX'],
+                         event['clientY'] ];
+            } else {
+                const rect = this.element.getPageRect();
 
-            return [ event['pageX'] - rect.left,
-                     event['pageY'] - rect.top ];
+                return [ event['pageX'] - rect.left,
+                         event['pageY'] - rect.top ];
+            }
         }
     }
 
@@ -284,5 +291,3 @@ UIEvent.prototype.getType = function() {
 
 
 export default UIEvent;
-
-

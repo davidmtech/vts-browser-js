@@ -3,28 +3,28 @@ import {utils as utils_} from '../utils/utils';
 import {utilsUrl as utilsUrl_} from '../utils/url';
 
 //get rid of compiler mess
-var utilsUrl = utilsUrl_;
-var utils = utils_;
+const utilsUrl = utilsUrl_;
+const utils = utils_;
 
 
-var MapUrl = function(map, path) {
+const MapUrl = function(map, path) {
     this.map = map;
 
     path = path.trim();
     this.baseUrl = utilsUrl.getBase(path);
     this.baseUrlSchema = utilsUrl.getSchema(path);
-    this.baseUrlOrigin = utilsUrl.getOrigin(path); 
+    this.baseUrlOrigin = utilsUrl.getOrigin(path);
 
     this.urlCounter = 0;
 };
 
 
 MapUrl.prototype['quad'] = function(lod, ix, iy) {
-    var quadKey = '';
+    let quadKey = '';
     //ty = Math.pow(2,zoom - 1) - ty;
-    for (var i = lod; i > 0; i--) {
-        var digit = 0;
-        var mask = 1 << (i-1);
+    for (let i = lod; i > 0; i--) {
+        let digit = 0;
+        const mask = 1 << (i-1);
         if ((ix & mask) != 0) {
             digit += 1;
         }
@@ -46,7 +46,7 @@ MapUrl.prototype['msDigit'] = function(iy, ix) {
 
 
 MapUrl.prototype.hex = function(v) {
-    var s = v.toString(16);
+    let s = v.toString(16);
     while (s.length < 8) {
         s = '0' + s;
     }
@@ -65,7 +65,7 @@ MapUrl.prototype['ppy'] = function(lod, iy) {
 
 
 MapUrl.prototype.processUrlFunction = function(id, counter, string) {
-    var string2, fc;
+    let string2, fc;
     if (typeof string == 'string') {
         if (string.indexOf('quad') != -1) {
             string2 = '(function(lod,x,y,loclod,locx,locy){' + string.replace('quad', 'return this.quad') + '})';
@@ -87,10 +87,10 @@ MapUrl.prototype.processUrlFunction = function(id, counter, string) {
             }
 
         } else if (string.indexOf('alt') != -1) {
-            var result = /\(([^)]*)\)/.exec(string);
+            const result = /\(([^)]*)\)/.exec(string);
 
             if (result && result[1]) {
-                var strings = result[1].match(/([^,]+)/g);
+                const strings = result[1].match(/([^,]+)/g);
 
                 if (strings.length > 0) {
                     return strings[(counter % strings.length)];
@@ -130,30 +130,30 @@ MapUrl.prototype.processUrlFunction = function(id, counter, string) {
 
 
 MapUrl.prototype.findLocalRoot = function(id) {
-    var nodes = this.map.referenceFrame.getSpatialDivisionNodes();
-    var validNodes = [];  
+    const nodes = this.map.referenceFrame.getSpatialDivisionNodes();
+    const validNodes = [];
 
-    for (var i = 0, li = nodes.length; i < li; i++) {
-        var node = nodes[i];
-        
-        var delta = id[0] - node.id[0];
-        var ix = id[1] >> delta;
-        var iy = id[2] >> delta;
-        
+    for (let i = 0, li = nodes.length; i < li; i++) {
+        const node = nodes[i];
+
+        const delta = id[0] - node.id[0];
+        const ix = id[1] >> delta;
+        const iy = id[2] >> delta;
+
         if (ix == node.id[1] && iy == node.id[2]) {
-            validNodes.push(node);           
+            validNodes.push(node);
         }
     }
 
-    var bestNode = null;
-    var bestLod = -1;
-    
-    for (i = 0, li = validNodes.length; i < li; i++) {
+    let bestNode = null;
+    let bestLod = -1;
+
+    for (let i = 0, li = validNodes.length; i < li; i++) {
         if (validNodes[i].id[0] > bestLod) {
-            bestNode = validNodes[i]; 
+            bestNode = validNodes[i];
         }
     }
-    
+
     if (bestNode) {
         return bestNode.id.slice();
     } else {
@@ -172,19 +172,19 @@ MapUrl.prototype.makeUrl = function(templ, id, subId, skipBaseUrl) {
     //}
     //templ = "maps{alt(1,2,3,4)}.irist-test.citationtech.net/map/{lod}-{x}-{y}.jpg?v=4";
 
-    var locx = 0;
-    var locy = 0;
-    var loclod = 0;
+    let locx = 0;
+    let locy = 0;
+    let loclod = 0;
 
     if (id.lod) {
-        var localRoot = this.findLocalRoot([id.lod, id.ix, id.iy]);    
+        const localRoot = this.findLocalRoot([id.lod, id.ix, id.iy]);
         loclod = id.lod - localRoot[0];
-        var mask = (1 << loclod) - 1;
+        const mask = (1 << loclod) - 1;
         locx = id.ix & mask;
-        locy = id.iy & mask;        
+        locy = id.iy & mask;
     }
-    
-    var id2 = {
+
+    const id2 = {
         lod: id.lod,
         ix : id.ix,
         iy : id.iy,
@@ -196,7 +196,7 @@ MapUrl.prototype.makeUrl = function(templ, id, subId, skipBaseUrl) {
     //remove white spaces from template
     templ = templ.replace(/ /g, '');
 
-    var url = utils.simpleFmtObjOrCall(templ, {'lod':id.lod,  'x':id.ix, 'y':id.iy, 'sub': subId,
+    const url = utils.simpleFmtObjOrCall(templ, {'lod':id.lod,  'x':id.ix, 'y':id.iy, 'sub': subId,
         'locx':locx, 'locy':locy, 'loclod':loclod, 'geonavtile': subId,
         'hereappid': 'abcde', 'hereappcode':'12345'},
                                                this.processUrlFunction.bind(this, id2, this.urlCounter));
@@ -206,7 +206,7 @@ MapUrl.prototype.makeUrl = function(templ, id, subId, skipBaseUrl) {
     skipBaseUrl = (url.indexOf('//') != -1);
 
     /* //useful for debug
-    var tmp;
+    let tmp;
 
     if (skipBaseUrl) {
         tmp =  url;
@@ -231,7 +231,7 @@ MapUrl.prototype.processUrl = function(url, fallback) {
     if (!url) {
         return fallback;
     }
-    
+
     url = url.trim();
 
     if (url.indexOf('://') != -1) { //absolute
@@ -241,10 +241,9 @@ MapUrl.prototype.processUrl = function(url, fallback) {
     } else if (url.indexOf('/') == 0) {  //absolute without host
         return this.baseUrlOrigin + url;
     } else {  //relative
-        return this.baseUrl + url; 
+        return this.baseUrl + url;
     }
 };
 
 
 export default MapUrl;
-

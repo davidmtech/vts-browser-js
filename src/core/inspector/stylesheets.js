@@ -1,12 +1,12 @@
 
-var InspectorStylesheets = function(inspector) {
+const InspectorStylesheets = function(inspector) {
     this.inspector = inspector;
     this.core = inspector.core;
 };
 
 
 InspectorStylesheets.prototype.init = function() {
-    var inspector = this.inspector;
+    const inspector = this.inspector;
     inspector.addStyle(
         '#vts-stylesheets-panel * {'
             + 'all: initial;'
@@ -102,7 +102,7 @@ InspectorStylesheets.prototype.init = function() {
     this.optionsElement.onchange = this.onComboSwitched.bind(this);
 
     this.textElement = document.getElementById('vts-stylesheets-panel-text');
-    
+
     document.getElementById('vts-stylesheets-panel-update-button').onclick = this.onUpdate.bind(this);
     document.getElementById('vts-stylesheets-panel-hide-button').onclick = this.hidePanel.bind(this);
 
@@ -141,18 +141,18 @@ InspectorStylesheets.prototype.switchPanel = function() {
 
 
 InspectorStylesheets.prototype.onComboSwitched = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var stylesheet = map.getStylesheet(this.optionsElement.value);
+    const stylesheet = map.getStylesheet(this.optionsElement.value);
     this.textElement.value = this.niceStyleFormat(stylesheet);
 };
 
 
 InspectorStylesheets.prototype.onUpdate = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
@@ -165,94 +165,93 @@ InspectorStylesheets.prototype.niceStyleFormat = function(data) {
     if (!data || !data.data) {
         return '';
     }
-    
+
     data = data.data;
 
     //return JSON.stringify(data, null, "  ");
-    
-    var tmp = '';
+
+    let tmp = '';
     tmp += '{\n';
 
-    var elements = [];
+    const elements = [];
 
     if (data['constants']) {
         elements.push('constants');
-    } 
+    }
 
     if (data['bitmaps']) {
         elements.push('bitmaps');
-    } 
+    }
 
     if (data['fonts']) {
         elements.push('fonts');
-    } 
+    }
 
     if (data['layers']) {
         elements.push('layers');
-    } 
-    
-    for (var j = 0, lj = elements.length; j < lj; j++) {
-        var type = elements[j];
+    }
+
+    for (let j = 0, lj = elements.length; j < lj; j++) {
+        const type = elements[j];
         tmp += '  "' + type + '": {\n';
 
-        var element = data[type];
+        const element = data[type];
 
-        var buff = [];
-        for (var key in element) {
+        const buff = [];
+        for (let key in element) {
             buff.push(key);
         }
 
-        for (var i = 0, li = buff.length; i < li; i++) {
+        for (let i = 0, li = buff.length; i < li; i++) {
             if (type == 'layers') {
-                
-                var element2 = element[buff[i]];
-                
-                var buff2 = [];
-                for (var key2 in element2) {
+
+                const element2 = element[buff[i]];
+
+                const buff2 = [];
+                for (let key2 in element2) {
                     buff2.push(key2);
                 }
 
                 tmp += '    "' + buff[i] + '": {\n';
 
-                for (var k = 0, lk = buff2.length; k < lk; k++) {
+                for (let k = 0, lk = buff2.length; k < lk; k++) {
                     tmp += '      "' + buff2[k] + '": ' + JSON.stringify(element2[buff2[k]]) + (k == (lk - 1) ? '' : ',') + '\n';
                 }
-                
+
                 tmp += '    }'  + (i == (li - 1) ? '' : ',\n');
             } else {
                 tmp += '    "' + buff[i] + '": ' + JSON.stringify(element[buff[i]]) + (i == (li - 1) ? '' : ',') + '\n';
             }
         }
-        
+
         tmp += '\n  }' + (j == (lj - 1) ? '' : ',\n');
     }
-    
+
     tmp += '\n}';
-    
+
     return tmp;
 };
 
 
 InspectorStylesheets.prototype.buildStylesheetsCombo = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var html = '';
+    let html = '';
 
-    var styles = map.getStylesheets();
-    
-    for (var i = 0, li = styles.length; i < li; i++) {
+    const styles = map.getStylesheets();
+
+    for (let i = 0, li = styles.length; i < li; i++) {
         html += '<option value="' + styles[i] + '">' + styles[i] + '</option>';
-    }    
-    
+    }
+
     this.optionsElement.innerHTML = html;
-    
-    var stylesheet = map.getStylesheet(styles[0]);
+
+    const stylesheet = map.getStylesheet(styles[0]);
     this.textElement.value = this.niceStyleFormat(stylesheet);
 };
 
 
 export default InspectorStylesheets;
-

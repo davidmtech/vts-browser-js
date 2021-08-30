@@ -3,14 +3,14 @@
 import {getCoreVersion} from '../core';
 
 
-var InspectorStats = function(inspector) {
+const InspectorStats = function(inspector) {
     this.inspector = inspector;
     this.core = inspector.core;
 };
 
 
 InspectorStats.prototype.init = function() {
-    var inspector = this.inspector;
+    const inspector = this.inspector;
     inspector.addStyle(
         '#vts-stats-panel {'
             + 'font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;'
@@ -96,9 +96,9 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
     if (!this.infoElement || !this.panelVisible) {
         return;
     }
-    var inspector = this.inspector;
-    
-    var text2 =
+    const inspector = this.inspector;
+
+    let text2 =
             'FPS: ' + Math.round(stats.fps) + '<br/>' +
             'Render time: ' + Math.round(stats.renderTime*1000) + '<br/>' +
             ' - resources: ' + Math.round(stats.gpuRenderUsed/(1024*1024)) + 'MB<br/>' +
@@ -120,11 +120,11 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
             '- desired lod: ' + (stats.heightLod.toFixed(2)) + '<br/>' +
             '- used lod: ' + (stats.heightNode.toFixed(2)) + '<br/>' +
             '- used source: ' + ((stats.heightClass == 2 ? 'navtile' : stats.heightClass == 1 ? 'node': '---') ) + '<br/>' +
-            'Terrain Radar Lod: ' + (inspector.radarLod) + '<br/><br/>' + 
+            'Terrain Radar Lod: ' + (inspector.radarLod) + '<br/><br/>' +
             'Loaded/Errors: ' + (stats.loadedCount) + ' / ' + (stats.loadErrorCount) + '<br/>' +
             'Load time: ' + ((stats.loadLast - stats.loadFirst)*0.001).toFixed(2) + 's <br/>';
 
-    var renderer = this.core.renderer;
+    const renderer = this.core.renderer;
 
     if (renderer) {
         text2 += '<br/>Render jobs: ' + renderer.totalJobs + '<br/>' +
@@ -134,13 +134,13 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
     }
 
     if (stats.debugStr) {
-        text2 += stats.debugStr + '<br/>';        
+        text2 += stats.debugStr + '<br/>';
     }
 
-    var text3 =  'PixelRatio: ' + (window.devicePixelRatio || 1).toFixed(3) +'<br/>'+
+    let text3 =  'PixelRatio: ' + (window.devicePixelRatio || 1).toFixed(3) +'<br/>'+
                  'BFRate: ' + Math.round(1000 / (stats.frameTime+0.00001)) +'<br/><br/>';
 
-    var map = this.core.getMap();
+    const map = this.core.getMap();
 
     if (map) {
         text3 += 'ReduceMode: ' +'<br/>'+ map.config.mapFeaturesReduceMode +'<br/>'+
@@ -168,28 +168,28 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
 
     text3 += 'Tiles: ' + (stats.drawnTiles) +'<br/>';
 
-    for (var i =0, li = stats.renderedLods.length; i < li; i++) {
+    for (let i =0, li = stats.renderedLods.length; i < li; i++) {
         if (stats.renderedLods[i]) {
             text3 += 'LOD ' + i + ': ' + (stats.renderedLods[i]) +'<br/>';
         }
     }
 
 
-    var text = '<table style="width:305px"><tr><td>' + text2 + '</td><td>' + text3 + '</td></tr></table>';
+    const text = '<table style="width:305px"><tr><td>' + text2 + '</td><td>' + text3 + '</td></tr></table>';
 
     this.infoElement.innerHTML = text;
 
     if (map) {
-        var p = map.getPosition();
-        var s = '';
+        const p = map.getPosition();
+        let s = '';
         s += p.getViewMode() + ',';
-        var c = p.getCoords();
+        const c = p.getCoords();
         s += c[0] + ',' + c[1] + ',' + p.getHeightMode() + ',' + c[2].toFixed(2) + ',';
-        var o = p.getOrientation();
+        const o = p.getOrientation();
         s += o[0].toFixed(2) + ',' + o[1].toFixed(2) + ',' + o[2].toFixed(2) + ',';
         s += p.getViewExtent().toFixed(2) + ',' + p.getFov().toFixed(2);
-        
-        //var value = JSON.stringify(p.pos);
+
+        //const value = JSON.stringify(p.pos);
 
         if (this.posElement.value != s) {
             this.posElement.value = s;
@@ -199,4 +199,3 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
 
 
 export default InspectorStats;
-

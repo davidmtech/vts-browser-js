@@ -2,29 +2,29 @@
 import UIEvent_ from '../ui/element/event';
 
 //get rid of compiler mess
-var UIEvent = UIEvent_;
+const UIEvent = UIEvent_;
 
 
 //Dom.dragging = false;
-var Dom = {};
+const Dom = {};
 
 Dom.hasClass = function(element, name) {
     if (element.classList !== undefined) {
         return element.classList.contains(name);
     }
-    var className = Dom.getClass(element);
+    const className = Dom.getClass(element);
     return className.length > 0 && new RegExp('(^|\\s)' + name + '(\\s|$)').test(className);
 };
 
 
 Dom.addClass = function(element, name) {
     if (element.classList !== undefined) {
-        var classes = Dom.splitWords(name);
-        for (var i = 0, li = classes.length; i < li; i++) {
+        const classes = Dom.splitWords(name);
+        for (let i = 0, li = classes.length; i < li; i++) {
             element.classList.add(classes[i]);
         }
     } else if (!Dom.hasClass(element, name)) {
-        var className = Dom.getClass(element);
+        const className = Dom.getClass(element);
         Dom.setClass(element, (className ? className + ' ' : '') + name);
     }
 };
@@ -100,9 +100,9 @@ Dom.enableContexMenu = function(element) {
 
 
 Dom.getSupportedProperty = function(properties) {
-    var style = document.documentElement.style;
+    const style = document.documentElement.style;
 
-    for (var i = 0, li = properties.length; i < li; i++) {
+    for (let i = 0, li = properties.length; i < li; i++) {
         if (properties[i] in style) {
             return properties[i];
         }

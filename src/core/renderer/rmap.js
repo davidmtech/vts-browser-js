@@ -2,10 +2,10 @@
 import {vec3 as vec3_} from '../utils/matrix';
 
 //get rid of compiler mess
-var vec3 = vec3_;
+const vec3 = vec3_;
 
 
-var RendererRMap = function(renderer, blockSize, maxBlockRectangles) {
+const RendererRMap = function(renderer, blockSize, maxBlockRectangles) {
     this.renderer = renderer;
     this.drawAllLabels = false;
     this.maxBlockRectangles = maxBlockRectangles || 500;
@@ -31,7 +31,7 @@ var RendererRMap = function(renderer, blockSize, maxBlockRectangles) {
 
 
 RendererRMap.prototype.clear = function() {
-    var renderer = this.renderer;
+    const renderer = this.renderer;
 
     this.sx2 = renderer.curSize[0];
     this.sy2 = renderer.curSize[1];
@@ -59,8 +59,8 @@ RendererRMap.prototype.clear = function() {
         this.sy2 = Math.max(1, renderer.curSize[1] - 68);
     }
 
-    var totalNeeded = this.ly * this.lx;
-    
+    const totalNeeded = this.ly * this.lx;
+
     if (!this.rectangles) {
         this.rectangles = new Array(totalNeeded * this.maxBlockRectangles * 6); //preallocate empty rectangles
     }
@@ -75,7 +75,7 @@ RendererRMap.prototype.clear = function() {
 
     if (this.rectanglesCount > 0 || this.allocatedBlocks != totalNeeded) {
 
-        for (var i = 0; i < totalNeeded; i++) { //check if all rectangles are preallocated and reset coutner
+        for (let i = 0; i < totalNeeded; i++) { //check if all rectangles are preallocated and reset coutner
             if (!this.blocks[i]) {
                 this.blocks[i] = [];
             }
@@ -86,7 +86,7 @@ RendererRMap.prototype.clear = function() {
 
     if (this.rectangles2Count > 0 || this.allocatedBlocks != totalNeeded) {
 
-        for (var i = 0; i < totalNeeded; i++) { //check if all rectangles are preallocated and reset coutner
+        for (let i = 0; i < totalNeeded; i++) { //check if all rectangles are preallocated and reset coutner
             if (!this.blocks2[i]) {
                 this.blocks2[i] = [];
             }
@@ -107,8 +107,8 @@ RendererRMap.prototype.clear = function() {
 
 
 RendererRMap.prototype.storeRemovedRectangle = function(x1, y1, x2, y2, z, subjob) {
-    var rectangles2 = this.rectanglesR;
-    var rectangles2Count = this.rectanglesRCount;
+    const rectangles2 = this.rectanglesR;
+    const rectangles2Count = this.rectanglesRCount;
 
     rectangles2[rectangles2Count] = x1;
     rectangles2[rectangles2Count+1] = y1;
@@ -124,10 +124,10 @@ RendererRMap.prototype.storeRemovedRectangle = function(x1, y1, x2, y2, z, subjo
 //http://www.firenibbler.com/2016/04/27/how-to-js-collision-detection-cheat-sheets-learn-aabb-box-circle-and-point-detection/
 RendererRMap.prototype.circleAABBoxCollide = function(x1, y1, x2, y2, cx, cy, cr){
     // Get the distance between the two objects
-    var hwidth = (x2 - x1) * 0.5;
-    var hheight = (y2 - y1) * 0.5;
-    var distX = Math.abs(cx - x1 - hwidth);
-    var distY = Math.abs(cy - y2 - hheight);
+    const hwidth = (x2 - x1) * 0.5;
+    const hheight = (y2 - y1) * 0.5;
+    const distX = Math.abs(cx - x1 - hwidth);
+    const distY = Math.abs(cy - y2 - hheight);
 
     // Check to make sure it is definitely not overlapping
     if (distX > (hwidth + cr) || distY > (hheight + cr)) {
@@ -139,8 +139,8 @@ RendererRMap.prototype.circleAABBoxCollide = function(x1, y1, x2, y2, cx, cy, cr
     }
 
     // Last Resort to see if they are overlapping
-    var dx = distX - hwidth;
-    var dy = distY - hheight;
+    const dx = distX - hwidth;
+    const dy = distY - hheight;
     return (dx * dx + dy * dy <= (cr * cr));
 };
 
@@ -148,16 +148,16 @@ RendererRMap.prototype.circleAABBoxCollide = function(x1, y1, x2, y2, cx, cy, cr
 //aabbox line
 //https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
 RendererRMap.prototype.lineAABBoxCollide = function(x1, y1, x2, y2, rx1, ry1, rx2, ry2) {
-    var dx = 1 / ( (rx2 != rx1) ? (rx2 - rx1) : 0.00001);
-    var tx1 = (x1 - rx1)*dx;
-    var tx2 = (x2 - rx1)*dx;
+    const dx = 1 / ( (rx2 != rx1) ? (rx2 - rx1) : 0.00001);
+    const tx1 = (x1 - rx1)*dx;
+    const tx2 = (x2 - rx1)*dx;
 
-    var tmin = Math.min(tx1, tx2);
-    var tmax = Math.max(tx1, tx2);
+    let tmin = Math.min(tx1, tx2);
+    let tmax = Math.max(tx1, tx2);
 
-    var dy = 1 / ( (ry2 != ry1) ? (ry2 - ry1) : 0.00001);
-    var ty1 = (y1 - ry1)*dy;
-    var ty2 = (y2 - ry1)*dy;
+    const dy = 1 / ( (ry2 != ry1) ? (ry2 - ry1) : 0.00001);
+    const ty1 = (y1 - ry1)*dy;
+    const ty2 = (y2 - ry1)*dy;
 
     tmin = Math.max(tmin, Math.min(ty1, ty2));
     tmax = Math.min(tmax, Math.max(ty1, ty2));
@@ -167,7 +167,7 @@ RendererRMap.prototype.lineAABBoxCollide = function(x1, y1, x2, y2, rx1, ry1, rx
 
 
 RendererRMap.prototype.checkRectangle = function(x1, y1, x2, y2, y3) {
-    var t;
+    let t;
 
     if (x1 > x2) { t = x1; x1 = x2; x2 = t; }
     if (y1 > y2) { t = y1; y1 = y2; y2 = t; }
@@ -178,7 +178,7 @@ RendererRMap.prototype.checkRectangle = function(x1, y1, x2, y2, y3) {
         //screen including credits
         return !(x2 < this.sx1 || x1 > this.sx2 || y3 < this.sy1 || y1 > this.sy2);
     }
-    
+
     //screen including credits
     if (x1 < this.sx1 || x2 > this.sx2 || y1 < this.sy1 || y3 > this.sy2) {
         return false;
@@ -198,7 +198,7 @@ RendererRMap.prototype.checkRectangle = function(x1, y1, x2, y2, y3) {
 }
 
 RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, checkDepthMap) {
-    var x, y, i, index, blockRectangles, blockRectanglesCount,
+    let x, y, i, index, blockRectangles, blockRectanglesCount,
         rectangleIndex, t, renderer = this.renderer;
 
     if (this.drawAllLabels) {
@@ -208,7 +208,7 @@ RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, c
     if (x1 > x2) { t = x1; x1 = x2; x2 = t; }
     if (y1 > y2) { t = y1; y1 = y2; y2 = t; }
 
-    var y3 = y2 + subjob[1]; //add stick shift
+    const y3 = y2 + subjob[1]; //add stick shift
 
     if (this.benevolentMargins) {
         //screen including credits
@@ -232,10 +232,10 @@ RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, c
         }
     }
 
-    var xx1 = Math.floor(x1 * this.blockSizeFactor);
-    var yy1 = Math.floor(y1 * this.blockSizeFactor);
-    var xx2 = Math.floor(x2 * this.blockSizeFactor);
-    var yy2 = Math.floor(y2 * this.blockSizeFactor);
+    let xx1 = Math.floor(x1 * this.blockSizeFactor);
+    let yy1 = Math.floor(y1 * this.blockSizeFactor);
+    let xx2 = Math.floor(x2 * this.blockSizeFactor);
+    let yy2 = Math.floor(y2 * this.blockSizeFactor);
 
     if (xx2 < 0 || yy2 < 0 || xx1 >= this.lx || yy1 >= this.ly) {
         return false;
@@ -247,13 +247,13 @@ RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, c
     if (yy1 < 0) yy1 = 0;
     if (yy2 >= this.ly) yy2 = this.ly - 1;
 
-    var lx = (xx2 - xx1) + 1;
-    var ly = (yy2 - yy1) + 1;
-    var removeList = {};
-    var exit = false;
+    const lx = (xx2 - xx1) + 1;
+    const ly = (yy2 - yy1) + 1;
+    const removeList = {};
+    //let exit = false;
 
-    var top = renderer.config.mapFeaturesSortByTop,
-        rectangles = this.rectangles, rectangles2 = this.rectangles2;
+    const top = renderer.config.mapFeaturesSortByTop,
+          rectangles = this.rectangles, rectangles2 = this.rectangles2;
 
     //test collision
     for (y = 0; y < ly; y++) {
@@ -304,7 +304,7 @@ RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, c
 
                  //   if (any) {
                         return false;
-                  //  }                    
+                  //  }
                 }
             }
 
@@ -313,17 +313,17 @@ RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, c
     }
 
     //remove rectangles
-    for (var key in removeList) {
+    for (let key in removeList) {
         this.removeRectangle(parseInt(key));
     }
 
     if (checkDepthMap) {
 
-        var reduce = checkDepthMap[2];
-        var depth = renderer.mapHack.getScreenDepth(checkDepthMap[0], checkDepthMap[1], (reduce[4] > 10000000));
+        const reduce = checkDepthMap[2];
+        const depth = renderer.mapHack.getScreenDepth(checkDepthMap[0], checkDepthMap[1], (reduce[4] > 10000000));
 
         if (depth[0]) {
-            var delta = depth[1] - reduce[4];
+            const delta = depth[1] - reduce[4];
             reduce[7] = delta;
 
             if (!renderer.drawHiddenLabels && delta < checkDepthMap[3]) {
@@ -354,21 +354,24 @@ RendererRMap.prototype.addRectangle = function(x1, y1, x2, y2, z, subjob, any, c
 };
 
 
+// eslint-disable-next-line
 RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
-    var job = subjob[0], blockRectangles, blockRectanglesCount, rectangleIndex;
-    var x1 = Number.POSITIVE_INFINITY, x2 = Number.NEGATIVE_INFINITY,
-        y1 = Number.POSITIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;
-    var x, y, r, rr = 0, xx, yy, renderer = this.renderer, i, li, pp = [0,0,0,0];
-    var pbuff = this.positionsBuffer;
-    var index = 0, pindex = 0;
-    var margin = job.noOverlap ? job.noOverlap[0] : 1;
+    const pbuff = this.positionsBuffer;
+    const job = subjob[0], renderer = this.renderer;
+    const margin = job.noOverlap ? job.noOverlap[0] : 1;
 
-    var targetSize = job.labelSize * 0.5; 
-    var sizeFactor = renderer.camera.scaleFactor2(subjob[5][3])*0.5*renderer.curSize[1]*(renderer.curSize[0]/renderer.curSize[1]);
-    var pointsIndex = subjob[9];
-    var labelPoints = job.labelPoints;
-    var labelIndex = job.labelIndex;
-    var labelMorph = 0;
+    let blockRectangles, blockRectanglesCount, rectangleIndex;
+    let x1 = Number.POSITIVE_INFINITY, x2 = Number.NEGATIVE_INFINITY,
+        y1 = Number.POSITIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;
+    let x, y, r, rr = 0, xx, yy, i, li, pp = [0,0,0,0];
+    let index = 0, pindex = 0;
+
+    const targetSize = job.labelSize * 0.5;
+    const sizeFactor = renderer.camera.scaleFactor2(subjob[5][3])*0.5*renderer.curSize[1]*(renderer.curSize[0]/renderer.curSize[1]);
+    const labelPoints = job.labelPoints;
+    let pointsIndex = subjob[9];
+    let labelIndex = job.labelIndex;
+    let labelMorph = 0;
 
     li = labelPoints.length;
 
@@ -379,21 +382,22 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
     li--;
 
     for (i = 0; i < li; i++) {
-        var s2 = labelPoints[i+1][0] * sizeFactor;
+        const s2 = labelPoints[i+1][0] * sizeFactor;
 
         if (s2 > targetSize) {
-            var s1 = labelPoints[i][0] * sizeFactor;
+            const s1 = labelPoints[i][0] * sizeFactor;
 
             labelIndex = i;
             labelMorph = (targetSize - s1) / (s2 - s1);
-            break;                
+            break;
         }
     }
 
-    var pointsIndex = (vec3.dot(labelPoints[labelIndex][1], renderer.labelVector) >= 0) ? 3 : 2;
-    var points = labelPoints[labelIndex][pointsIndex];
-    var points2 = (labelPoints[labelIndex+1]) ? labelPoints[labelIndex+1][pointsIndex] : points;
-    var p, p2, buffer, benevolentMargins = this.benevolentMargins;
+    pointsIndex = (vec3.dot(labelPoints[labelIndex][1], renderer.labelVector) >= 0) ? 3 : 2;
+
+    let points = labelPoints[labelIndex][pointsIndex];
+    let points2 = (labelPoints[labelIndex+1]) ? labelPoints[labelIndex+1][pointsIndex] : points;
+    let p, p2, buffer, benevolentMargins = this.benevolentMargins;
 
     if (renderer.useSuperElevation) {
         buffer = job.labelPointsBuffer;
@@ -405,8 +409,8 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
                 buffer.points2 = new Array(points.length);
             }
 
-            var sePoints = buffer.points;
-            var sePoints2 = buffer.points2;
+            const sePoints = buffer.points;
+            const sePoints2 = buffer.points2;
 
             for(i = 0, li = points.length; i < li; i++) {
                 sePoints[i] = renderer.transformPointBySE2(points[i]);
@@ -480,9 +484,10 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
         }
     }
 
-    var blockSizeFactor = this.blockSizeFactor, xx1, yy1, xx2, yy2, dx, dy, llx = this.lx, lly = this.ly;
-    var top = renderer.config.mapFeaturesSortByTop, j,
-        rectangles = this.rectangles, rectangles2 = this.rectangles2;
+    const blockSizeFactor = this.blockSizeFactor;
+    const /*top = renderer.config.mapFeaturesSortByTop,*/
+          rectangles = this.rectangles, rectangles2 = this.rectangles2;
+    let xx1, yy1, xx2, yy2, dx, dy, llx = this.lx, lly = this.ly, j;
 
     pindex = 0;
 
@@ -500,16 +505,16 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
         if (benevolentMargins) {
             if (xx2 < 0 || xx1 >= llx || yy2 < 0 || yy1 >= lly) {
               pindex += 4;
-              continue;  
-            } 
+              continue;
+            }
             if (xx1 < 0) xx1 = 0;
             if (yy1 < 0) yy1 = 0;
             if (xx2 >= llx) xx2 = llx - 1;
             if (yy2 >= lly) yy2 = lly - 1;
         }
 
-        var lx = (xx2 - xx1) + 1;
-        var ly = (yy2 - yy1) + 1;
+        const lx = (xx2 - xx1) + 1;
+        const ly = (yy2 - yy1) + 1;
 
         //test collision
         for (y = 0; y < ly; y++) {
@@ -527,7 +532,7 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
 
                         //if (any) {
                             return false;
-                        //}                    
+                        //}
                     }
                 }
 
@@ -546,7 +551,7 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
 
                         //if (any) {
                             return false;
-                        //}                    
+                        //}
                     }
                 }
             }
@@ -572,16 +577,16 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
         if (benevolentMargins) {
             if (xx2 < 0 || xx1 >= llx || yy2 < 0 || yy1 >= lly) {
               pindex += 4;
-              continue;  
-            } 
+              continue;
+            }
             if (xx1 < 0) xx1 = 0;
             if (yy1 < 0) yy1 = 0;
             if (xx2 >= llx) xx2 = llx - 1;
             if (yy2 >= lly) yy2 = lly - 1;
         }
 
-        var lx = (xx2 - xx1) + 1;
-        var ly = (yy2 - yy1) + 1;
+        const lx = (xx2 - xx1) + 1;
+        const ly = (yy2 - yy1) + 1;
 
         rectangleIndex = this.rectangles2Count;
         rectangles2[rectangleIndex] = xx;
@@ -614,7 +619,8 @@ RendererRMap.prototype.addLineLabel = function(subjob, checkDepthMap) {
 
 
 RendererRMap.prototype.removeRectangle = function(rectangleIndex) {
-    var rectangles = this.rectangles, x1, y1, x2, y2, x, y, i, index,
+    const rectangles = this.rectangles;
+    let x1, y1, x2, y2, x, y, i, index,
         blockRectangles, blockRectanglesCount;
 
     x1 = rectangles[rectangleIndex];
@@ -623,8 +629,8 @@ RendererRMap.prototype.removeRectangle = function(rectangleIndex) {
     y2 = rectangles[rectangleIndex+3];
 
     //store removed rectangels for second pass
-    var rectangles2 = this.rectanglesR;
-    var rectangles2Count = this.rectanglesRCount;
+    const rectangles2 = this.rectanglesR;
+    const rectangles2Count = this.rectanglesRCount;
 
     rectangles2[rectangles2Count] = x1;
     rectangles2[rectangles2Count+1] = y1;
@@ -637,10 +643,10 @@ RendererRMap.prototype.removeRectangle = function(rectangleIndex) {
     //remove subjob
     rectangles[rectangleIndex+5] = null;
 
-    var xx1 = Math.floor(x1 * this.blockSizeFactor);
-    var yy1 = Math.floor(y1 * this.blockSizeFactor);
-    var xx2 = Math.floor(x2 * this.blockSizeFactor);
-    var yy2 = Math.floor(y2 * this.blockSizeFactor);
+    let xx1 = Math.floor(x1 * this.blockSizeFactor);
+    let yy1 = Math.floor(y1 * this.blockSizeFactor);
+    let xx2 = Math.floor(x2 * this.blockSizeFactor);
+    let yy2 = Math.floor(y2 * this.blockSizeFactor);
 
     if (xx1 < 0) xx1 = 0;
     if (xx2 >= this.lx) xx2 = this.lx - 1;
@@ -648,8 +654,8 @@ RendererRMap.prototype.removeRectangle = function(rectangleIndex) {
     if (yy1 < 0) yy1 = 0;
     if (yy2 >= this.ly) yy2 = this.ly - 1;
 
-    var lx = (xx2 - xx1) + 1;
-    var ly = (yy2 - yy1) + 1;
+    const lx = (xx2 - xx1) + 1;
+    const ly = (yy2 - yy1) + 1;
 
     for (y = 0; y < ly; y++) {
         for (x = 0; x < lx; x++) {
@@ -671,15 +677,15 @@ RendererRMap.prototype.removeRectangle = function(rectangleIndex) {
 };
 
 RendererRMap.prototype.processRectangles = function(gpu, gl, renderer, screenPixelSize) {
-    var rectangles = this.rectangles;
-    var rectangles2 = this.rectangles2;
-    var rectanglesR = this.rectanglesR;
-    var draw = renderer.draw;
+    const rectangles = this.rectangles;
+    const rectangles2 = this.rectangles2;
+    const rectanglesR = this.rectanglesR;
+    const draw = renderer.gpu.draw;
 
     // second pass
     // add removed rectangles
-    for (var i = 0, li = this.rectanglesRCount; i < li; i+=6) {
-        var x1 = rectanglesR[i],
+    for (let i = 0, li = this.rectanglesRCount; i < li; i+=6) {
+        const x1 = rectanglesR[i],
             y1 = rectanglesR[i+1],
             x2 = rectanglesR[i+2],
             y2 = rectanglesR[i+3],
@@ -692,8 +698,8 @@ RendererRMap.prototype.processRectangles = function(gpu, gl, renderer, screenPix
     this.rectanglesRCount = 0;
 
     //labels
-    for (i = 0, li = this.rectanglesCount; i < li; i+=6) {
-        var subjob = rectangles[i+5];
+    for (let i = 0, li = this.rectanglesCount; i < li; i+=6) {
+        const subjob = rectangles[i+5];
 
         if (subjob) {
             if (subjob[0].hysteresis) {
@@ -706,11 +712,11 @@ RendererRMap.prototype.processRectangles = function(gpu, gl, renderer, screenPix
     }
 
     //line labels
-    for (i = 0, li = this.rectangles2Count; i < li; i+=4) {
-        var subjob = rectangles2[i+3];
+    for (let i = 0, li = this.rectangles2Count; i < li; i+=4) {
+        const subjob = rectangles2[i+3];
 
         if (subjob) {
-            var job = subjob[0];
+            const job = subjob[0];
 
             if (job.hysteresis) {
                 renderer.jobHBuffer[job.id] = job;
@@ -719,7 +725,7 @@ RendererRMap.prototype.processRectangles = function(gpu, gl, renderer, screenPix
                 draw.drawGpuSubJobLineLabel(gpu, gl, renderer, screenPixelSize, subjob, null);
             }
 
-            var l = job.labelPoints[0][2].length;
+            const l = job.labelPoints[0][2].length;
 
             if (l > 0) {
                 i += (4 * (l - 1));
@@ -731,4 +737,3 @@ RendererRMap.prototype.processRectangles = function(gpu, gl, renderer, screenPix
 };
 
 export default RendererRMap;
-

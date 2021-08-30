@@ -2,10 +2,10 @@
 import {utils as utils_} from '../../core/utils/utils';
 
 //get rid of compiler mess
-var utils = utils_;
+const utils = utils_;
 
 
-var RoiLoadingQueue = function(options) {
+const RoiLoadingQueue = function(options) {
     this.options = options;
 
     // states
@@ -29,7 +29,7 @@ var RoiLoadingQueue = function(options) {
     this.slots = 1;
     this.finishedSlots = 5;
 
-    if (typeof this.options === 'object' && this.options !== null) {
+    if (typeof this.options === 'object' && this.options !== null) {
         this.slots = this.options.slots || 1;
         this.finishedSlots = this.options.finishedSlots || 5;
     }
@@ -53,10 +53,11 @@ RoiLoadingQueue.Type = {
     JSON : 1,
     Image : 2
 }
+
 RoiLoadingQueue.TypeCheck = function(type) {
-    var keys = Object.keys(RoiLoadingQueue.Type);
-    var valid = false;
-    for (var i in keys) {
+    const keys = Object.keys(RoiLoadingQueue.Type);
+    let valid = false;
+    for (let i in keys) {
         if (RoiLoadingQueue.Type[keys[i]] === type) {
             valid = true;
             break;
@@ -69,25 +70,25 @@ RoiLoadingQueue.TypeCheck = function(type) {
 
 // Type is required hint for queue
 RoiLoadingQueue.prototype.enqueue = function(resourceUrl, type, clb) {
-    var clb = clb || function(){};
+    clb = clb || function(){};
 
     if (typeof resourceUrl !== 'string'
         ) {// TODO: || !URLSanity(resourceUrl)) {
-        var err = new Error('Loading Queue: URL given to enqueue is not valid URL');
+        const err = new Error('Loading Queue: URL given to enqueue is not valid URL');
         console.error(err);
         clb(err);
         return null;
     }
 
     if (!RoiLoadingQueue.TypeCheck(type)) {
-        var err = new Error('Loading Queue: Given hint type is not valid type');
+        const err = new Error('Loading Queue: Given hint type is not valid type');
         console.error(err);
         clb(err);
         return null;
     }
 
     // find item and update (or create if doesnt exists yet)
-    var item = this.pickItem(resourceUrl);
+    let item = this.pickItem(resourceUrl);
     if (item === null) {
         item = {
             url : resourceUrl,
@@ -97,11 +98,11 @@ RoiLoadingQueue.prototype.enqueue = function(resourceUrl, type, clb) {
             data : null
         }
     } else {
-        if (item.state === PanoLoadingQueue.Status.Enqueued) {
+        if (item.state === RoiLoadingQueue.Status.Enqueued) {
             item.type = type;
 
-            var insertCallback = true;
-            for (var i in item.clb) {
+            let insertCallback = true;
+            for (let i in item.clb) {
                 if (item.clb[i] === clb) {
                     insertCallback = false;
                     break;
@@ -130,7 +131,7 @@ RoiLoadingQueue.prototype.enqueue = function(resourceUrl, type, clb) {
 
 
 RoiLoadingQueue.prototype.dequeue = function(resourceUrl) {
-    var item = this.pickItem(resourceUrl);
+    const item = this.pickItem(resourceUrl);
     if (item.state === RoiLoadingQueue.Status.Downloading) {
         this.cancel(item);
     }
@@ -145,7 +146,7 @@ RoiLoadingQueue.prototype.on = function(event, action) {
             && event !== this.stateBegin)) {
         return;
     }
-    for (var i in this.listeners[event]) {
+    for (let i in this.listeners[event]) {
         if (this.listeners[event][i] === action) {
             this.listeners[event].push(action);
         }
@@ -160,7 +161,7 @@ RoiLoadingQueue.prototype.removeListener = function(event, action) {
             && event !== this.stateBegin)) {
         return;
     }
-    for (var i in this.listeners[event]) {
+    for (let i in this.listeners[event]) {
         if (this.listeners[event][i] === action) {
             this.listeners[event].slice(i, 1);
         }
@@ -190,12 +191,12 @@ RoiLoadingQueue.prototype.next = function() {
     if (this.inProgress.length === this.slots) {
         return;
     }
-    var its = this.enqueued.splice(0, 1);
+    const its = this.enqueued.splice(0, 1);
     if (its.length === 0) {
         return;
     }
 
-    var item = its[0];
+    const item = its[0];
     this.inProgress.push(item);
 
     if (item.type === RoiLoadingQueue.Type.Binary) {
@@ -205,7 +206,7 @@ RoiLoadingQueue.prototype.next = function() {
         // TODO
         this.finalizeItem(item, new Error('Not implemented yet'), null);
     } else if (item.type === RoiLoadingQueue.Type.Image) {
-        item.data = utils.loadImage(item.url, function(data) {
+        item.data = utils.loadImage(item.url, function(/*data*/) {
             this.finalizeItem(item, null, item.data);
         }.bind(this), function(data) {
             this.finalizeItem(item, new Error(data), null);
@@ -224,15 +225,15 @@ RoiLoadingQueue.prototype.next = function() {
 };
 
 
-RoiLoadingQueue.prototype.cancel = function(item) {
+RoiLoadingQueue.prototype.cancel = function(/*item*/) {
     // TODO
 };
 
 
 RoiLoadingQueue.prototype.pickItem = function(itemUrl, nremove) {
-    var item = null;
-    var resourceUrl = itemUrl.url;
-    for (var i in this.enqueued) {
+    let item = null;
+    const resourceUrl = itemUrl.url;
+    for (let i in this.enqueued) {
         if (this.enqueued[i].url === resourceUrl) {
             item = this.enqueued[i];
             nremove || this.enqueued.splice(i, 1);
@@ -240,7 +241,7 @@ RoiLoadingQueue.prototype.pickItem = function(itemUrl, nremove) {
         }
     }
     if (item === null) {
-        for (var i in this.inProgress) {
+        for (let i in this.inProgress) {
             if (this.inProgress[i].url === resourceUrl) {
                 item = this.inProgress[i];
                 nremove || this.inProgress.splice(i, 1);
@@ -249,7 +250,7 @@ RoiLoadingQueue.prototype.pickItem = function(itemUrl, nremove) {
         }
     }
     if (item === null) {
-        for (var i in this.finished) {
+        for (let i in this.finished) {
             if (this.finished[i].url === resourceUrl) {
                 item = this.finished[i];
                 nremove || this.finished.splice(i, 1);
@@ -276,7 +277,7 @@ RoiLoadingQueue.prototype.finalizeItem = function(item, error, data) {
     item.data = data;
 
     // invoke all callbacks
-    for (var i in item.clb) {
+    for (let i in item.clb) {
         item.clb[i](error, data);
     }
 

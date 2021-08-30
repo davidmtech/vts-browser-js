@@ -10,12 +10,14 @@ var CopyPlugin = require('copy-webpack-plugin');
 
 var path = require('path');
 
+process.env.VTS_DEVICE = 'webgl';
+
 var plugins = [
     new LicenseWebpackPlugin({ outputFilename: '3rdpartylicenses.txt' }),
     new MiniCssExtractPlugin({ filename: '[name]' + (PROD ? '.min' : '') + '.css' }),
     new webpack.BannerPlugin({
         "banner": function(filename) {
-          return "Copyright (c) 2020 Melown Technologies SE\n" +
+          return "Copyright (c) 2021 Melown Technologies SE\n" +
                  " *  For terms of use, see accompanying [name] file.\n" +
                  " *  For 3rd party libraries licenses, see 3rdpartylicenses.txt.\n"
         }
@@ -26,7 +28,18 @@ var plugins = [
         { from: './LICENSE', to: 'vts-core.js' + (PROD ? '.min' : '') + '.LICENSE' }
       ],
     }),
+
+    new webpack.NormalModuleReplacementPlugin(
+//        /some\/path\/config\.development\.js/,
+        /\.\/rmap2/,
+      './rmap'
+    ),
+
     new webpack.DefinePlugin({
+
+      'VTS_DEVICE_WEBGL':             1,
+      'VTS_DEVICE_THREE':             2,
+
       'VTS_MATERIAL_DEPTH':           1,
       'VTS_MATERIAL_FLAT':            2,
       'VTS_MATERIAL_FOG':             3,
@@ -157,9 +170,6 @@ module.exports = {
   },
 
   devtool: 'source-map',
-
-
-
 
   devServer: {
     inline: true,

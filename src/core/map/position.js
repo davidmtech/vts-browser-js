@@ -2,9 +2,9 @@
 import {math as math_} from '../utils/math';
 
 //get rid of compiler mess
-var math = math_;
+const math = math_;
 
-var MapPosition = function(pos) {
+const MapPosition = function(pos) {
     if (pos instanceof MapPosition) {
         this.pos = pos.pos.slice();
     } else {
@@ -139,7 +139,7 @@ MapPosition.prototype.isSame = function(pos) {
 
 
 MapPosition.prototype.validate = function() {
-    var pos = this.pos;
+    const pos = this.pos;
     if (pos[0] == 'fixed') { //old format
         pos[0] = 'obj';
         pos[9] = pos[8];
@@ -167,10 +167,10 @@ MapPosition.prototype.validate = function() {
 
 
 MapPosition.prototype.toString = function() {
-    var p = this.pos;
+    const p = this.pos;
     return p[0] + ', ' + p[1].toFixed(0) + ', ' + p[2].toFixed(0) + ', ' + p[3] + ', ' + p[4].toFixed(0)
-           + ', ' + p[5].toFixed(0) + ', ' + p[6].toFixed(0) + ', ' + p[7].toFixed(0) + ', ' 
-           + ', ' + p[8].toFixed(0) + ', ' + p[9].toFixed(0); 
+           + ', ' + p[5].toFixed(0) + ', ' + p[6].toFixed(0) + ', ' + p[7].toFixed(0) + ', '
+           + ', ' + p[8].toFixed(0) + ', ' + p[9].toFixed(0);
 };
 
 

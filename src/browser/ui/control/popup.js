@@ -1,5 +1,5 @@
 
-var UIControlPopup = function(ui, visible, visibleLock) {
+const UIControlPopup = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('popup',
@@ -16,8 +16,8 @@ var UIControlPopup = function(ui, visible, visibleLock) {
 
 UIControlPopup.prototype.show = function(style, html) {
     this.control.setVisible(true);
-    
-    for (var key in style) {
+
+    for (let key in style) {
         this.popup.setStyle(key, style[key]);
     }
 

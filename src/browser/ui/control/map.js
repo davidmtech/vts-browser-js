@@ -1,5 +1,5 @@
 
-var UIControlMap = function(ui, visible, visibleLock) {
+const UIControlMap = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('map',
@@ -7,7 +7,7 @@ var UIControlMap = function(ui, visible, visibleLock) {
       + ' class="vts-map">'
       + ' </div>', visible, visibleLock);
 
-    var map = this.getMapElement();
+    const map = this.getMapElement();
     map.setDraggableState(true);
 };
 

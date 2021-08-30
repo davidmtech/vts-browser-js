@@ -1,6 +1,6 @@
 
 
-var UIControlFallback = function(ui, visible, visibleLock) {
+const UIControlFallback = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.control = this.ui.addControl('fallback',
       '<div class="vts-fallback">'

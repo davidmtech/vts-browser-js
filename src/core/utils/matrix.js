@@ -1,10 +1,9 @@
 
-
-var vec2 = {};
+const vec2 = {};
 
 
 vec2.create = function (a) {
-    var b = new Array(2);
+    const b = new Array(2);
     if (a) {
         b[0] = a[0];
         b[1] = a[1];
@@ -13,11 +12,11 @@ vec2.create = function (a) {
 };
 
 
-var vec4 = {};
+const vec4 = {};
 
 
 vec4.create = function (a) {
-    var b = new Array(4);
+    const b = new Array(4);
     if (a) {
         b[0] = a[0];
         b[1] = a[1];
@@ -43,11 +42,11 @@ vec4.dot3 = function (a, b, i, x, y, z) {
 };
 
 
-var vec3 = {};
+const vec3 = {};
 
 
 vec3.create = function (a) {
-    var b = new Array(3);
+    const b = new Array(3);
     if (a) {
         b[0] = a[0];
         b[1] = a[1];
@@ -118,10 +117,11 @@ vec3.scale = function (a, b, c) {
 
 vec3.normalize = function (a, b) {
     b || (b = a);
-    var c = a[0],
+    const c = a[0],
         d = a[1],
-        e = a[2],
-        g = Math.sqrt(c * c + d * d + e * e);
+        e = a[2];
+    let g = Math.sqrt(c * c + d * d + e * e);
+
     if (g) {
         if (g == 1) {
             b[0] = c;
@@ -144,10 +144,11 @@ vec3.normalize = function (a, b) {
 
 
 vec3.normalize2 = function (a, i, b) {
-    var c = a[i],
+    const c = a[i],
         d = a[i+1],
-        e = a[i+2],
-        g = Math.sqrt(c * c + d * d + e * e);
+        e = a[i+2];
+    let g = Math.sqrt(c * c + d * d + e * e);
+
     if (g) {
         if (g == 1) {
             b[0] = c;
@@ -169,10 +170,11 @@ vec3.normalize2 = function (a, i, b) {
 
 
 vec3.normalize3 = function (a, i, b, j) {
-    var c = a[i],
+    const c = a[i],
         d = a[i+1],
-        e = a[i+2],
-        g = Math.sqrt(c * c + d * d + e * e);
+        e = a[i+2];
+    let g = Math.sqrt(c * c + d * d + e * e);
+
     if (g) {
         if (g == 1) {
             b[j] = c;
@@ -195,10 +197,11 @@ vec3.normalize3 = function (a, i, b, j) {
 
 vec3.normalize4 = function (a, b) {
     b || (b = a);
-    var c = a[0],
+    const c = a[0],
         d = a[1],
-        e = a[2],
-        g = Math.sqrt(c * c + d * d + e * e);
+        e = a[2];
+    let g = Math.sqrt(c * c + d * d + e * e);
+
     if (g) {
         if (g == 1) {
             b[0] = c;
@@ -212,7 +215,7 @@ vec3.normalize4 = function (a, b) {
         b[2] = 0;
         return b;
     }
-    var dd = g;
+    const dd = g;
     g = 1 / g;
     b[0] = c * g;
     b[1] = d * g;
@@ -223,10 +226,10 @@ vec3.normalize4 = function (a, b) {
 
 vec3.cross = function (a, b, c) {
     c || (c = a);
-    var d = a[0],
+    const d = a[0],
         e = a[1];
     a = a[2];
-    var g = b[0],
+    const g = b[0],
         f = b[1];
     b = b[2];
     c[0] = e * b - a * f;
@@ -237,7 +240,7 @@ vec3.cross = function (a, b, c) {
 
 
 vec3.length = function (a) {
-    var b = a[0],
+    const b = a[0],
         c = a[1];
     a = a[2];
     return Math.sqrt(b * b + c * c + a * a);
@@ -259,32 +262,32 @@ vec3.dot3 = function (a, i, b, j) {
 };
 
 vec3.distance = function (a, b) {
-    var dx = b[0] - a[0];
-    var dy = b[1] - a[1];
-    var dz = b[2] - a[2];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const dz = b[2] - a[2];
     return Math.sqrt(dx*dx + dy*dy + dz*dz);
 };
 
 vec3.distance2 = function (a, i, b, j) {
-    var dx = b[j] - a[i];
-    var dy = b[j+1] - a[i+1];
-    var dz = b[j+2] - a[i+2];
+    const dx = b[j] - a[i];
+    const dy = b[j+1] - a[i+1];
+    const dz = b[j+2] - a[i+2];
     return Math.sqrt(dx*dx + dy*dy + dz*dz);
 };
 
 
 vec3.squareDistance = function (a, b) {
-    var dx = b[0] - a[0];
-    var dy = b[1] - a[1];
-    var dz = b[2] - a[2];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const dz = b[2] - a[2];
     return dx*dx + dy*dy + dz*dz;
 };
 
 
 vec3.direction = function (a, b, c) {
     c || (c = a);
-    var d = a[0] - b[0],
-        e = a[1] - b[1];
+    const d = a[0] - b[0],
+          e = a[1] - b[1];
     a = a[2] - b[2];
     b = Math.sqrt(d * d + e * e + a * a);
     if (!b) {
@@ -315,11 +318,11 @@ vec3.str = function (a) {
 };
 
 
-var mat3 = {};
+const mat3 = {};
 
 
 mat3.create = function (a) {
-    var b = new Array(9);
+    const b = new Array(9);
     if (a) {
         b[0] = a[0];
         b[1] = a[1];
@@ -366,7 +369,7 @@ mat3.identity = function (a) {
 
 mat3.transpose = function (a, b) {
     if (!b || a == b) {
-        var c = a[1],
+        const c = a[1],
             d = a[2],
             e = a[5];
         a[1] = a[3];
@@ -413,7 +416,7 @@ mat3.toMat4 = function (a, b) {
 
 mat3.multiplyVec3 = function (a, b, c) {
     c || (c = b);
-    var d = b[0],
+    const d = b[0],
         e = b[1];
     b = b[2];
     c[0] = a[0] * d + a[3] * e + a[6] * b;
@@ -428,11 +431,11 @@ mat3.str = function (a) {
 };
 
 
-var mat4 = {};
+const mat4 = {};
 
 
 mat4.create = function (a) {
-    var b = new Array(16);
+    const b = new Array(16);
     if (a) {
         b[0] = a[0];
         b[1] = a[1];
@@ -499,7 +502,7 @@ mat4.identity = function (a) {
 
 mat4.transpose = function (a, b) {
     if (!b || a == b) {
-        var c = a[1],
+        const c = a[1],
             d = a[2],
             e = a[3],
             g = a[6],
@@ -540,7 +543,7 @@ mat4.transpose = function (a, b) {
 
 
 mat4.determinant = function (a) {
-    var b = a[0],
+    const b = a[0],
         c = a[1],
         d = a[2],
         e = a[3],
@@ -562,7 +565,7 @@ mat4.determinant = function (a) {
 
 mat4.inverse = function (a, b) {
     b || (b = a);
-    var c = a[0],
+    const c = a[0],
         d = a[1],
         e = a[2],
         g = a[3],
@@ -649,7 +652,7 @@ mat4.toMat3 = function (a, b) {
 
 
 mat4.toInverseMat3 = function (a, b) {
-    var c = a[0],
+    const c = a[0],
         d = a[1],
         e = a[2],
         g = a[4],
@@ -660,8 +663,8 @@ mat4.toInverseMat3 = function (a, b) {
         k = a[10],
         l = k * f - h * j,
         o = -k * g + h * i,
-        m = j * g - f * i,
-        n = c * l + d * o + e * m;
+        m = j * g - f * i;
+    let n = c * l + d * o + e * m;
     if (!n) return null;
     n = 1 / n;
     b || (b = mat3.create());
@@ -680,7 +683,7 @@ mat4.toInverseMat3 = function (a, b) {
 
 mat4.multiply = function (a, b, c) {
     c || (c = a);
-    var d = a[0],
+    const d = a[0],
         e = a[1],
         g = a[2],
         f = a[3],
@@ -696,7 +699,7 @@ mat4.multiply = function (a, b, c) {
         r = a[13],
         s = a[14];
     a = a[15];
-    var A = b[0],
+    const A = b[0],
         B = b[1],
         t = b[2],
         u = b[3],
@@ -722,8 +725,7 @@ mat4.multiply = function (a, b, c) {
     c[7] = v * f + w * k + x * n + y * a;
     c[8] = z * d + C * h + D * l + E * p;
     c[9] = z * e + C * i + D * o + E * r;
-    c[10] = z *
-        g + C * j + D * m + E * s;
+    c[10] = z * g + C * j + D * m + E * s;
     c[11] = z * f + C * k + D * n + E * a;
     c[12] = q * d + F * h + G * l + b * p;
     c[13] = q * e + F * i + G * o + b * r;
@@ -735,7 +737,7 @@ mat4.multiply = function (a, b, c) {
 
 mat4.multiplyVec3 = function (a, b, c) {
     c || (c = b);
-    var d = b[0],
+    const d = b[0],
         e = b[1];
     b = b[2];
     c[0] = a[0] * d + a[4] * e + a[8] * b + a[12];
@@ -747,7 +749,7 @@ mat4.multiplyVec3 = function (a, b, c) {
 
 mat4.multiplyVec4 = function (a, b, c) {
     c || (c = b);
-    var d = b[0],
+    const d = b[0],
         e = b[1],
         g = b[2];
     b = b[3];
@@ -760,7 +762,7 @@ mat4.multiplyVec4 = function (a, b, c) {
 
 
 mat4.translate = function (a, b, c) {
-    var d = b[0],
+    const d = b[0],
         e = b[1];
     b = b[2];
     if (!c || a == c) {
@@ -770,7 +772,7 @@ mat4.translate = function (a, b, c) {
         a[15] = a[3] * d + a[7] * e + a[11] * b + a[15];
         return a;
     }
-    var g = a[0],
+    const g = a[0],
         f = a[1],
         h = a[2],
         i = a[3],
@@ -803,7 +805,7 @@ mat4.translate = function (a, b, c) {
 
 
 mat4.scale = function (a, b, c) {
-    var d = b[0],
+    const d = b[0],
         e = b[1];
     b = b[2];
     if (!c || a == c) {
@@ -842,10 +844,10 @@ mat4.scale = function (a, b, c) {
 
 
 mat4.rotate = function (a, b, c, d) {
-    var e = c[0],
+    let e = c[0],
         g = c[1];
     c = c[2];
-    var f = Math.sqrt(e * e + g * g + c * c);
+    let f = Math.sqrt(e * e + g * g + c * c);
     if (!f) return null;
     if (f != 1) {
         f = 1 / f;
@@ -853,12 +855,12 @@ mat4.rotate = function (a, b, c, d) {
         g *= f;
         c *= f;
     }
-    var h = Math.sin(b),
+    const h = Math.sin(b),
         i = Math.cos(b),
         j = 1 - i;
     b = a[0];
     f = a[1];
-    var k = a[2],
+    const k = a[2],
         l = a[3],
         o = a[4],
         m = a[5],
@@ -888,8 +890,7 @@ mat4.rotate = function (a, b, c, d) {
     d[0] = b * t + o * u + r * v;
     d[1] = f * t + m * u + s * v;
     d[2] = k * t + n * u + A * v;
-    d[3] = l * t + p * u + B *
-        v;
+    d[3] = l * t + p * u + B * v;
     d[4] = b * w + o * x + r * y;
     d[5] = f * w + m * x + s * y;
     d[6] = k * w + n * x + A * y;
@@ -903,9 +904,9 @@ mat4.rotate = function (a, b, c, d) {
 
 
 mat4.rotateX = function (a, b, c) {
-    var d = Math.sin(b);
+    const d = Math.sin(b);
     b = Math.cos(b);
-    var e = a[4],
+    const e = a[4],
         g = a[5],
         f = a[6],
         h = a[7],
@@ -938,9 +939,9 @@ mat4.rotateX = function (a, b, c) {
 
 
 mat4.rotateY = function (a, b, c) {
-    var d = Math.sin(b);
+    const d = Math.sin(b);
     b = Math.cos(b);
-    var e = a[0],
+    const e = a[0],
         g = a[1],
         f = a[2],
         h = a[3],
@@ -973,9 +974,9 @@ mat4.rotateY = function (a, b, c) {
 
 
 mat4.rotateZ = function (a, b, c) {
-    var d = Math.sin(b);
+    const d = Math.sin(b);
     b = Math.cos(b);
-    var e = a[0],
+    const e = a[0],
         g = a[1],
         f = a[2],
         h = a[3],
@@ -1009,7 +1010,7 @@ mat4.rotateZ = function (a, b, c) {
 
 mat4.frustum = function (a, b, c, d, e, g, f) {
     f || (f = mat4.create());
-    var h = b - a,
+    const h = b - a,
         i = d - c,
         j = g - e;
     f[0] = e * 2 / h;
@@ -1041,7 +1042,7 @@ mat4.perspective = function (a, b, c, d, e) {
 
 mat4.ortho = function (a, b, c, d, e, g, f) {
     f || (f = mat4.create());
-    var h = b - a,
+    const h = b - a,
         i = d - c,
         j = g - e;
     f[0] = 2 / h;
@@ -1066,16 +1067,16 @@ mat4.ortho = function (a, b, c, d, e, g, f) {
 
 mat4.lookAt = function (a, b, c, d) {
     d || (d = mat4.create());
-    var e = a[0],
+    let e = a[0],
         g = a[1];
     a = a[2];
-    var f = c[0],
+    let f = c[0],
         h = c[1],
         i = c[2];
     c = b[1];
-    var j = b[2];
+    let j = b[2];
     if (e == b[0] && g == c && a == j) return mat4.identity(d);
-    var k, l, o, m;
+    let k, l, o, m;
     c = e - b[0];
     j = g - b[1];
     b = a - b[2];
@@ -1129,11 +1130,11 @@ mat4.str = function (a) {
 };
 
 
-var quat4 = {};
+const quat4 = {};
 
 
 quat4.create = function (a) {
-    var b = new Array(4);
+    const b = new Array(4);
     if (a) {
         b[0] = a[0];
         b[1] = a[1];
@@ -1154,7 +1155,7 @@ quat4.set = function (a, b) {
 
 
 quat4.calculateW = function (a, b) {
-    var c = a[0],
+    const c = a[0],
         d = a[1],
         e = a[2];
     if (!b || a == b) {
@@ -1185,7 +1186,7 @@ quat4.inverse = function (a, b) {
 
 
 quat4.length = function (a) {
-    var b = a[0],
+    const b = a[0],
         c = a[1],
         d = a[2];
     a = a[3];
@@ -1195,11 +1196,11 @@ quat4.length = function (a) {
 
 quat4.normalize = function (a, b) {
     b || (b = a);
-    var c = a[0],
+    const c = a[0],
         d = a[1],
         e = a[2],
-        g = a[3],
-        f = Math.sqrt(c * c + d * d + e * e + g * g);
+        g = a[3];
+    let f = Math.sqrt(c * c + d * d + e * e + g * g);
     if (f == 0) {
         b[0] = 0;
         b[1] = 0;
@@ -1218,11 +1219,11 @@ quat4.normalize = function (a, b) {
 
 quat4.multiply = function (a, b, c) {
     c || (c = a);
-    var d = a[0],
+    const d = a[0],
         e = a[1],
         g = a[2];
     a = a[3];
-    var f = b[0],
+    const f = b[0],
         h = b[1],
         i = b[2];
     b = b[3];
@@ -1236,14 +1237,14 @@ quat4.multiply = function (a, b, c) {
 
 quat4.multiplyVec3 = function (a, b, c) {
     c || (c = b);
-    var d = b[0],
-        e = b[1],
+    let d = b[0];
+    const e = b[1],
         g = b[2];
     b = a[0];
-    var f = a[1],
+    const f = a[1],
         h = a[2];
     a = a[3];
-    var i = a * d + f * g - h * e,
+    const i = a * d + f * g - h * e,
         j = a * e + h * d - b * g,
         k = a * g + b * e - f * d;
     d = -b * d - f * e - h * g;
@@ -1256,7 +1257,7 @@ quat4.multiplyVec3 = function (a, b, c) {
 
 quat4.toMat3 = function (a, b) {
     b || (b = mat3.create());
-    var c = a[0],
+    let c = a[0],
         d = a[1],
         e = a[2],
         g = a[3],
@@ -1266,7 +1267,7 @@ quat4.toMat3 = function (a, b) {
         j = c * f,
         k = c * h;
     c = c * i;
-    var l = d * h;
+    const l = d * h;
     d = d * i;
     e = e * i;
     f = g * f;
@@ -1287,7 +1288,7 @@ quat4.toMat3 = function (a, b) {
 
 quat4.toMat4 = function (a, b) {
     b || (b = mat4.create());
-    var c = a[0],
+    let c = a[0],
         d = a[1],
         e = a[2],
         g = a[3],
@@ -1297,7 +1298,7 @@ quat4.toMat4 = function (a, b) {
         j = c * f,
         k = c * h;
     c = c * i;
-    var l = d * h;
+    const l = d * h;
     d = d * i;
     e = e * i;
     f = g * f;
@@ -1325,7 +1326,7 @@ quat4.toMat4 = function (a, b) {
 
 quat4.slerp = function (a, b, c, d) {
     d || (d = a);
-    var e = c;
+    let e = c;
     if (a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3] < 0) e = -1 * c;
     d[0] = 1 - c * a[0] + e * b[0];
     d[1] = 1 - c * a[1] + e * b[1];
@@ -1340,4 +1341,3 @@ quat4.str = function (a) {
 };
 
 export {vec2, vec3, vec4, mat3, mat4};
-

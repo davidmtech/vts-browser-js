@@ -1,5 +1,5 @@
 
-var UIControlGithub = function(ui, visible, visibleLock) {
+const UIControlGithub = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.control = this.ui.addControl("github",
       '<a target="_blank" href="https://github.com/Melown/vts-browser-js">'
@@ -10,4 +10,3 @@ var UIControlGithub = function(ui, visible, visibleLock) {
 
 
 export default UIControlGithub;
-

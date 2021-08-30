@@ -2,9 +2,9 @@
 import {utils as utils_} from '../utils/utils';
 
 //get rid of compiler mess
-var utils = utils_;
+const utils = utils_;
 
-var MapCredit = function(map, json) {
+const MapCredit = function(map, json) {
     this.map = map;
     this.id = json['id'] || null;
     this.notice = json['notice'] || null;
@@ -28,4 +28,3 @@ MapCredit.prototype.getInfo = function() {
 
 
 export default MapCredit;
-

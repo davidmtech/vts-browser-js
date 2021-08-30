@@ -1,7 +1,7 @@
 
 import {mat4 as mat4_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
-import {utils as utils_} from '../utils/utils';
+//import {utils as utils_} from '../utils/utils';
 import InspectorInput_ from './input';
 import InspectorStats_ from './stats';
 import InspectorGraphs_ from './graphs';
@@ -10,18 +10,18 @@ import InspectorReplay_ from './replay';
 import InspectorStylesheets_ from './stylesheets';
 
 //get rid of compiler mess
-var mat4 = mat4_;
-var math = math_;
-var utils = utils_;
-var InspectorInput = InspectorInput_;
-var InspectorStats = InspectorStats_;
-var InspectorGraphs = InspectorGraphs_;
-var InspectorLayers = InspectorLayers_;
-var InspectorReplay = InspectorReplay_;
-var InspectorStylesheets = InspectorStylesheets_;
+const mat4 = mat4_;
+const math = math_;
+//const utils = utils_;
+const InspectorInput = InspectorInput_;
+const InspectorStats = InspectorStats_;
+const InspectorGraphs = InspectorGraphs_;
+const InspectorLayers = InspectorLayers_;
+const InspectorReplay = InspectorReplay_;
+const InspectorStylesheets = InspectorStylesheets_;
 
 
-var Inspector = function(core) {
+const Inspector = function(core) {
     this.core = core;
     this.enabled = false;
     this.input = new InspectorInput(this);
@@ -77,7 +77,7 @@ Inspector.prototype.setParameter = function(key, value) {
 };
 
 Inspector.prototype.addStyle = function(string) {
-    var style = document.createElement('style');
+    const style = document.createElement('style');
     style.type = 'text/css';
     style.innerHTML = string;
     document.getElementsByTagName('head')[0].appendChild(style);
@@ -101,7 +101,7 @@ Inspector.prototype.preventDefault = function(e) {
 
 
 Inspector.prototype.onMapUpdate = function() {
-    var map = this.core.getMapInterface();
+    const map = this.core.getMapInterface();
     if (!map) {
         return;
     }
@@ -111,16 +111,17 @@ Inspector.prototype.onMapUpdate = function() {
     }
 
     /*if (this.measureMode) {
-        var renderer = this.core.getRenderer();
-        var p = map.convertCoordsFromPhysToNav(this.measurePoints[0]);
+        const renderer = this.core.getRenderer();
+        const p = map.convertCoordsFromPhysToNav(this.measurePoints[0]);
         map.convertCoordsFromPhysToCanvas(this.measurePoints[0]);
     }*/
 
-    var renderer = this.core.getRendererInterface(), i, li, j, lj, lines, slines, p;
+    const renderer = this.core.getRendererInterface();
+    let i, li, j, lj, lines, slines, p;
 
     if (this.replay.drawGlobe) {
         p = map.convertCoordsFromPhysToCameraSpace([0,0,0]);
-        var renderer2 = this.core.getRenderer();
+        const renderer2 = this.core.getRenderer();
         renderer2.draw.drawTBall(p, 12742000 * 0.5, renderer2.progStardome, this.replay.globeTexture, 12742000 * 0.5, true);
     }
 
@@ -177,18 +178,18 @@ Inspector.prototype.onMapUpdate = function() {
         }
 
 
-        var cameInfo = map.getCameraInfo();
-        var p1 = map.convertCoordsFromPhysToCameraSpace(this.replay.cameraLines[0]);
+        const cameInfo = map.getCameraInfo();
+        const p1 = map.convertCoordsFromPhysToCameraSpace(this.replay.cameraLines[0]);
 
-        //var map2 = this.core.getMap();
+        //const map2 = this.core.getMap();
 
-        //var m2 = map2.camera.getRotationviewMatrix();
-        var mv = mat4.create(this.replay.cameraMatrix);
+        //const m2 = map2.camera.getRotationviewMatrix();
+        const mv = mat4.create(this.replay.cameraMatrix);
         //mat4.inverse(m2, mv);
 
         //matrix which tranforms mesh position and scale
         /*
-        var mv = [
+        const mv = [
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -199,7 +200,7 @@ Inspector.prototype.onMapUpdate = function() {
         mv[14] = p1[2];
 
         //setup material
-        var material = [
+        const material = [
             255,128,128, 0, //ambient,
             0,0,0,0, //diffuse
             0,0,0,0, //specular
@@ -209,7 +210,7 @@ Inspector.prototype.onMapUpdate = function() {
         //multiply cube matrix with camera view matrix
         mat4.multiply(cameInfo.viewMatrix, mv, mv);
 
-        var norm = [
+        const norm = [
             0,0,0,
             0,0,0,
             0,0,0
@@ -234,19 +235,19 @@ Inspector.prototype.onMapUpdate = function() {
     }
 
     if (this.drawRadar && this.circleTexture) {
-        //var renderer = this.core.getRendererInterface();
-        var pos = map.getPosition();
-        var count = 16;
-        var step = pos.getViewExtent() / (count * 4);
+        //const renderer = this.core.getRendererInterface();
+        const pos = map.getPosition();
+        const count = 16;
+        const step = pos.getViewExtent() / (count * 4);
 
-        var cbuffer = new Array(count * count);
+        const cbuffer = new Array(count * count);
 
 /*
-        var coords = pos.getCoords();
+        const coords = pos.getCoords();
 
-        for (var j = 0; j < count; j++) {
-            for (var i = 0; i < count; i++) {
-                var screenCoords = map.convertCoordsFromNavToCanvas([coords[0] + i*step - count*0.5*step,
+        for (let j = 0; j < count; j++) {
+            for (let i = 0; i < count; i++) {
+                const screenCoords = map.convertCoordsFromNavToCanvas([coords[0] + i*step - count*0.5*step,
                                                                        coords[1] + j*step - count*0.5*step, 0], "float", this.radarLod);
 
                 cbuffer[j * count + i] = screenCoords;
@@ -257,22 +258,22 @@ Inspector.prototype.onMapUpdate = function() {
 
         for (j = 0; j < count; j++) {
             for (i = 0; i < count; i++) {
-                var dx =  i*step - count*0.5*step;
-                var dy =  j*step - count*0.5*step;
-                var a = Math.atan2(dy, dx);
-                var l = Math.sqrt(dx*dx + dy*dy);
+                const dx =  i*step - count*0.5*step;
+                const dy =  j*step - count*0.5*step;
+                const a = Math.atan2(dy, dx);
+                const l = Math.sqrt(dx*dx + dy*dy);
 
-                var pos2 = map.movePositionCoordsTo(pos, math.degrees(a), l);
-                var coords = pos2.getCoords();
+                const pos2 = map.movePositionCoordsTo(pos, math.degrees(a), l);
+                const coords = pos2.getCoords();
 
-                var screenCoords = map.convertCoordsFromNavToCanvas([coords[0], coords[1], 0], 'float', this.radarLod);
+                const screenCoords = map.convertCoordsFromNavToCanvas([coords[0], coords[1], 0], 'float', this.radarLod);
 
                 cbuffer[j * count + i] = screenCoords;
             }
         }
 
 
-        var lbuffer = new Array(count);
+        const lbuffer = new Array(count);
 
         for (j = 0; j < count; j++) {
             for (i = 0; i < count; i++) {

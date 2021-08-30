@@ -1,14 +1,16 @@
 
-import {vec3 as vec3_} from '../utils/matrix';
+import {vec3 as vec3_, mat3 as mat3_, mat4 as mat4_} from '../utils/matrix';
 //import GpuTexture_ from '../renderer/gpu/texture';
 import {math as math_} from '../utils/math';
 
 //get rid of compiler mess
-var vec3 = vec3_;
-//var GpuTexture = GpuTexture_;
-var math = math_;
+const vec3 = vec3_;
+const mat3 = mat3_;
+const mat4 = mat4_;
+//const GpuTexture = GpuTexture_;
+const math = math_;
 
- var tileBorderTable = [
+ const tileBorderTable = [
     [-1, -1, 0, 0],
     [0, -1, 0.5, 1], //
     [1, -1, 1, 0],
@@ -22,7 +24,7 @@ var math = math_;
     [1, 1, 1, 1]
 ];
 
-var tileCornerTable = [
+const tileCornerTable = [
     [0,1,3],
     [2,1,5],
     [6,3,7],
@@ -30,7 +32,7 @@ var tileCornerTable = [
 ];
 
 
-var MapSurfaceTile = function(map, parent, id) {
+const MapSurfaceTile = function(map, parent, id) {
     this.map = map;
     this.id = id;
     this.parent = parent;
@@ -86,7 +88,7 @@ var MapSurfaceTile = function(map, parent, id) {
 
 MapSurfaceTile.prototype.kill = function() {
     //kill children
-    for (var i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
         if (this.children[i] != null) {
             this.children[i].kill();
         }
@@ -96,7 +98,7 @@ MapSurfaceTile.prototype.kill = function() {
         this.surfaceMesh.kill();
     }
 
-    for (var key in this.surfaceTextures) {
+    for (let key in this.surfaceTextures) {
         if (this.surfaceTextures[key] != null) {
             this.surfaceTextures[key].kill();
         }
@@ -114,7 +116,7 @@ MapSurfaceTile.prototype.kill = function() {
         this.heightMap.kill();
     }
 
-    for (var key in this.boundTextures) {
+    for (let key in this.boundTextures) {
         if (this.boundTextures[key] != null) {
             this.boundTextures[key].kill();
         }
@@ -155,7 +157,7 @@ MapSurfaceTile.prototype.kill = function() {
     this.verifyChildren = false;
     this.children = [null, null, null, null];
 
-    var parent = this.parent;
+    const parent = this.parent;
     this.parent = null;
 
     if (parent != null) {
@@ -220,7 +222,7 @@ MapSurfaceTile.prototype.viewSwitched = function() {
     //this.lastMetanode = null;
     //this.metanode = null;
 
-    for (var key in this.bounds) {
+    for (let key in this.bounds) {
         this.bounds[key] = {
             sequence : [],
             alpha : [],
@@ -274,8 +276,8 @@ MapSurfaceTile.prototype.addChild = function(index) {
         return;
     }
 
-    var id = this.id;
-    var childId = [id[0] + 1, id[1] << 1, id[2] << 1];
+    const id = this.id;
+    const childId = [id[0] + 1, id[1] << 1, id[2] << 1];
 
     switch (index) {
     case 1: childId[1]++; break;
@@ -298,7 +300,7 @@ MapSurfaceTile.prototype.removeChildByIndex = function(index) {
 
 
 MapSurfaceTile.prototype.removeChild = function(tile) {
-    for (var i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
         if (this.children[i] == tile) {
             this.children[i].kill();
             this.children[i] = null;
@@ -327,7 +329,7 @@ MapSurfaceTile.prototype.isMetanodeReady = function(tree, priority, preventLoad)
         if (this.metanode == null || this.lastMetanode) {
 
             if (!this.virtualSurfacesUncomplete) {
-                var ret = this.checkMetanode(tree, priority);
+                const ret = this.checkMetanode(tree, priority);
 
                 if (!ret && !(this.metanode != null && this.lastMetanode)) { //metanode is not ready yet
                     return false;
@@ -365,9 +367,9 @@ MapSurfaceTile.prototype.isMetanodeReady = function(tree, priority, preventLoad)
     }
 
     if (this.seCounter != this.map.renderer.seCounter) {
-        var renderer = this.map.renderer;
+        const renderer = this.map.renderer;
         this.seCounter = renderer.seCounter;
-        var node = this.metanode;
+        const node = this.metanode;
 
         if (renderer.useSuperElevation) {
             node.minZ = renderer.getSuperElevatedHeight(node.minZ2);
@@ -404,23 +406,24 @@ MapSurfaceTile.prototype.checkSurface = function(tree, priority) {
         return;
     }
 
-    var sequence = tree.surfaceSequence;
+    const sequence = tree.surfaceSequence;
 
     //multiple surfaces
     //build virtual surfaces array
     //find surfaces with content
-    for (var i = 0, li = sequence.length; i < li; i++) {
-        var surface = sequence[i][0];
-        var alien = sequence[i][1];
+    for (let i = 0, li = sequence.length; i < li; i++) {
+        const surface = sequence[i][0];
+        const alien = sequence[i][1];
 
-        var res = surface.hasTile2(this.id);
+        const res = surface.hasTile2(this.id);
         if (res[0]) {
 
             //check if tile exist
             if (this.id[0] > 0) { //surface.lodRange[0]) {
                 // removed for debug !!!!!
                 // ????????
-                var parent = this.parent;
+
+                const parent = this.parent;
                 if (parent) {
 
                     if (parent.virtualSurfacesUncomplete) {
@@ -429,7 +432,7 @@ MapSurfaceTile.prototype.checkSurface = function(tree, priority) {
                         return;
                     }
 
-                    var metatile = parent.metaresources.getMetatile(surface, null, this);
+                    const metatile = parent.metaresources.getMetatile(surface, null, this);
                     if (metatile) {
 
                         if (!metatile.isReady(priority)) {
@@ -437,7 +440,7 @@ MapSurfaceTile.prototype.checkSurface = function(tree, priority) {
                             continue;
                         }
 
-                        var node = metatile.getNode(parent.id);
+                        const node = metatile.getNode(parent.id);
                         if (node) {
                             if (!node.hasChildById(this.id)) {
                                 continue;
@@ -475,13 +478,13 @@ MapSurfaceTile.prototype.checkMetanode = function(tree, priority) {
         }
     }
 
-    var surface = this.surface;
+    const surface = this.surface;
 
     if (surface == null) {
         return false;
     }
 
-    var metatile = this.metaresources.getMetatile(surface, true, this);
+    const metatile = this.metaresources.getMetatile(surface, true, this);
 
     if (metatile.isReady(priority)) {
 
@@ -496,7 +499,7 @@ MapSurfaceTile.prototype.checkMetanode = function(tree, priority) {
             this.lastMetanode = null;
             this.map.markDirty();
 
-            for (var i = 0; i < 4; i++) {
+            for (let i = 0; i < 4; i++) {
                 if (this.metanode.hasChild(i)) {
                     this.addChild(i);
                 } else {
@@ -514,12 +517,12 @@ MapSurfaceTile.prototype.checkMetanode = function(tree, priority) {
 
 
 MapSurfaceTile.prototype.isVirtualMetanodeReady = function(tree, priority) {
-    var surfaces = this.virtualSurfaces;
-    var readyCount = 0;
+    const surfaces = this.virtualSurfaces;
+    let readyCount = 0, i, li;
 
-    for (var i = 0, li = surfaces.length; i < li; i++) {
-        var surface = surfaces[i][0];
-        var metatile = this.metaresources.getMetatile(surface, true, this);
+    for (i = 0, li = surfaces.length; i < li; i++) {
+        const surface = surfaces[i][0];
+        const metatile = this.metaresources.getMetatile(surface, true, this);
 
         if (metatile.isReady(priority)) {
             readyCount++;
@@ -535,13 +538,13 @@ MapSurfaceTile.prototype.isVirtualMetanodeReady = function(tree, priority) {
 
 
 MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
-    var surfaces = this.virtualSurfaces;
-    var node = null, i, li, surface, metatile, metanode;
+    const surfaces = this.virtualSurfaces;
+    let node = null, i, li, surface, metatile, metanode;
 
     //get top most existing surface
     for (i = 0, li = surfaces.length; i < li; i++) {
         surface = surfaces[i][0];
-        var alien = surfaces[i][1];
+        const alien = surfaces[i][1];
         metatile = this.metaresources.getMetatile(surface, null, this);
 
         if (metatile.isReady(priority)) {
@@ -557,12 +560,12 @@ MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
                 if (!alien && surface.glue && !metanode.hasGeometry() &&
                     metanode.internalTextureCount > 0) {
 
-                    var desiredSurfaceIndex = metanode.internalTextureCount - 1;
+                    let desiredSurfaceIndex = metanode.internalTextureCount - 1;
                     desiredSurfaceIndex = this.map.getSurface(surface.id[desiredSurfaceIndex]).viewSurfaceIndex;
 
-                    var jump = false;
+                    let jump = false;
 
-                    for (var j = i; j < li; j++) {
+                    for (let j = i; j < li; j++) {
                         if (surfaces[j].viewSurfaceIndex <= desiredSurfaceIndex) {
                             jump = (j > i);
                             i = j - 1;
@@ -609,7 +612,7 @@ MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
                     node.flags |= metanode.flags & ((15)<<4);
 
                     /*
-                    for (var j = 0, lj = metanode.credits.length; j <lj; j++) {
+                    for (let j = 0, lj = metanode.credits.length; j <lj; j++) {
                         if (node.credits.indexOf(metanode.credits[j]) == -1) {
                             node.credits.push(metanode.credits[j]);
                         }
@@ -638,25 +641,25 @@ MapSurfaceTile.prototype.createVirtualMetanode = function(tree, priority) {
 
 
 MapSurfaceTile.prototype.bboxVisible = function(id, bbox, cameraPos, node) {
-    var map = this.map;
-    var camera = map.camera;
+    const map = this.map;
+    const camera = map.camera;
     if (id[0] < map.measure.minDivisionNodeDepth) {
         return true;
     }
 
-    var skipGeoTest = map.config.mapDisableCulling;
+    const skipGeoTest = map.config.mapDisableCulling;
     if (!skipGeoTest && map.isGeocent) {
         if (node) {
             //if (true) {  //version with perspektive
-            var p2 = node.diskPos;
-            var p1 = camera.position;
-            var rayVec = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
-            var distance = vec3.normalize4(rayVec) * camera.distanceFactor;
+            const p2 = node.diskPos;
+            const p1 = camera.position;
+            const rayVec = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
+            const distance = vec3.normalize4(rayVec) * camera.distanceFactor;
                 //vec3.normalize(camVec);
 
-            var a = vec3.dot(rayVec, node.diskNormal);
+            const a = vec3.dot(rayVec, node.diskNormal);
             //} else { //version without perspektive
-            //    var a = vec3.dot(camera.vector, node.diskNormal);
+            //    const a = vec3.dot(camera.vector, node.diskNormal);
             //}
             this.tiltAngle = a;
 
@@ -680,7 +683,7 @@ MapSurfaceTile.prototype.bboxVisible = function(id, bbox, cameraPos, node) {
 MapSurfaceTile.prototype.insideCone = function(coneVec, angle, node) {
 
     if (this.map.isGeocent) { // && node.diskPos && node.diskNormal) {
-        var a = Math.acos(vec3.dot(coneVec, node.diskNormal));
+        const a = Math.acos(vec3.dot(coneVec, node.diskNormal));
 
         return (a < angle + node.diskAngle2A);
     }
@@ -690,18 +693,18 @@ MapSurfaceTile.prototype.insideCone = function(coneVec, angle, node) {
 
 
 MapSurfaceTile.prototype.getPixelSize = function(bbox, screenPixelSize, cameraPos, worldPos, returnDistance) {
-    var min = bbox.min;
-    var max = bbox.max;
-    var tilePos1x = min[0] - cameraPos[0];
-    var tilePos1y = min[1] - cameraPos[1];
-    var tilePos2x = max[0] - cameraPos[0];
-    var tilePos2y = min[1] - cameraPos[1];
-    var tilePos3x = max[0] - cameraPos[0];
-    var tilePos3y = max[1] - cameraPos[1];
-    var tilePos4x = min[0] - cameraPos[0];
-    var tilePos4y = max[1] - cameraPos[1];
-    var h1 = min[2] - cameraPos[2];
-    var h2 = max[2] - cameraPos[2];
+    const min = bbox.min;
+    const max = bbox.max;
+    const tilePos1x = min[0] - cameraPos[0];
+    const tilePos1y = min[1] - cameraPos[1];
+    const tilePos2x = max[0] - cameraPos[0];
+    const tilePos2y = min[1] - cameraPos[1];
+    const tilePos3x = max[0] - cameraPos[0];
+    const tilePos3y = max[1] - cameraPos[1];
+    const tilePos4x = min[0] - cameraPos[0];
+    const tilePos4y = max[1] - cameraPos[1];
+    const h1 = min[2] - cameraPos[2];
+    const h2 = max[2] - cameraPos[2];
 
     //camera inside bbox
     if (cameraPos[0] > min[0] && cameraPos[0] < max[0] &&
@@ -715,8 +718,8 @@ MapSurfaceTile.prototype.getPixelSize = function(bbox, screenPixelSize, cameraPo
         return Number.POSITIVE_INFINITY;
     }
 
-    var factor = 0;
-    var camera = this.map.camera.camera;
+    let factor = 0;
+    const camera = this.map.camera.camera;
 
     //find bbox sector
     if (0 < tilePos1y) { //top row - zero means camera position in y
@@ -810,21 +813,21 @@ MapSurfaceTile.prototype.getPixelSize = function(bbox, screenPixelSize, cameraPo
 
 
 MapSurfaceTile.prototype.getPixelSize3Old = function(node, screenPixelSize, factor) {
-    var camera = this.map.camera;
-    var d = (camera.geocentDistance*factor) - node.diskDistance;
+    const camera = this.map.camera;
+    let d = (camera.geocentDistance*factor) - node.diskDistance;
     if (d < 0) {
         d = -d;
         //return [Number.POSITIVE_INFINITY, 0.1];
     }
 
-    var a = vec3.dot(camera.geocentNormal, node.diskNormal);
+    let a = vec3.dot(camera.geocentNormal, node.diskNormal);
 
     if (a < node.diskAngle2) {
-        var a2 = Math.acos(a);
-        var a3 = Math.acos(node.diskAngle2);
+        let a2 = Math.acos(a);
+        const a3 = Math.acos(node.diskAngle2);
         a2 = a2 - a3;
 
-        var l1 = Math.tan(a2) * node.diskDistance;
+        const l1 = Math.tan(a2) * node.diskDistance;
         d = Math.sqrt(l1*l1 + d*d);
     }
 
@@ -837,19 +840,19 @@ MapSurfaceTile.prototype.getPixelSize3 = function(node, screenPixelSize) {
     //if (this.map.drawIndices) {
       //  return this.getPixelSize3Old(node, screenPixelSize, factor);
     //}
-    var camera = this.map.camera;
-    var cameraDistance = camera.geocentDistance;// * factor;
+    const camera = this.map.camera;
+    const cameraDistance = camera.geocentDistance;// * factor;
 
-    var a = vec3.dot(camera.geocentNormal, node.diskNormal); //get angle between tile normal and cameraGeocentNormal
-    var d = cameraDistance - (node.diskDistance + (node.maxZ - node.minZ)), d2; //vertical distance from top bbox level
+    const a = vec3.dot(camera.geocentNormal, node.diskNormal); //get angle between tile normal and cameraGeocentNormal
+    let d = cameraDistance - (node.diskDistance + (node.maxZ - node.minZ)), d2; //vertical distance from top bbox level
 
     if (a < node.diskAngle2) { //is camera inside tile conus?
 
         //get horizontal distance
-        var a2 = Math.acos(a);
-        var a3 = node.diskAngle2A;
+        let a2 = Math.acos(a);
+        const a3 = node.diskAngle2A;
         a2 = a2 - a3;
-        var l1 = Math.tan(a2) * node.diskDistance;// * factor;
+        const l1 = Math.tan(a2) * node.diskDistance;// * factor;
 
         if (d < 0) { //is camera is belown top bbox level?
             d2 = cameraDistance - node.diskDistance;
@@ -880,19 +883,19 @@ MapSurfaceTile.prototype.getPixelSize3 = function(node, screenPixelSize) {
 /*
 
 MapSurfaceTile.prototype.getPixelSize22 = function(bbox, screenPixelSize, cameraPos, worldPos, returnDistance) {
-    var min = bbox.min;
-    var max = bbox.max;
-    var p1 = bbox.center();
+    const min = bbox.min;
+    const max = bbox.max;
+    const p1 = bbox.center();
     bbox.updateMaxSize();
-    var d = bbox.maxSize * 0.5;
+    const d = bbox.maxSize * 0.5;
 
-    var dd = [cameraPos[0]-p1[0],
+    const dd = [cameraPos[0]-p1[0],
                cameraPos[1]-p1[1],
                cameraPos[2]-p1[2]];
 
-    var d2 = vec3.length(dd) - (bbox.maxSize * 0.5);
+    const d2 = vec3.length(dd) - (bbox.maxSize * 0.5);
 
-    var factor = this.camera.scaleFactor2(d2);
+    const factor = this.camera.scaleFactor2(d2);
 
     if (returnDistance) {
         return [(factor[0] * screenPixelSize), factor[1]];
@@ -903,17 +906,17 @@ MapSurfaceTile.prototype.getPixelSize22 = function(bbox, screenPixelSize, camera
 */
 
 MapSurfaceTile.prototype.updateTexelSize = function() {
-    var pixelSize, factor, v, p;
-    var map = this.map;
-    var draw = map.draw;
-    var camera = map.camera;
-    var texelSizeFit = draw.texelSizeFit;
-    var node = this.metanode;
-    var cameraPos = map.camera.position;
-    var preciseDistance = (map.isGeocent && (map.config.mapPreciseDistanceTest || node.metatile.useVersion >= 4));
+    const map = this.map;
+    const draw = map.draw;
+    const camera = map.camera;
+    const texelSizeFit = draw.texelSizeFit;
+    const node = this.metanode;
+    const cameraPos = map.camera.position;
+    const preciseDistance = (map.isGeocent && (map.config.mapPreciseDistanceTest || node.metatile.useVersion >= 4));
+    let pixelSize, factor, v, p;
 
     if (node.hasGeometry()) {
-        var screenPixelSize = Number.POSITIVE_INFINITY;
+        let screenPixelSize = Number.POSITIVE_INFINITY;
 
         if (node.usedTexelSize()) {
             screenPixelSize = draw.ndcToScreenPixel * node.pixelSize;
@@ -922,7 +925,7 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
         }
 
         if (camera.camera.ortho) {
-            var height = camera.camera.getViewHeight();
+            const height = camera.camera.getViewHeight();
             pixelSize = [(screenPixelSize*2.0) / height, height];
         } else {
 
@@ -984,13 +987,13 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
         return;
     }
 
-    var degradeHorizon = map.config.mapDegradeHorizonParams;
-    var degradeFadeStart = degradeHorizon[1];
-    var degradeFadeEnd = degradeHorizon[2];
+    const degradeHorizon = map.config.mapDegradeHorizonParams;
+    const degradeFadeStart = degradeHorizon[1];
+    const degradeFadeEnd = degradeHorizon[2];
 
     //reduce degrade factor by tilt
-    var degradeFactor = draw.degradeHorizonFactor * draw.degradeHorizonTiltFactor;
-    var distance = this.distance * camera.distanceFactor;
+    let degradeFactor = draw.degradeHorizonFactor * draw.degradeHorizonTiltFactor;
+    const distance = this.distance * camera.distanceFactor;
 
     //apply degrade factor smoothly from specified tile distance
     if (distance < degradeFadeStart) {
@@ -1002,8 +1005,8 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
     degradeFactor = Math.max(degradeFactor, 1.0);
 
     //reduce degrade factor by observed distance
-    var observerDistance = camera.perceivedDistance;
-    var distanceFade = degradeHorizon[3];
+    const observerDistance = camera.perceivedDistance;
+    const distanceFade = degradeHorizon[3];
 
     if (observerDistance > distanceFade) {
         degradeFactor = 1.0;
@@ -1017,6 +1020,7 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
 };
 
 
+// eslint-disable-next-line
 MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetBorderData, subdiv) {
     /* if (!(subdiv || onlySetBorderData)) {
         if (this.gridRenderCounter != this.map.draw.drawCounter) {
@@ -1034,7 +1038,8 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         return;
     }
 
-    var map = this.map, node, ll, ur, res;
+    const map = this.map;
+    let node, ll, ur, res;
 
     if (map.draw.gridSkipped) {
         return;
@@ -1052,9 +1057,9 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         ur = res[1][1];
     }
 
-    var middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5];
+    let middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5];
 
-    var hasPoles = map.referenceFrame.hasPoles;
+    const hasPoles = map.referenceFrame.hasPoles;
 
     angle = angle || this.metanode.diskAngle2;
 
@@ -1070,42 +1075,42 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         return;
     }
 
-    var desiredSamplesPerViewExtent = 5;
-    var nodeExtent = node.extents.ur[1] - node.extents.ll[1];
-    var viewExtent = this.distance ;//* 0.1;
-    var lod = Math.log((desiredSamplesPerViewExtent * nodeExtent) / viewExtent) / map.log2;
-    lod = Math.max(0,lod - 8 + node.id[0]);
+    //const desiredSamplesPerViewExtent = 5;
+    //const nodeExtent = node.extents.ur[1] - node.extents.ll[1];
+    //const viewExtent = this.distance ;//* 0.1;
+    //let lod = Math.log((desiredSamplesPerViewExtent * nodeExtent) / viewExtent) / map.log2;
+    //lod = Math.max(0,lod - 8 + node.id[0]);
 
-    var h, factor, prog, draw = map.draw;
+    let h, factor, prog, mnode;
 
-    var sx = cameraPos[0];
-    var sx = cameraPos[0];
-    var sy = cameraPos[1];
-    var sz = cameraPos[2];
-    var buffer = draw.planeBuffer;
-    var flatGrid = draw.gridFlat;
-    var joinGrids = draw.gridGlues; //this.map.draw.debug.drawFog;
-    var gridPoints = this.gridPoints;
-    var useSurrogatez = map.config.mapGridSurrogatez;
+    const draw = map.draw;
+    const sx = cameraPos[0];
+    const sy = cameraPos[1];
+    const sz = cameraPos[2];
+    const buffer = draw.planeBuffer;
+    const flatGrid = draw.gridFlat;
+    const joinGrids = draw.gridGlues; //this.map.draw.debug.drawFog;
+    const gridPoints = this.gridPoints;
+    const useSurrogatez = map.config.mapGridSurrogatez;
 
     if (!gridPoints) {
 
         h = useSurrogatez ? this.metanode.surrogatez : this.metanode.minZ;
-        var n1 = node.getPhysicalCoords([ur[0], ur[1], h], true);
-        var n2 = node.getPhysicalCoords([ur[0], ll[1], h], true);
-        var n3 = node.getPhysicalCoords([ll[0], ll[1], h], true);
-        var n4 = node.getPhysicalCoords([ll[0], ur[1], h], true);
-        var mtop = node.getPhysicalCoords([middle[0], ur[1], h], true);
-        var mbottom = node.getPhysicalCoords([middle[0], ll[1], h], true);
-        var mleft = node.getPhysicalCoords([ll[0], middle[1], h], true);
-        var mright = node.getPhysicalCoords([ur[0], middle[1], h], true);
+        const n1 = node.getPhysicalCoords([ur[0], ur[1], h], true);
+        const n2 = node.getPhysicalCoords([ur[0], ll[1], h], true);
+        const n3 = node.getPhysicalCoords([ll[0], ll[1], h], true);
+        const n4 = node.getPhysicalCoords([ll[0], ur[1], h], true);
+        const mtop = node.getPhysicalCoords([middle[0], ur[1], h], true);
+        const mbottom = node.getPhysicalCoords([middle[0], ll[1], h], true);
+        const mleft = node.getPhysicalCoords([ll[0], middle[1], h], true);
+        const mright = node.getPhysicalCoords([ur[0], middle[1], h], true);
 
         middle[2] = h;
         middle = node.getPhysicalCoords(middle, true);
 
         if (!divNode) {
 
-            var gridPoints = [
+            const gridPoints = [
                 n4[0], n4[1], n4[2],
                 mtop[0], mtop[1], mtop[2],
                 n1[0], n1[1], n1[2],
@@ -1163,10 +1168,10 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
     if (!flatGrid) {
 
-        var mnode = this.metanode;
+        mnode = this.metanode;
 
-        var border = mnode.border, borderNodes = mnode.borderNodes;
-        var i, li, n, tree = map.tree, id = this.id;
+        let border = mnode.border, borderNodes = mnode.borderNodes;
+        let i, li, n, tree = map.tree, id = this.id;
 
         if (!border) {
             mnode.border = new Array(9);
@@ -1176,8 +1181,8 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         }
 
 
-        var borderTable = tileBorderTable;
-        var skip = false;
+        const borderTable = tileBorderTable;
+        let skip = false;
 
         if (!mnode.borderReady) {
 
@@ -1197,7 +1202,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
         }
 
-        var border2 = mnode.border2;
+        let border2 = mnode.border2;
         h = useSurrogatez ? mnode.surrogatez : mnode.minZ
 
         if (!border2 || !mnode.borderReady) {
@@ -1227,8 +1232,8 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         }
 
         if (joinGrids) {
-            var cornerTable = tileCornerTable;
-            var nodeTable = this.nodeTable;
+            const cornerTable = tileCornerTable;
+            let nodeTable = this.nodeTable;
 
             if (!nodeTable) {
                 nodeTable = new Array(9);
@@ -1242,7 +1247,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                 }
             }
 
-            var border3 = mnode.border3;
+            let border3 = mnode.border3;
 
             if (!border3) {
                 border3 = new Array(9);
@@ -1251,9 +1256,9 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
 
             //solve corners
             for (i = 0, li = cornerTable.length; i < li; i++) {
-                var lowestNode = nodeTable[cornerTable[i][0]];
+                let lowestNode = nodeTable[cornerTable[i][0]];
 
-                for (var j = 1; j < 3; j++) {
+                for (let j = 1; j < 3; j++) {
                     n = nodeTable[cornerTable[i][j]];
 
                     if (n) {
@@ -1274,7 +1279,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
                 n = nodeTable[i];
 
                 if (i != 4 && (n && n.id[0] < id[0])) {
-                    var bcoords;
+                    let bcoords;
 
                     switch(i) {
                         case 0:  bcoords = [mnode.llx, mnode.lly]; break;
@@ -1305,9 +1310,9 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         }
     }
 
-    var renderer = map.renderer;
-    var mv = renderer.camera.getModelviewMatrix();
-    var proj = renderer.camera.getProjectionMatrix();
+    const renderer = map.renderer;
+    const mv = renderer.camera.getModelviewMatrix();
+    const proj = renderer.camera.getProjectionMatrix();
 
     if (gridPoints) {
         buffer[0] = gridPoints[0] - sx;
@@ -1348,25 +1353,25 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     }
 
     if (hasPoles && !map.poleRadius && node.id[0] == 1 && !node.isPole) {
-        var p = node.getPhysicalCoords([node.extents.ur[0], node.extents.ur[1], 0]);
+        const p = node.getPhysicalCoords([node.extents.ur[0], node.extents.ur[1], 0]);
         map.poleRadius = Math.sqrt(p[0]*p[0]+p[1]*p[1]);
         map.poleRadiusFactor = 8 * Math.pow(2.0, 552058 / map.poleRadius);
     }
 
     factor = 1;
 
-    var useTexture = (map.config.mapGridTextureLayer != '');
+    let useTexture = (map.config.mapGridTextureLayer != '');
 
     if (useTexture) {
         if (!this.gridTexture) {
 
-            var layer = map.boundLayers[map.config.mapGridTextureLayer];
-            var sourceTile = this;
+            const layer = map.boundLayers[map.config.mapGridTextureLayer];
+            let sourceTile = this;
 
             if (!layer || sourceTile < layer.lodRange[0]) {
                 useTexture = false;
             } else {
-                var sourceLod = math.clamp(sourceTile.id[0] - map.config.mapGridTextureLevel, layer.lodRange[0], layer.lodRange[3]);
+                const sourceLod = math.clamp(sourceTile.id[0] - map.config.mapGridTextureLevel, layer.lodRange[0], layer.lodRange[3]);
 
                 while (sourceTile.id[0] > sourceLod) {
                     sourceTile = sourceTile.parent;
@@ -1384,20 +1389,20 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         }
     }
 
-    var hitmapRender = renderer.onlyDepth;
+    const hitmapRender = renderer.onlyDepth;
 
     if (hasPoles && node.isPole) {
         factor = map.poleRadiusFactor;
-        prog = hitmapRender ? renderer.progPlane2D :renderer.progPlane2;
+        prog = hitmapRender ? renderer.gpu.progPlane2D :renderer.gpu.progPlane2;
         renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
         prog.setVec4('uParams4', [-sx, -sy, map.poleRadius, 0]);
     } else {
 
         if (!flatGrid) {
-            prog = hitmapRender ? renderer.progPlane3D : renderer.progPlane3;
+            prog = hitmapRender ? renderer.gpu.progPlane3D : renderer.gpu.progPlane3;
             renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
 
-            var border;
+            let border;
 
             if (joinGrids) {
                 border =  mnode.border3;
@@ -1409,7 +1414,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
             prog.setVec3('uVector', mnode.diskNormal);
 
         } else {
-            prog = hitmapRender ? renderer.progPlane : renderer.progPlane;
+            prog = hitmapRender ? renderer.gpu.progPlane : renderer.gpu.progPlane;
             renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
         }
     }
@@ -1419,13 +1424,13 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     prog.setFloatArray('uPoints', buffer);
 
     /*
-    var lx = (ur[0] - ll[0]);
-    var ly = (ll[1] - ur[1]);
-    var px = (ll[0] - node.extents.ll[0]) / lx;
-    var py = (ur[1] - node.extents.ll[1]) / ly;
+    const lx = (ur[0] - ll[0]);
+    const ly = (ll[1] - ur[1]);
+    const px = (ll[0] - node.extents.ll[0]) / lx;
+    const py = (ur[1] - node.extents.ll[1]) / ly;
 
-    var llx = (node.extents.ur[0] - node.extents.ll[0]) / lx;
-    var lly = (node.extents.ur[1] - node.extents.ll[1]) / ly;
+    const llx = (node.extents.ur[0] - node.extents.ll[0]) / lx;
+    const lly = (node.extents.ur[1] - node.extents.ll[1]) / ly;
 
     px = px / llx;
     py = py / lly;
@@ -1438,21 +1443,21 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     py *= step1;
     */
 
-    var step1 = node.gridStep1 * factor;
+    const step1 = node.gridStep1 * factor;
 
-    var lx = 1.0 / (ur[0] - ll[0]);
-    var ly = 1.0 / (ll[1] - ur[1]);
-    var llx = step1 / ((node.extents.ur[0] - node.extents.ll[0]) * lx);
-    var lly = step1 / ((node.extents.ur[1] - node.extents.ll[1]) * ly);
-    var px = (ll[0] - node.extents.ll[0]) * lx * llx;
-    var py = (ur[1] - node.extents.ll[1]) * ly * lly;
+    const lx = 1.0 / (ur[0] - ll[0]);
+    const ly = 1.0 / (ll[1] - ur[1]);
+    const llx = step1 / ((node.extents.ur[0] - node.extents.ll[0]) * lx);
+    const lly = step1 / ((node.extents.ur[1] - node.extents.ll[1]) * ly);
+    const px = (ll[0] - node.extents.ll[0]) * lx * llx;
+    const py = (ur[1] - node.extents.ll[1]) * ly * lly;
 
 
     if (useTexture) {
         renderer.gpu.bindTexture(this.gridTexture.getGpuTexture());
         prog.setVec4('uParams', [step1 * factor, draw.fogDensity, 1/15, node.gridStep2 * factor]);
 
-        var tt = this.gridTexture.getTransform();
+        const tt = this.gridTexture.getTransform();
 
 //        prog.setVec4('uParams3', [tt[2], tt[3]+tt[1], tt[0], tt[1]]);
         prog.setVec4('uParams3', [tt[2], tt[3], tt[0], tt[1]]);
@@ -1460,7 +1465,7 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
         //prog.setVec4('uParams3', [(py - Math.floor(py)), (px - Math.floor(px)), lly*0.5, llx*0.5]);
         prog.setVec4('uParams2', [0, 0, 0, 0]);
     } else {
-        renderer.gpu.bindTexture(renderer.heightmapTexture);
+        renderer.gpu.bindTexture(renderer.gpu.heightmapTexture);
         prog.setVec4('uParams', [step1 * factor, draw.fogDensity, 1/15, node.gridStep2 * factor]);
         prog.setVec4('uParams3', [(py - Math.floor(py)), (px - Math.floor(px)), lly, llx]);
         prog.setVec4('uParams2', [0, 0, node.gridBlend, 0]);
@@ -1469,9 +1474,9 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
     prog.setVec4('uFogColor', draw.atmoColor);
 
     //draw bbox
-    renderer.planeMesh.draw(prog, 'aPosition', 'aTexCoord');
+    renderer.gpu.planeMesh.draw(prog, 'aPosition', 'aTexCoord');
 
-    this.map.stats.drawnFaces += renderer.planeMesh.polygons;
+    this.map.stats.drawnFaces += renderer.gpu.planeMesh.polygons;
 };
 
 
@@ -1484,10 +1489,10 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         return;
     }
 
-    var map = this.map, node, ll, ur, res;
-    var renderer = map.renderer;
+    let node, ll, ur, res;
+    const renderer = map.renderer, map = this.map, draw = map.draw;
 
-    if (!renderer.progHmapPlane) {
+    if (!renderer.gpu.progHmapPlane) {
         renderer.initProceduralShaders();
     }
 
@@ -1502,8 +1507,8 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         ur = res[1][1];
     }
 
-    var middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5];
-    var hasPoles = map.referenceFrame.hasPoles;
+    let middle = [(ur[0] + ll[0])* 0.5, (ur[1] + ll[1])* 0.5];
+    const hasPoles = map.referenceFrame.hasPoles;
     angle = angle || this.metanode.diskAngle2;
 
     if ((hasPoles && !node.isPole) &&  Math.acos(angle) > Math.PI*0.1) {
@@ -1518,41 +1523,40 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         return;
     }
 
-    var desiredSamplesPerViewExtent = 5;
-    var nodeExtent = node.extents.ur[1] - node.extents.ll[1];
-    var viewExtent = this.distance ;//* 0.1;
-    var lod = Math.log((desiredSamplesPerViewExtent * nodeExtent) / viewExtent) / map.log2;
-    lod = Math.max(0,lod - 8 + node.id[0]);
+    //const desiredSamplesPerViewExtent = 5;
+    //const nodeExtent = node.extents.ur[1] - node.extents.ll[1];
+    //const viewExtent = this.distance ;//* 0.1;
+    //let lod = Math.log((desiredSamplesPerViewExtent * nodeExtent) / viewExtent) / map.log2;
+    //lod = Math.max(0,lod - 8 + node.id[0]);
 
-    var h, factor, prog, draw = map.draw;
+    let h, factor, prog;
 
-    var sx = cameraPos[0];
-    var sx = cameraPos[0];
-    var sy = cameraPos[1];
-    var sz = cameraPos[2];
-    var buffer = draw.planeBuffer;
-    var gridPoints = this.gridPoints;
-    var useSurrogatez = map.config.mapGridSurrogatez;
+    const sx = cameraPos[0];
+    const sy = cameraPos[1];
+    const sz = cameraPos[2];
+    const buffer = draw.planeBuffer;
+    const gridPoints = this.gridPoints;
+    //const useSurrogatez = map.config.mapGridSurrogatez;
 
     if (!gridPoints) {
 
 //        h = this.metanode.minZ;
         h = 0;//this.metanode.minHeight;
-        var n1 = node.getPhysicalCoords([ur[0], ur[1], h], true);
-        var n2 = node.getPhysicalCoords([ur[0], ll[1], h], true);
-        var n3 = node.getPhysicalCoords([ll[0], ll[1], h], true);
-        var n4 = node.getPhysicalCoords([ll[0], ur[1], h], true);
-        var mtop = node.getPhysicalCoords([middle[0], ur[1], h], true);
-        var mbottom = node.getPhysicalCoords([middle[0], ll[1], h], true);
-        var mleft = node.getPhysicalCoords([ll[0], middle[1], h], true);
-        var mright = node.getPhysicalCoords([ur[0], middle[1], h], true);
+        const n1 = node.getPhysicalCoords([ur[0], ur[1], h], true);
+        const n2 = node.getPhysicalCoords([ur[0], ll[1], h], true);
+        const n3 = node.getPhysicalCoords([ll[0], ll[1], h], true);
+        const n4 = node.getPhysicalCoords([ll[0], ur[1], h], true);
+        const mtop = node.getPhysicalCoords([middle[0], ur[1], h], true);
+        const mbottom = node.getPhysicalCoords([middle[0], ll[1], h], true);
+        const mleft = node.getPhysicalCoords([ll[0], middle[1], h], true);
+        const mright = node.getPhysicalCoords([ur[0], middle[1], h], true);
 
         middle[2] = h;
         middle = node.getPhysicalCoords(middle, true);
 
         if (!divNode) {
 
-            var gridPoints = [
+            const gridPoints = [
                 n4[0], n4[1], n4[2],
                 mtop[0], mtop[1], mtop[2],
                 n1[0], n1[1], n1[2],
@@ -1607,8 +1611,8 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         }
      }
 
-    var mv = renderer.camera.getModelviewMatrix();
-    var proj = renderer.camera.getProjectionMatrix();
+    const mv = renderer.camera.getModelviewMatrix();
+    const proj = renderer.camera.getProjectionMatrix();
 
     if (gridPoints) {
         buffer[0] = gridPoints[0] - sx;
@@ -1649,39 +1653,40 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
     }
 
     if (hasPoles && !map.poleRadius && node.id[0] == 1 && !node.isPole) {
-        var p = node.getPhysicalCoords([node.extents.ur[0], node.extents.ur[1], 0]);
+        const p = node.getPhysicalCoords([node.extents.ur[0], node.extents.ur[1], 0]);
         map.poleRadius = Math.sqrt(p[0]*p[0]+p[1]*p[1]);
         map.poleRadiusFactor = 8 * Math.pow(2.0, 552058 / map.poleRadius);
     }
 
-    var mnode = this.metanode;
-    var testMode = draw.debug.drawTestMode;
+    let mnode = this.metanode;
+    const testMode = draw.debug.drawTestMode;
 
     factor = 1;
 
     if (hasPoles && node.isPole) {
         factor = map.poleRadiusFactor;
-        prog = renderer.progPlane2;
+        prog = renderer.gpu.progPlane2;
         renderer.gpu.useProgram(prog, ['aPosition', 'aTexCoord']);
         prog.setVec4('uParams4', [-sx, -sy, map.poleRadius, 0]);
     } else {
 
         switch(testMode) {
             default:
-            case 0: prog = renderer.progHmapPlane; break;
-            case 1: prog = renderer.progHmapPlane2; break;
-            case 2: prog = renderer.progHmapPlane5; break;
-            case 3: prog = renderer.progHmapPlane6; break;
-            case 4: prog = renderer.progHmapPlane7; break;
+            case 0: prog = renderer.gpu.progHmapPlane; break;
+            case 1: prog = renderer.gpu.progHmapPlane2; break;
+            case 2: prog = renderer.gpu.progHmapPlane5; break;
+            case 3: prog = renderer.gpu.progHmapPlane6; break;
+            case 4: prog = renderer.gpu.progHmapPlane7; break;
 
-            case 8: prog = renderer.progHmapPlane4; break;
-            case 9: prog = pipeline == 1 ? renderer.progHmapPlane3 : renderer.progHmapPlane8; break;
+            case 8: prog = renderer.gpu.progHmapPlane4; break;
+            case 9: prog = pipeline == 1 ? renderer.gpu.progHmapPlane3 : renderer.gpu.progHmapPlane8; break;
         }
 
 
         if (testMode == 3 || testMode == 4) {
             if (!renderer.ntextures) {
                 renderer.ntextures = [
+                    /*
                     new GpuTexture(renderer.gpu, './textures/test/test001.png', renderer.core, null), //0
                     new GpuTexture(renderer.gpu, './textures/test/test002.png', renderer.core, null), //1
                     new GpuTexture(renderer.gpu, './textures/test003.jpg', renderer.core, null),      //2
@@ -1703,6 +1708,29 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
                     new GpuTexture(renderer.gpu, './textures/test016.jpg', renderer.core, null),      //17
                     new GpuTexture(renderer.gpu, './textures/test017.jpg', renderer.core, null),      //18
                     new GpuTexture(renderer.gpu, './textures/test018.jpg', renderer.core, null)      //18
+                    */
+
+                    renderer.gpu.createTexture({path: './textures/test/test001.png'}), //0
+                    renderer.gpu.createTexture({path: './textures/test/test002.png'}), //1
+                    renderer.gpu.createTexture({path: './textures/test003.jpg'}),      //2
+                    renderer.gpu.createTexture({path: './textures/download.png'}),     //3
+                    renderer.gpu.createTexture({path: './textures/test009.jpg'}),      //4
+                    renderer.gpu.createTexture({path: './textures/test004.jpg'}),      //5
+                    renderer.gpu.createTexture({path: './textures/test005.jpg'}),      //6
+                    renderer.gpu.createTexture({path: './textures/nor_sand.jpg'}),     //7
+                    renderer.gpu.createTexture({path: './textures/test007.jpg'}),      //8
+                    renderer.gpu.createTexture({path: './textures/test008.jpg'}),      //9
+
+                    renderer.gpu.createTexture({path: './textures/download (1).png'}),  //10
+                    renderer.gpu.createTexture({path: './textures/test010.jpg'}),      //11
+                    renderer.gpu.createTexture({path: './textures/test011.jpg'}),      //12
+                    renderer.gpu.createTexture({path: './textures/test012.jpg'}),      //13
+                    renderer.gpu.createTexture({path: './textures/test013.jpg'}),      //14
+                    renderer.gpu.createTexture({path: './textures/test014.jpg'}),      //15
+                    renderer.gpu.createTexture({path: './textures/test015.jpg'}),      //16
+                    renderer.gpu.createTexture({path: './textures/test016.jpg'}),      //17
+                    renderer.gpu.createTexture({path: './textures/test017.jpg'}),      //18
+                    renderer.gpu.createTexture({path: './textures/test018.jpg'})      //18
 
                     ];
             }
@@ -1716,39 +1744,39 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         //prog.setVec3('uRight', mnode.diskNormal);
 
         if (gridPoints) {
-            var vecRight = [gridPoints[15] - gridPoints[12], gridPoints[16] - gridPoints[13], gridPoints[17] - gridPoints[14]];
-            var vecTop = [gridPoints[21] - gridPoints[12], gridPoints[22] - gridPoints[13], gridPoints[23] - gridPoints[14]];
+            const vecRight = [gridPoints[15] - gridPoints[12], gridPoints[16] - gridPoints[13], gridPoints[17] - gridPoints[14]];
+            const vecTop = [gridPoints[21] - gridPoints[12], gridPoints[22] - gridPoints[13], gridPoints[23] - gridPoints[14]];
 
             vec3.normalize(vecRight);
             vec3.normalize(vecTop);
 
-            var vecDir = mnode.diskNormal.slice();
+            const vecDir = mnode.diskNormal.slice();
             //vecDir = [-vecDir[0], -vecDir[1], -vecDir[2]];
 
             //prog.setVec3('uRight', vecRight);
             //prog.setVec3('uTop', vecTop);
 
 
-            var mv = map.camera.camera.modelview;
-            var mv2 = vts.mat3.create();
+            const mv = map.camera.camera.modelview;
+            const mv2 = mat3.create();
 
-            vts.mat4.toInverseMat3(mv, mv2);
+            mat4.toInverseMat3(mv, mv2);
 
             //vts.mat4.toMat3(mv, mv2);
-            vts.mat3.transpose(mv2);
+            mat3.transpose(mv2);
 
-            vts.mat3.multiplyVec3(mv2, vecTop);
-            vts.mat3.multiplyVec3(mv2, vecDir);
-            vts.mat3.multiplyVec3(mv2, vecRight);
+            mat3.multiplyVec3(mv2, vecTop);
+            mat3.multiplyVec3(mv2, vecDir);
+            mat3.multiplyVec3(mv2, vecRight);
 
-            var space = [
+            const space = [
                 vecRight[0], vecRight[1], vecRight[2],
                 vecTop[0], vecTop[1], vecTop[2],
                 vecDir[0], vecDir[1], vecDir[2],
             ];
 
             /*
-            var mv3 = vts.mat3.toMat4(mv2);
+            const mv3 = vts.mat3.toMat4(mv2);
             vts.mat4.multiply(mv3, vts.mat3.toMat4(space), mv3);
             prog.setMat3('uSpace', vts.mat4.toMat3(mv3));
             */
@@ -1762,7 +1790,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
     prog.setFloatArray('uPoints', buffer);
 
 
-    var step1 = node.gridStep1 * factor;
+    const step1 = node.gridStep1 * factor;
     prog.setVec4('uParams', [step1 * factor, draw.fogDensity, 1/127, node.gridStep2 * factor]);
 
     if (testMode >= 3 && testMode <= 4) {
@@ -1771,12 +1799,12 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         if (texture) {
             prog.setVec4('uParams3', texture.getTransform());
         } else {
-            var lx = 1.0 / (ur[0] - ll[0]);
-            var ly = 1.0 / (ll[1] - ur[1]);
-            var llx = step1 / ((node.extents.ur[0] - node.extents.ll[0]) * lx);
-            var lly = step1 / ((node.extents.ur[1] - node.extents.ll[1]) * ly);
-            var px = (ll[0] - node.extents.ll[0]) * lx * llx;
-            var py = (ur[1] - node.extents.ll[1]) * ly * lly;
+            const lx = 1.0 / (ur[0] - ll[0]);
+            const ly = 1.0 / (ll[1] - ur[1]);
+            const llx = step1 / ((node.extents.ur[0] - node.extents.ll[0]) * lx);
+            const lly = step1 / ((node.extents.ur[1] - node.extents.ll[1]) * ly);
+            const px = (ll[0] - node.extents.ll[0]) * lx * llx;
+            const py = (ur[1] - node.extents.ll[1]) * ly * lly;
 
             prog.setVec4('uParams3', [lly, llx, (py - Math.floor(py)), (px - Math.floor(px))]);
         }
@@ -1805,7 +1833,7 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
         if (texture) {
             renderer.gpu.bindTexture(texture.getGpuTexture());
         } else {
-            renderer.gpu.bindTexture(renderer.heightmapTexture);
+            renderer.gpu.bindTexture(renderer.gpu.heightmapTexture);
         }
     }
 
@@ -1821,22 +1849,22 @@ MapSurfaceTile.prototype.drawHmapTile = function(cameraPos, divNode, angle, pipe
     prog.setSampler('uSampler2', 1);
 
     //draw bbox
-    //renderer.planeMesh2.draw(prog, 'aPosition', 'aTexCoord');
-    renderer.planeMesh2.draw(prog, 'aPosition');
+    //renderer.gpu.planeMesh2.draw(prog, 'aPosition', 'aTexCoord');
+    renderer.gpu.planeMesh2.draw(prog, 'aPosition');
 
     /*
     if (vecRight && gridPoints) {
-        //renderer.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, transparent, writeDepth, useState);
-        renderer.draw.drawLineString([[gridPoints[12], gridPoints[13], gridPoints[14]], [gridPoints[15], gridPoints[16], gridPoints[17]]], false, 4, [1,0,0,1], null, false, false, false, false);
-        renderer.draw.drawLineString([[gridPoints[12], gridPoints[13], gridPoints[14]], [gridPoints[21], gridPoints[22], gridPoints[23]]], false, 4, [0,0,1,1], null, false, false, false, false);
+        //renderer.gpu.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, transparent, writeDepth, useState);
+        renderer.gpu.draw.drawLineString([[gridPoints[12], gridPoints[13], gridPoints[14]], [gridPoints[15], gridPoints[16], gridPoints[17]]], false, 4, [1,0,0,1], null, false, false, false, false);
+        renderer.gpu.draw.drawLineString([[gridPoints[12], gridPoints[13], gridPoints[14]], [gridPoints[21], gridPoints[22], gridPoints[23]]], false, 4, [0,0,1,1], null, false, false, false, false);
 
-        renderer.draw.drawLineString([[0, 0, 0], [9000000, 0, 0]], false, 4, [1,0,0,1], null, false, false, false, false);
-        renderer.draw.drawLineString([[0, 0, 0], [0, 9000000, 0, 0]], false, 4, [0,1,0,1], null, false, false, false, false);
-        renderer.draw.drawLineString([[0, 0, 0], [0, 0, 9000000]], false, 4, [0,0,1,1], null, false, false, false, false);
+        renderer.gpu.draw.drawLineString([[0, 0, 0], [9000000, 0, 0]], false, 4, [1,0,0,1], null, false, false, false, false);
+        renderer.gpu.draw.drawLineString([[0, 0, 0], [0, 9000000, 0, 0]], false, 4, [0,1,0,1], null, false, false, false, false);
+        renderer.gpu.draw.drawLineString([[0, 0, 0], [0, 0, 9000000]], false, 4, [0,0,1,1], null, false, false, false, false);
     }*/
 
 
-    this.map.stats.drawnFaces += renderer.planeMesh2.polygons;
+    this.map.stats.drawnFaces += renderer.gpu.planeMesh2.polygons;
 };
 
 

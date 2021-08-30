@@ -7,17 +7,17 @@ import {addText as addText_, getSplitIndex as getSplitIndex_, getTextGlyphs as g
 import {postGroupMessageFast as postGroupMessageFast_} from './worker-message.js';
 
 //get rid of compiler mess
-var globals = globals_, clamp = clamp_;
-var getLayerPropertyValue = getLayerPropertyValue_, getLayerExpresionValue = getLayerExpresionValue_;
-var addText = addText_, getSplitIndex = getSplitIndex_, getTextGlyphs = getTextGlyphs_,
+const globals = globals_, clamp = clamp_;
+const getLayerPropertyValue = getLayerPropertyValue_, getLayerExpresionValue = getLayerExpresionValue_;
+const addText = addText_, getSplitIndex = getSplitIndex_, getTextGlyphs = getTextGlyphs_,
     getTextLength = getTextLength_, getFonts = getFonts_, getFontsStorage = getFontsStorage_,
     areTextCharactersAvailable = areTextCharactersAvailable_, getCharVerticesCount = getCharVerticesCount_, getLineHeight = getLineHeight_;
-var postGroupMessageFast = postGroupMessageFast_;
+const postGroupMessageFast = postGroupMessageFast_;
 
 
-var checkDPoints = function(pointArray) {
-    var pointsGroups = []; 
-    var i, li, g, gl, points, p, pp;
+function checkDPoints(pointArray) {
+    let pointsGroups = [];
+    let i, li, g, gl, points, p, pp;
 
     if (pointArray['d-points'] || pointArray['d-lines']) {  //converty d-lines/points to lines/points
         pointsGroups = pointArray['d-points'] || pointArray['d-lines'];
@@ -26,10 +26,10 @@ var checkDPoints = function(pointArray) {
 
             for (g = 0, gl = pointsGroups; g < gl; g++) {
                 points = pointsGroups[g];
-                
+
                 if (Array.isArray(points) && points.length > 0) {
                     p = points[0];
-                    
+
                     p[0] = (p[0] >> 1) ^ (-(p[0] & 1));
                     p[1] = (p[1] >> 1) ^ (-(p[1] & 1));
                     p[2] = (p[2] >> 1) ^ (-(p[2] & 1));
@@ -54,12 +54,12 @@ var checkDPoints = function(pointArray) {
             delete pointArray['d-lines'];
         }
     }
-};
+}
 
 
-var processPointArrayPass = function(pointArray, lod, style, featureIndex, zIndex, eventInfo) {
-    var pointsGroups = []; 
-    var i, li, g, gl, points, p, pp;
+function processPointArrayPass(pointArray, lod, style, featureIndex, zIndex, eventInfo) {
+    let pointsGroups = [];
+    let i, li, g, gl, points, p, pp;
 
     checkDPoints(pointArray);
 
@@ -68,31 +68,33 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
     } else {
         pointsGroups = [pointArray['points']];
     }
-    
+
     if (!pointsGroups || pointsGroups.length == 0) {
         return;
     }
 
-    var visibility = getLayerPropertyValue(style, 'visibility-rel', pointArray, lod) || 
+    let visibility = getLayerPropertyValue(style, 'visibility-rel', pointArray, lod) ||
                      getLayerPropertyValue(style, 'visibility-abs', pointArray, lod) ||
                      getLayerPropertyValue(style, 'visibility', pointArray, lod);
-    var culling = getLayerPropertyValue(style, 'culling', pointArray, lod);
-    var hoverEvent = getLayerPropertyValue(style, 'hover-event', pointArray, lod);
-    var clickEvent = getLayerPropertyValue(style, 'click-event', pointArray, lod);
-    var drawEvent = getLayerPropertyValue(style, 'draw-event', pointArray, lod);
-    var enterEvent = getLayerPropertyValue(style, 'enter-event', pointArray, lod);
-    var leaveEvent = getLayerPropertyValue(style, 'leave-event', pointArray, lod);
-    var advancedHit = getLayerPropertyValue(style, 'advanced-event', pointArray, lod);
-    var linePoints = getLayerPropertyValue(style, 'line-points', pointArray, lod);
+    const culling = getLayerPropertyValue(style, 'culling', pointArray, lod);
+    const hoverEvent = getLayerPropertyValue(style, 'hover-event', pointArray, lod);
+    const clickEvent = getLayerPropertyValue(style, 'click-event', pointArray, lod);
+    const drawEvent = getLayerPropertyValue(style, 'draw-event', pointArray, lod);
+    const enterEvent = getLayerPropertyValue(style, 'enter-event', pointArray, lod);
+    const leaveEvent = getLayerPropertyValue(style, 'leave-event', pointArray, lod);
+    const advancedHit = getLayerPropertyValue(style, 'advanced-event', pointArray, lod);
+    const linePoints = getLayerPropertyValue(style, 'line-points', pointArray, lod);
 
-    var zbufferOffset = getLayerPropertyValue(style, 'zbuffer-offset', pointArray, lod);
+    const zbufferOffset = getLayerPropertyValue(style, 'zbuffer-offset', pointArray, lod);
 
-    var point = getLayerPropertyValue(style, 'point', pointArray, lod);
-    var pointFlat = getLayerPropertyValue(style, 'point-flat', pointArray, lod);
-    var pointColor = getLayerPropertyValue(style, 'point-color', pointArray, lod);
-    var pointRadius = 0.5 * getLayerPropertyValue(style, 'point-radius', pointArray, lod);
+    const point = getLayerPropertyValue(style, 'point', pointArray, lod);
+    const pointFlat = getLayerPropertyValue(style, 'point-flat', pointArray, lod);
+    const pointColor = getLayerPropertyValue(style, 'point-color', pointArray, lod);
+    const pointRadius = 0.5 * getLayerPropertyValue(style, 'point-radius', pointArray, lod);
 
-    var source, bufferSize, bufferSize2, totalPoints = 0, noOverlap;
+    let source, bufferSize, bufferSize2, totalPoints = 0, noOverlap;
+    let labelData, iconData;
+
     //zIndex = (zIndex !== null) ? zIndex : getLayerPropertyValue(style, "z-index", pointArray, lod);
 
     for (g = 0, gl = pointsGroups.length; g < gl; g++) {
@@ -102,15 +104,15 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
         }
     }
 
-    var icon = getLayerPropertyValue(style, 'icon', pointArray, lod);
+    let icon = getLayerPropertyValue(style, 'icon', pointArray, lod);
     if (icon) {
         source = getLayerPropertyValue(style, 'icon-source', pointArray, lod);
-        
+
         if (source) {
             bufferSize = getCharVerticesCount() * totalPoints;
             bufferSize2 = getCharVerticesCount(true) * totalPoints;
-    
-            var iconData = {
+
+            iconData = {
                 color : getLayerPropertyValue(style, 'icon-color', pointArray, lod),
                 scale : getLayerPropertyValue(style, 'icon-scale', pointArray, lod),
                 offset : getLayerPropertyValue(style, 'icon-offset', pointArray, lod),
@@ -138,25 +140,25 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
         }
     }
 
-    var label = getLayerPropertyValue(style, 'label', pointArray, lod);
+    let label = getLayerPropertyValue(style, 'label', pointArray, lod);
     if (label) {
         source = getLayerPropertyValue(style, 'label-source', pointArray, lod);
 
-        var text = getLayerExpresionValue(style, source, pointArray, lod, source);
+        let text = getLayerExpresionValue(style, source, pointArray, lod, source);
         text = text ? text.replace('\r\n', '\n').replace('\r', '\n') : '';
-        var size = getLayerPropertyValue(style, 'label-size', pointArray, lod);
-        var fontNames = getLayerPropertyValue(style, 'label-font', pointArray, lod);
-        var fonts = getFonts(fontNames);
-        var glyphsRes = getTextGlyphs(text, fonts);
-        
+        const size = getLayerPropertyValue(style, 'label-size', pointArray, lod);
+        const fontNames = getLayerPropertyValue(style, 'label-font', pointArray, lod);
+        const fonts = getFonts(fontNames);
+        let glyphsRes = getTextGlyphs(text, fonts);
+
         if (source == '$name') {
             if (!areTextCharactersAvailable(text, fonts, glyphsRes)) {
-                var text2 = getLayerExpresionValue(style, '$name:en', pointArray, lod, source);
+                let text2 = getLayerExpresionValue(style, '$name:en', pointArray, lod, source);
                 text2 = text2 ? text2.replace('\r\n', '\n').replace('\r', '\n') : '';
-                var glyphsRes2 = getTextGlyphs(text2, fonts);
-                
+                const glyphsRes2 = getTextGlyphs(text2, fonts);
+
                 if (areTextCharactersAvailable(text2, fonts)) {
-                    text = text2;                     
+                    text = text2;
                     glyphsRes = glyphsRes2;
                 }
             }
@@ -166,14 +168,14 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
             bufferSize = getCharVerticesCount() * text.length * (noOverlap ? 1 : totalPoints);
             bufferSize2 = getCharVerticesCount(true) * text.length * (noOverlap ? 1 : totalPoints);
 
-            var useSingleBuffer = (totalPoints == 1);
+            const useSingleBuffer = (totalPoints == 1);
 
-            var factor = 1;
+            let factor = 1;
             if (getLayerPropertyValue(style, 'label-size-units', pointArray, lod) == 'points') {
                 factor = globals.pixelFactor / ((1 / 72) * (96));
             }
 
-            var labelData = {
+            labelData = {
                 color : getLayerPropertyValue(style, 'label-color', pointArray, lod),
                 color2 : getLayerPropertyValue(style, 'label-color2', pointArray, lod),
                 outline : getLayerPropertyValue(style, 'label-outline', pointArray, lod),
@@ -213,19 +215,22 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
         }
     }
 
-    var index = 0;
-    var index2 = 0;
+    let index = 0;
+    let index2 = 0;
 
-    
-    var center = [0,0,0];
-    var forceOrigin = globals.forceOrigin;
-    var bboxMin = globals.bboxMin;
-    var tileX = globals.tileX;
-    var tileY = globals.tileY;
-    var forceScale = globals.forceScale;
-    var labelBBox, iconBBox, p, p1, p2, pp, pp2;
+    let center = [0,0,0];
+    const forceOrigin = globals.forceOrigin;
+    const bboxMin = globals.bboxMin;
+    const tileX = globals.tileX;
+    const tileY = globals.tileY;
+    const forceScale = globals.forceScale;
+    let labelBBox, iconBBox, p1, p2, pp2;
 
-    var generatePoint = (function(pindex) {
+    let circleBuffer = [];
+    let circleSides = clamp(pointRadius * 8 * 0.5, 8, 32);
+
+    // eslint-disable-next-line
+    const generatePoint = (function(pindex) {
 
         if (icon && (!iconData.noOverlap)) {
             iconBBox = processIcon(pp, iconData) ;//, pointArray, lod, style, zIndex);
@@ -237,7 +242,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
 
         if (point) {
 
-            for (var j = 0; j < circleSides; j++) {
+            for (let j = 0; j < circleSides; j++) {
 
                 if (pointFlat) {
 
@@ -294,10 +299,9 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
     });
 
 
-    var getLinePoint = (function(length) {
+    const getLinePoint = (function(length) {
 
-        var l1 = 0;
-        var l2 = 0;
+        let l1 = 0, l2 = 0;
 
         p = points[0];
         p1 = [p[0], p[1], p[2]];
@@ -314,7 +318,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
             return p1;
         }
 
-        for (var k = 0, lk = points.length - 1; k < lk; k++) {
+        for (let k = 0, lk = points.length - 1; k < lk; k++) {
             p = points[k+1];
             p2 = [p[0], p[1], p[2]];
 
@@ -326,14 +330,14 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                 p2 = [p2[0] * forceScale[0], p2[1] * forceScale[1], p2[2] * forceScale[2]];
             }
 
-            var dx = p2[0] - p1[0], dy = p2[1] - p1[1], dz = p2[2] - p1[2]; 
-            var l = Math.sqrt(dx*dx+dy*dy+dz*dz);
+            const dx = p2[0] - p1[0], dy = p2[1] - p1[1], dz = p2[2] - p1[2];
+            const l = Math.sqrt(dx*dx+dy*dy+dz*dz);
 
             l1 = l2;
             l2 += l;
 
             if (length >= l1 && length <= l2) {
-                var d = (length - l1) / l;
+                const d = (length - l1) / l;
 
                 return [p1[0] + dx * d,  p1[1] + dy * d, p1[2] + dz * d];
             }
@@ -343,15 +347,15 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
 
     });
 
-    var pointsBuffer = new Array(2048), pointsBufferLength = 0;
-
+    const pointsBuffer = new Array(2048);
+    let pointsBufferLength = 0;
 
     for (g = 0, gl = pointsGroups.length; g < gl; g++) {
         points = pointsGroups[g];
-        
+
         if (Array.isArray(points) && points.length > 0) {
 
-            var totalLength = 0, lengths = null;
+            let totalLength = 0, lengths = null;
 
             if (linePoints[0] != 'vertices') {
                 lengths = new Array(points.length);
@@ -366,11 +370,11 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                 if (forceOrigin) {
                     p1 = [p1[0] - tileX, p1[1] - tileY, p1[2]];
                 }
-        
+
                 if (forceScale != null) {
                     p1 = [p1[0] * forceScale[0], p1[1] * forceScale[1], p1[2] * forceScale[2]];
                 }
-                
+
                 if (i + 1 < li) {
                     p = points[i+1];
                     p2 = [p[0], p[1], p[2]];
@@ -378,13 +382,13 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                     if (forceOrigin) {
                         p2 = [p2[0] - tileX, p2[1] - tileY, p2[2]];
                     }
-            
+
                     if (forceScale != null) {
                         p2 = [p2[0] * forceScale[0], p2[1] * forceScale[1], p2[2] * forceScale[2]];
                     }
 
-                    var dx = p2[0] - p1[0], dy = p2[1] - p1[1], dz = p2[2] - p1[2]; 
-                    var l = Math.sqrt(dx*dx+dy*dy+dz*dz);
+                    const dx = p2[0] - p1[0], dy = p2[1] - p1[1], dz = p2[2] - p1[2];
+                    const l = Math.sqrt(dx*dx+dy*dy+dz*dz);
 
                     if (lengths) {
                         lengths[i] = l;
@@ -392,7 +396,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
 
                     totalLength += l;
                 }
-        
+
                 center[0] += p1[0];
                 center[1] += p1[1];
                 center[2] += p1[2];
@@ -404,8 +408,8 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
             }
 
             if (linePoints[0] == 'by-length' || linePoints[0] == 'by-ratio') {
-                var period = linePoints[1];
-                var offset = linePoints[2] || 0;
+                let period = linePoints[1];
+                let offset = linePoints[2] || 0;
 
                 if (linePoints[0] == 'by-ratio') {
                     period *= totalLength;
@@ -451,13 +455,13 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
         }
     }
 
-    var pointsVertices, vertexBuffer, pointsNormals, normalBuffer, bufferPoints = pointsBufferLength;
+    let pointsVertices, vertexBuffer, pointsNormals, normalBuffer, bufferPoints = pointsBufferLength;
 
     if (point) {
-        var circleBuffer = [];
-        var circleSides = clamp(pointRadius * 8 * 0.5, 8, 32);
+        circleBuffer = [];
+        circleSides = clamp(pointRadius * 8 * 0.5, 8, 32);
 
-        var angle = 0, step = (2.0*Math.PI) / circleSides;
+        let angle = 0, step = (2.0*Math.PI) / circleSides;
 
         for (i = 0; i < circleSides; i++) {
             circleBuffer[i] = [-Math.sin(angle), Math.cos(angle)];
@@ -485,7 +489,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
     //if (pointsBufferLength > 1) {
       //  globals.directPoints = pointsBuffer.slice(1,pointsBufferLength);
     //}
- 
+
     globals.directPoints = pointsBuffer.slice(0,pointsBufferLength);
 
     for (i = 0; i < pointsBufferLength; i++) {
@@ -503,11 +507,11 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
     center[1] += bboxMin[1];//groupOrigin[1];
     center[2] += bboxMin[2];//groupOrigin[2];
 
-    var hitable = hoverEvent || clickEvent || enterEvent || leaveEvent;
-    var message, messageSize;
+    const hitable = hoverEvent || clickEvent || enterEvent || leaveEvent;
+    //let message, messageSize;
 
     globals.signatureCounter++;
-    var signature = (""+globals.signatureCounter);
+    let signature = (""+globals.signatureCounter);
 
     if (visibility && !Array.isArray(visibility)) {
         visibility = [visibility];
@@ -519,28 +523,30 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                 'color':pointColor, 'z-index':zIndex, 'visibility': visibility, 'center': center,
                 'hover-event':hoverEvent, 'click-event':clickEvent, 'draw-event':drawEvent, 'advancedHit': advancedHit,
                 'enter-event':enterEvent, 'leave-event':leaveEvent, 'zbuffer-offset':zbufferOffset,
-                'hitable':hitable, 'state':globals.hitState, 'eventInfo': (globals.alwaysEventInfo || hitable || drawEvent) ? eventInfo : {}, 
+                'hitable':hitable, 'state':globals.hitState, 'eventInfo': (globals.alwaysEventInfo || hitable || drawEvent) ? eventInfo : {},
                 'lod':(globals.autoLod ? null : globals.tileLod) }, [vertexBuffer], signature);
         } else {
             postGroupMessageFast(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_PIXEL_LINE, {
                 'color':pointColor, 'z-index':zIndex, 'visibility': visibility, 'center': center,
                 'hover-event':hoverEvent, 'click-event':clickEvent, 'draw-event':drawEvent,
                 'enter-event':enterEvent, 'leave-event':leaveEvent, 'zbuffer-offset':zbufferOffset,
-                'hitable':hitable, 'state':globals.hitState, 'eventInfo': (globals.alwaysEventInfo || hitable || drawEvent) ? eventInfo : {}, 
+                'hitable':hitable, 'state':globals.hitState, 'eventInfo': (globals.alwaysEventInfo || hitable || drawEvent) ? eventInfo : {},
                 'lod':(globals.autoLod ? null : globals.tileLod) }, [vertexBuffer, normalBuffer], signature);
         }
     }
 
-    var sendIconMessage = (function(){
+    const sendIconMessage = (function(){
 
         if (icon) {
 
             globals.signatureCounter++;
             signature = (""+globals.signatureCounter);
 
+            let noOverlap;
+
             if (iconData.noOverlap) {
-                var margin = iconData.noOverlapMargin;
-                var factorType = null, factorValue = null;
+                const margin = iconData.noOverlapMargin;
+                let factorType = null, factorValue = null;
 
                 if (iconData.noOverlapFactor !== null) {
                     switch(iconData.noOverlapFactor[0]) {
@@ -551,7 +557,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                     factorValue = iconData.noOverlapFactor[1];
                 }
 
-                var noOverlap = [iconBBox[0]-margin[0], iconBBox[1]-margin[1], iconBBox[2]+margin[0], iconBBox[3]+margin[1], factorType, factorValue];
+                noOverlap = [iconBBox[0]-margin[0], iconBBox[1]-margin[1], iconBBox[2]+margin[0], iconBBox[3]+margin[1], factorType, factorValue];
             }
 
             if ((iconData.singleBuffer && iconData.singleBuffer.length > 0) || (iconData.vertexBuffer && iconData.vertexBuffer.length > 0)) {
@@ -570,15 +576,17 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
 
     });
 
-    var sendLabelMessage = (function(){
+    const sendLabelMessage = (function(){
 
         if (label) {
             globals.signatureCounter++;
             signature = (""+globals.signatureCounter);
 
+            let noOverlap;
+
             if (labelData.noOverlap) {
-                var margin = labelData.noOverlapMargin;
-                var factorType = null, factorValue = null;
+                const margin = labelData.noOverlapMargin;
+                let factorType = null, factorValue = null;
 
                 if (labelData.noOverlapFactor !== null) {
                     switch(labelData.noOverlapFactor[0]) {
@@ -589,7 +597,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                     factorValue = labelData.noOverlapFactor[1];
                 }
 
-                var noOverlap = [labelBBox[0]-margin[0], labelBBox[1]-margin[1], labelBBox[2]+margin[0], labelBBox[3]+margin[1], factorType, factorValue];
+                noOverlap = [labelBBox[0]-margin[0], labelBBox[1]-margin[1], labelBBox[2]+margin[0], labelBBox[3]+margin[1], factorType, factorValue];
             }
 
             if ((labelData.singleBuffer && labelData.singleBuffer.length > 0) || (labelData.vertexBuffer && labelData.vertexBuffer.length > 0)) {
@@ -600,7 +608,7 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
                     'culling': culling, 'center': pp2, 'stick': labelData.stick, 'noOverlap' : (labelData.noOverlap ? noOverlap: null),
                     'hover-event':hoverEvent, 'click-event':clickEvent, 'draw-event':drawEvent, 'files':labelData.files, 'index': featureIndex,
                     'enter-event':enterEvent, 'leave-event':leaveEvent, 'zbuffer-offset':zbufferOffset, 'fonts': labelData.fontsStorage,
-                    'hitable':hitable, 'state':globals.hitState, 'advancedHit': advancedHit, 'reduce': labelData.reduce, 'hysteresis': labelData.hysteresis, 
+                    'hitable':hitable, 'state':globals.hitState, 'advancedHit': advancedHit, 'reduce': labelData.reduce, 'hysteresis': labelData.hysteresis,
                     'eventInfo': (globals.alwaysEventInfo || hitable || drawEvent) ? eventInfo : {}, 'lod':(globals.autoLod ? null : globals.tileLod) },
                     (labelData.singleBuffer) ? [labelData.singleBuffer] : [labelData.vertexBuffer, labelData.originBuffer, labelData.texcoordsBuffer],
                     signature);
@@ -634,12 +642,12 @@ var processPointArrayPass = function(pointArray, lod, style, featureIndex, zInde
         }
     }
 
-};
+}
 
-
-var processPointArrayVSwitchPass = function(pointArray, lod, style, featureIndex, zIndex, eventInfo) {
-    var pointsGroups = []; 
-    var i, li;
+// eslint-disable-next-line
+function processPointArrayVSwitchPass(pointArray, lod, style, featureIndex, zIndex, eventInfo) {
+    let pointsGroups = [];
+    let i, li;
 
     checkDPoints(pointArray);
 
@@ -648,19 +656,19 @@ var processPointArrayVSwitchPass = function(pointArray, lod, style, featureIndex
     } else {
         pointsGroups = [pointArray['points']];
     }
-    
+
     if (!pointsGroups || pointsGroups.length == 0) {
         return;
     }
 
 
-    var visibility = getLayerPropertyValue(style, 'visibility-rel', pointArray, lod) || 
+    const visibility = getLayerPropertyValue(style, 'visibility-rel', pointArray, lod) ||
                      getLayerPropertyValue(style, 'visibility-abs', pointArray, lod) ||
                      getLayerPropertyValue(style, 'visibility', pointArray, lod);
-    var culling = getLayerPropertyValue(style, 'culling', pointArray, lod);
-    var hysteresis = getLayerPropertyValue(style, 'hysteresis', pointArray, lod);
+    const culling = getLayerPropertyValue(style, 'culling', pointArray, lod);
+    const hysteresis = getLayerPropertyValue(style, 'hysteresis', pointArray, lod);
 
-    var points, g, gl, totalPoints = 0;
+    let points, g, gl, totalPoints = 0;
 
     for (g = 0, gl = pointsGroups.length; g < gl; g++) {
         points = pointsGroups[g];
@@ -669,39 +677,39 @@ var processPointArrayVSwitchPass = function(pointArray, lod, style, featureIndex
         }
     }
 
-    var center = [0,0,0];
-    var forceOrigin = globals.forceOrigin;
-    var bboxMin = globals.bboxMin;
-    var tileX = globals.tileX;
-    var tileY = globals.tileY;
-    var forceScale = globals.forceScale;
-    var p, p1;
+    let center = [0,0,0];
+    const forceOrigin = globals.forceOrigin;
+    const bboxMin = globals.bboxMin;
+    const tileX = globals.tileX;
+    const tileY = globals.tileY;
+    const forceScale = globals.forceScale;
+    let p, p1;
 
     for (g = 0, gl = pointsGroups.length; g < gl; g++) {
         points = pointsGroups[g];
-        
+
         if (Array.isArray(points) && points.length > 0) {
-       
+
             //add ponints
             for (i = 0, li = points.length; i < li; i++) {
                 p = points[i];
                 p1 = [p[0], p[1], p[2]];
-        
+
                 if (forceOrigin) {
                     p1 = [p1[0] - tileX, p1[1] - tileY, p1[2]];
                 }
-        
+
                 if (forceScale != null) {
                     p1 = [p1[0] * forceScale[0], p1[1] * forceScale[1], p1[2] * forceScale[2]];
                 }
-        
+
                 center[0] += p1[0];
                 center[1] += p1[1];
                 center[2] += p1[2];
             }
         }
     }
-   
+
     if (totalPoints > 0) {
         center[0] /= totalPoints;
         center[1] /= totalPoints;
@@ -713,16 +721,16 @@ var processPointArrayVSwitchPass = function(pointArray, lod, style, featureIndex
     center[2] += bboxMin[2];//groupOrigin[2];
 
     globals.signatureCounter++;
-    var signature = (""+globals.signatureCounter);
+    const signature = (""+globals.signatureCounter);
 
     postGroupMessageFast(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_VSPOINT, {
         'z-index':zIndex, 'hysteresis' : hysteresis,
         'visibility': visibility, 'culling': culling, 'center': center, 'eventInfo': {} /*(globals.alwaysEventInfo || hitable || drawEvent) ? eventInfo : {}*/,
          'index': featureIndex, 'lod':(globals.autoLod ? null : globals.tileLod) }, [], signature);
-};
+}
 
 
-var getOriginOffset = function(origin, width, height) { //TODO: fix pixel units
+function getOriginOffset(origin, width, height) { //TODO: fix pixel units
     switch(origin) {
     case 'top-left':        return [0, 0];
     case 'top-right':       return [-width, 0];
@@ -734,10 +742,10 @@ var getOriginOffset = function(origin, width, height) { //TODO: fix pixel units
     case 'bottom-right':    return [-width, -height];
     case 'bottom-center':   return [-width*0.5, -height];
     }
-};
+}
 
 
-var processIcon = function(point, iconData, cloneBuffers) {
+function processIcon(point, iconData, cloneBuffers) {
 
     if (cloneBuffers) {
         iconData.index = 0;
@@ -747,21 +755,21 @@ var processIcon = function(point, iconData, cloneBuffers) {
         iconData.singleBuffer = iconData.singleBuffer ?  (new Float32Array(iconData.singleBuffer.length)) : null;
     }
 
-    var icon = iconData.source;
-    var index = iconData.index;
-    var index2 = iconData.index2;
-    var lastIndex = index;
+    const icon = iconData.source;
+    let index = iconData.index;
+    let index2 = iconData.index2;
+    let lastIndex = index;
 
-    var width = Math.abs(icon[3] * iconData.scale * 0.5);
-    var height = Math.abs(icon[4] * iconData.scale * 0.5);
+    const width = Math.abs(icon[3] * iconData.scale * 0.5);
+    const height = Math.abs(icon[4] * iconData.scale * 0.5);
 
     //get offset
-    var originOffset = getOriginOffset(iconData.origin, width, height);
-    var offsetX = originOffset[0] + iconData.offset[0];
-    var offsetY = originOffset[1] + iconData.offset[1];
+    const originOffset = getOriginOffset(iconData.origin, width, height);
+    const offsetX = originOffset[0] + iconData.offset[0];
+    const offsetY = originOffset[1] + iconData.offset[1];
 
     if (iconData.singleBuffer) {
-        var b = iconData.singleBuffer;
+        const b = iconData.singleBuffer;
 
         b[0] = offsetX; b[1] = offsetY;
         b[2] = icon[1];
@@ -782,9 +790,9 @@ var processIcon = function(point, iconData, cloneBuffers) {
         return [offsetX * 0.5, offsetY * 0.5, (offsetX + width) * 0.5 + 1, (offsetY + height) *0.5];
     }
 
-    var vertexBuffer = iconData.vertexBuffer;
-    var texcoordsBuffer = iconData.texcoordsBuffer;
-    var originBuffer = iconData.originBuffer;
+    const vertexBuffer = iconData.vertexBuffer;
+    const texcoordsBuffer = iconData.texcoordsBuffer;
+    const originBuffer = iconData.originBuffer;
 
     //add polygon
     vertexBuffer[index] = 0;
@@ -849,15 +857,15 @@ var processIcon = function(point, iconData, cloneBuffers) {
     texcoordsBuffer[index+9] = icon[2]+icon[4];
     texcoordsBuffer[index+10] = 0;
     texcoordsBuffer[index+11] = 0;
-    
+
     index += 12;
 
-    var p1 = point[0];
-    var p2 = point[1];
-    var p3 = point[2];
+    const p1 = point[0];
+    const p2 = point[1];
+    const p3 = point[2];
 
     //set origin buffer and apply offset
-    for (var i = lastIndex; i < index; i+=4) {
+    for (let i = lastIndex; i < index; i+=4) {
         vertexBuffer[i] += offsetX;
         vertexBuffer[i+1] -= offsetY;
 
@@ -871,10 +879,10 @@ var processIcon = function(point, iconData, cloneBuffers) {
     iconData.index2 = index2;
 
     return [offsetX * 0.5, offsetY * 0.5, (offsetX + width) * 0.5 + 1, (offsetY + height) *0.5];
-};
+}
 
 
-var processLabel = function(point, labelData, cloneBuffers) {
+function processLabel(point, labelData, cloneBuffers) {
 
     if (cloneBuffers) {
         labelData.index = 0;
@@ -884,24 +892,24 @@ var processLabel = function(point, labelData, cloneBuffers) {
         labelData.singleBuffer = labelData.singleBuffer ?  (new Float32Array(labelData.singleBuffer.length)) : null;
     }
 
-    var vertexBuffer = labelData.vertexBuffer;
-    var texcoordsBuffer = labelData.texcoordsBuffer;
-    var originBuffer = labelData.originBuffer;
-    var singleBuffer = labelData.singleBuffer;
-    var index = labelData.index;
-    var index2 = labelData.index2;
-    var lastIndex = index;
-    var text = '' + labelData.text;
-    var fonts = labelData.fonts;
-    var planes = {}, i, li;
-    var glyphsRes = labelData.glyphsRes;
+    const vertexBuffer = labelData.vertexBuffer;
+    const texcoordsBuffer = labelData.texcoordsBuffer;
+    const originBuffer = labelData.originBuffer;
+    let singleBuffer = labelData.singleBuffer;
+    let index = labelData.index;
+    let index2 = labelData.index2;
+    let lastIndex = index;
+    //let text = '' + labelData.text;
+    const fonts = labelData.fonts;
+    let planes = {}, i, li, res;
+    let glyphsRes = labelData.glyphsRes;
 
-    var linesGlyphsRes = [];
-    var linesGlyphsRes2 = [];
+    const linesGlyphsRes = [];
+    const linesGlyphsRes2 = [];
 
     //split text to lines
     do {
-        var res = glyphsRes[2].indexOf(10); //search /n
+        res = glyphsRes[2].indexOf(10); //search /n
 
         if (res != -1) {
             linesGlyphsRes.push([glyphsRes[0].slice(0,res), glyphsRes[1].slice(0,res), glyphsRes[2].slice(0,res)]);
@@ -913,14 +921,14 @@ var processLabel = function(point, labelData, cloneBuffers) {
     } while (res != -1);
 
     //split lines by width
-    for (var i = 0, li = linesGlyphsRes.length; i < li; i++) {
+    for (let i = 0, li = linesGlyphsRes.length; i < li; i++) {
 
-        var glyphsRes = linesGlyphsRes[i];
+        glyphsRes = linesGlyphsRes[i];
 
         // eslint-disable-next-line
         do {
-            var splitIndex = getSplitIndex(null, labelData.width, labelData.size, labelData.spacing, fonts, glyphsRes);
-            var codes = glyphsRes[2];
+            const splitIndex = getSplitIndex(null, labelData.width, labelData.size, labelData.spacing, fonts, glyphsRes);
+            const codes = glyphsRes[2];
 
             if (codes.length == splitIndex) {
                 linesGlyphsRes2.push(glyphsRes);
@@ -931,14 +939,15 @@ var processLabel = function(point, labelData, cloneBuffers) {
 
             glyphsRes = [glyphsRes[0].slice(splitIndex+1), glyphsRes[1].slice(splitIndex+1), glyphsRes[2].slice(splitIndex+1)];
 
+        // eslint-disable-next-line
         } while(true);
 
     }
 
-    var x = 0, y = 0;
-    var lineHeight = getLineHeight(labelData.size, labelData.lineHeight, fonts);
-    var maxWidth = 0;
-    var lineWidths = [];
+    let x = 0, y = 0;
+    let lineHeight = getLineHeight(labelData.size, labelData.lineHeight, fonts);
+    let maxWidth = 0;
+    let lineWidths = [];
 
     //get max width
     for (i = 0, li = linesGlyphsRes2.length; i < li; i++) {
@@ -948,7 +957,7 @@ var processLabel = function(point, labelData, cloneBuffers) {
 
     //generate text
     for (i = 0, li = linesGlyphsRes2.length; i < li; i++) {
-        var textWidth = lineWidths[i];
+        const textWidth = lineWidths[i];
 
         switch(labelData.align) {
         case 'left': x = 0; break;
@@ -961,13 +970,13 @@ var processLabel = function(point, labelData, cloneBuffers) {
     }
 
     //get offset
-    var originOffset = getOriginOffset(labelData.origin, maxWidth, -y);
-    var offsetX = originOffset[0] + labelData.offset[0];
-    var offsetY = originOffset[1] + labelData.offset[1];
-    
-    var p1 = point[0];
-    var p2 = point[1];
-    var p3 = point[2];
+    const originOffset = getOriginOffset(labelData.origin, maxWidth, -y);
+    const offsetX = originOffset[0] + labelData.offset[0];
+    const offsetY = originOffset[1] + labelData.offset[1];
+
+    const p1 = point[0];
+    const p2 = point[1];
+    const p3 = point[2];
 
     //set origin buffer and apply offset
     if (!singleBuffer) {
@@ -991,24 +1000,24 @@ var processLabel = function(point, labelData, cloneBuffers) {
         labelData.pos = [p1,p2,p3];
         singleBuffer = new Float32Array(singleBuffer.buffer, 0, index);
     }
-    
-    var fonts = labelData.fonts;
+
+    //const fonts = labelData.fonts;
     labelData.files = new Array(fonts.length);
 
     for (i = 0, li= fonts.length; i < li; i++) {
         labelData.files[i] = [];
     }
 
-    for (var key in planes) {
-        var fontIndex = parseInt(key);
-        var planes2 = planes[key];
+    for (let key in planes) {
+        const fontIndex = parseInt(key);
+        const planes2 = planes[key];
 
-        var files = [];
+        const files = [];
 
-        for (var key2 in planes2) {
-            var plane = parseInt(key2) - (fontIndex*4000);
-            var file = Math.round((plane - (plane % 4)) / 4);
-            
+        for (let key2 in planes2) {
+            const plane = parseInt(key2) - (fontIndex*4000);
+            const file = Math.round((plane - (plane % 4)) / 4);
+
             if (files.indexOf(file) == -1) {
                 files.push(file);
             }
@@ -1021,27 +1030,28 @@ var processLabel = function(point, labelData, cloneBuffers) {
     labelData.index2 = index2;
 
     return [offsetX * 0.5, offsetY * 0.5, (offsetX + maxWidth) * 0.5 + 1, (offsetY + Math.abs(y)) *0.5];
-};
+}
 
-var processPointArrayGeometry = function(pointArray) {
-    var i, li;
+function processPointArrayGeometry(pointArray) {
 
     checkDPoints(pointArray);
+
+    let pointsGroups;
 
     if (pointArray['lines']) {  //use lines as points
         pointsGroups = pointArray['lines'];
     } else {
         pointsGroups = [pointArray['points']];
     }
-    
+
     if (!pointsGroups || pointsGroups.length == 0) {
         return;
     }
 
-    var totalPoints = 0;
-    var indicesBuffer = new Uint32Array(pointsGroups.length);
+    let totalPoints = 0;
+    const indicesBuffer = new Uint32Array(pointsGroups.length);
 
-    for (i = 0; i < pointsGroups.length; i++) {
+    for (let i = 0; i < pointsGroups.length; i++) {
         indicesBuffer[i] = totalPoints;
 
         if (Array.isArray(pointsGroups[i])) {
@@ -1049,31 +1059,31 @@ var processPointArrayGeometry = function(pointArray) {
         }
     }
 
-    var geometryBuffer = new Float64Array(totalPoints * 3);
+    const geometryBuffer = new Float64Array(totalPoints * 3);
 
-    /*var forceOrigin = globals.forceOrigin;
-    var tileX = globals.tileX;
-    var tileY = globals.tileY;*/
-    var forceScale = globals.forceScale;
-    var index = 0, p1, p2, pp, p;
+    /*const forceOrigin = globals.forceOrigin;
+    const tileX = globals.tileX;
+    const tileY = globals.tileY;*/
+    const forceScale = globals.forceScale;
+    let index = 0, p1, pp, p;
 
-    for (var i = 0; i < pointsGroups.length; i++) {
+    for (let i = 0; i < pointsGroups.length; i++) {
         if (!Array.isArray(pointsGroups[i]) || !pointsGroups[i].length) {
             continue;
         }
-        
-        var points = pointsGroups[i];
-   
+
+        const points = pointsGroups[i];
+
         p = points[0];
         p1 = [p[0], p[1], p[2]];
-    
+
         //add lines
-        for (var j = 0, lj = points.length; j < lj; j++) {
+        for (let j = 0, lj = points.length; j < lj; j++) {
 
             /*if (forceOrigin) {
                 pp = [p1[0] - tileX, p1[1] - tileY, p1[2]];
             }*/
-    
+
             if (forceScale != null) {
                 pp = [p1[0] * forceScale[0], p1[1] * forceScale[1], p1[2] * forceScale[2]];
             }
@@ -1086,7 +1096,7 @@ var processPointArrayGeometry = function(pointArray) {
             if (j == (lj - 1)) {
                 break;
             }
-    
+
             p1 = points[j+1];
         }
     }
@@ -1094,8 +1104,6 @@ var processPointArrayGeometry = function(pointArray) {
     globals.signatureCounter++;
     postGroupMessageFast(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_POINT_GEOMETRY, {
         'id':pointArray['id'] }, [geometryBuffer, indicesBuffer], (""+globals.signatureCounter));
-};
+}
 
 export {processPointArrayPass, processPointArrayGeometry, processPointArrayVSwitchPass, checkDPoints};
-
-

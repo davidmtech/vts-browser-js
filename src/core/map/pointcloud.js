@@ -1,4 +1,5 @@
 
+import {math as math_} from '../utils/math';
 import {mat4 as mat4_} from '../utils/matrix';
 import {utils as utils_} from '../utils/utils';
 import BBox_ from '../renderer/bbox';
@@ -7,14 +8,15 @@ import BBox_ from '../renderer/bbox';
 //import GpuPointcloud_ from '../renderer/gpu/pointcloud';
 
 //get rid of compiler mess
-var mat4 = mat4_;
-var BBox = BBox_;
-var utils = utils_;
-//var GpuProgram = GpuProgram_;
-//var GpuShaders = GpuShaders_;
-//var GpuPointcloud = GpuPointcloud_;
+const mat4 = mat4_;
+const math = math_;
+const BBox = BBox_;
+const utils = utils_;
+//const GpuProgram = GpuProgram_;
+//const GpuShaders = GpuShaders_;
+//const GpuPointcloud = GpuPointcloud_;
 
-var MapPointCloud = function(map, url, tile, offset, size) {
+const MapPointCloud = function(map, url, tile, offset, size) {
     this.generateLines = true;
     this.map = map;
     this.stats = map.stats;
@@ -54,7 +56,7 @@ MapPointCloud.prototype.kill = function() {
 
 
 MapPointCloud.prototype.killSubclouds = function(killedByCache) {
-    for (var i = 0, li = this.subclouds.length; i < li; i++) {
+    for (let i = 0, li = this.subclouds.length; i < li; i++) {
         this.subclouds[i].kill();
     }
     //this.subclouds = [];
@@ -74,8 +76,8 @@ MapPointCloud.prototype.killSubclouds = function(killedByCache) {
 
 
 MapPointCloud.prototype.killGpuSubclouds = function(killedByCache) {
-    var size = 0;
-    for (var i = 0, li = this.gpuSubclouds.length; i < li; i++) {
+    let size = 0, i, li;
+    for (i = 0, li = this.gpuSubclouds.length; i < li; i++) {
         this.gpuSubclouds[i].kill();
         size += this.gpuSubclouds[i].getSize();
     }
@@ -101,7 +103,7 @@ MapPointCloud.prototype.killGpuSubclouds = function(killedByCache) {
 
 
 MapPointCloud.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
-    var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
+    const doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
 
     if (this.loadState == 2) { //loaded
@@ -122,7 +124,7 @@ MapPointCloud.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) {
                 return false;
             }
 
-            var t = performance.now();
+            const t = performance.now();
             this.buildGpuSubclouds();
             this.stats.renderBuild += performance.now() - t;
         }
@@ -200,13 +202,13 @@ MapPointCloud.prototype.onLoaded = function(data, task, direct) {
         return;
     }
 
-    var t = performance.now();
+    const t = performance.now();
 
     if (direct) {
         this.parseWorkerData(data);
     } else {
         this.fileSize = data.byteLength;
-        var stream = {data: new DataView(data), buffer:data, index:0};
+        const stream = {data: new DataView(data), buffer:data, index:0};
         this.parseMapPointCloud(stream);
     }
 
@@ -238,8 +240,8 @@ MapPointCloud.prototype.parseMapPointCloud = function (stream) {
     //this.killSubclouds(); //just in case
 
     //parase header
-    var streamData = stream.data;
-    var magic = '';
+    const streamData = stream.data;
+    let magic = '';
 
     if (streamData.length < 2) {
         return false;
@@ -254,20 +256,21 @@ MapPointCloud.prototype.parseMapPointCloud = function (stream) {
 
     this.version = streamData.getUint16(stream.index, true); stream.index += 2;
 
-    var jsonSize = streamData.getUint32(stream.index, true); stream.index += 4;
+    const jsonSize = streamData.getUint32(stream.index, true); stream.index += 4;
 
-    var json = utils.unint8ArrayToString(new Uint8Array(streamData.buffer, stream.index, jsonSize));
+    let json = utils.unint8ArrayToString(new Uint8Array(streamData.buffer, stream.index, jsonSize));
     stream.index += jsonSize;
 
     try {
         json = JSON.parse(json);
+        // eslint-disable-next-line
     } catch (e) {
     }
 
-    var headerSize = jsonSize + 2 + 2 + 4;
+    const headerSize = jsonSize + 2 + 2 + 4;
 
-    var features = json['features'];
-    var attributes = json['attributes'];
+    const features = json['features'];
+    const attributes = json['attributes'];
 
     if (!features || features.length < 1) {
         return false;
@@ -277,19 +280,19 @@ MapPointCloud.prototype.parseMapPointCloud = function (stream) {
         return false;
     }
 
-    for (var i = 0, li = features.length; i < li; i++) {
-        var feature = features[i];
+    for (let i = 0, li = features.length; i < li; i++) {
+        const feature = features[i];
 
-        var attribute = attributes[feature['attributes']];
+        const attribute = attributes[feature['attributes']];
 
         if (!attribute) {
             continue;
         }
 
-        var subcloud = {};
+        const subcloud = {};
 
-        var offset = feature['offset'] + headerSize;
-        var size = feature['size'];
+        let offset = feature['offset'] + headerSize;
+        const size = feature['size'];
 
         subcloud.size = size;
 
@@ -324,13 +327,13 @@ MapPointCloud.prototype.addSubcloud = function(subcloud) {
 
 
 MapPointCloud.prototype.buildGpuSubclouds = function() {
-    var size = 0;
+    let size = 0;
     this.gpuSubclouds = new Array(this.subclouds.length);
 
-    var renderer = this.map.renderer;
+    const renderer = this.map.renderer;
 
-    for (var i = 0, li = this.subclouds.length; i < li; i++) {
-        var subcloud = this.subclouds[i];
+    for (let i = 0, li = this.subclouds.length; i < li; i++) {
+        const subcloud = this.subclouds[i];
 
         this.gpuSubclouds[i] = new GpuPointcloud(renderer.gpu, { vertices: subcloud.vertices, colors: subcloud.colors }, subcloud.size, this.map.core, true);
     }
@@ -352,7 +355,7 @@ MapPointCloud.prototype.getWorldMatrix = function(geoPos, matrix) {
     // camera effectively stays in the position [0,0] and the tiles travel
     // around it. (The Z coordinate is fine and is not handled in this way.)
 
-    var m = matrix;
+    let m = matrix;
 
     if (m) {
         m[0] = this.transform[3]; m[1] = 0; m[2] = 0; m[3] = 0;
@@ -369,30 +372,30 @@ MapPointCloud.prototype.getWorldMatrix = function(geoPos, matrix) {
     return m;
 };
 
-
+// eslint-disable-next-line
 MapPointCloud.prototype.drawSubcloud = function (cameraPos, index, texture, type, alpha, layer, surface, splitMask, splitSpace) {
-    var renderer = this.map.renderer;
+    const renderer = this.map.renderer;
 
     if (!this.gpuSubclouds[index] && this.subclouds[index] && !this.subclouds[index].killed) {
         this.gpuSubclouds[index] = new GpuPointcloud(renderer.gpu, { vertices: this.subclouds[index].vertices, colors: this.subclouds[index].colors }, this.subclouds[index].size, this.map.core, true);
     }
 
-    var subcloud = this.subclouds[index];
-    var gpuSubcloud = this.gpuSubclouds[index];
+    const subcloud = this.subclouds[index];
+    const gpuSubcloud = this.gpuSubclouds[index];
 
     if (!gpuSubcloud) {
         return;
     }
 
-    var program = renderer.progPCloud;
+    const program = renderer.gpu.progPCloud;
 
-    var mv = this.mBuffer, m = this.mBuffer2, mvp = this.vBuffer;
+    const mv = this.mBuffer, m = this.mBuffer2; //, mvp = this.vBuffer;
 
     mat4.multiply(renderer.camera.getModelviewFMatrix(), this.getWorldMatrix(cameraPos, m), mv);
 
     renderer.gpu.useProgram(program, ['aPosition', 'aColor'], null /*gpuMask*/);
 
-    var proj = renderer.camera.getProjectionMatrix();
+    const proj = renderer.camera.getProjectionMatrix();
     mat4.multiply(proj, mv, m);
 
     program.setMat4('uMVP', m);
@@ -406,7 +409,7 @@ MapPointCloud.prototype.drawSubcloud = function (cameraPos, index, texture, type
 
 MapPointCloud.prototype.draw = function (cameraPos, splitMask, splitSpace) {
 
-    for (var i = 0, li = this.subclouds.length; i < li; i++) {
+    for (let i = 0, li = this.subclouds.length; i < li; i++) {
         this.drawSubcloud(cameraPos, i, splitMask, splitSpace);
     }
 

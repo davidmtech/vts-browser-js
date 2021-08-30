@@ -5,39 +5,36 @@ function processGMap(gpu, gl, renderer, screenPixelSize, draw) {
         return;
     }
 
-    var tileCount = renderer.config.mapFeaturesReduceParams[1]; //31; //labelGridCells
-    var featuresPerSquareInch = renderer.config.mapFeaturesReduceParams[0]; //0.6614; //labelsPerSquareInch
-    var ppi = 96 * (window.devicePixelRatio || 1);
-    var screenLX = renderer.curSize[0];
-    var screenLY = renderer.curSize[1];
-    var featureCount = Math.ceil((screenLX/ppi)*(screenLY/ppi)*featuresPerSquareInch); 
-    var i, li, top = renderer.config.mapFeaturesSortByTop;
+    const featuresPerSquareInch = renderer.config.mapFeaturesReduceParams[0]; //0.6614; //labelsPerSquareInch
+    const ppi = 96 * (window.devicePixelRatio || 1);
+    const screenLX = renderer.curSize[0];
+    const screenLY = renderer.curSize[1];
+    let tileCount = renderer.config.mapFeaturesReduceParams[1]; //31; //labelGridCells
+    let featureCount = Math.ceil((screenLX/ppi)*(screenLY/ppi)*featuresPerSquareInch);
+    let i, li, top = renderer.config.mapFeaturesSortByTop;
 
     if (tileCount <= 0) {
         tileCount = featureCount * 2; //31; //labelGridCells
-    } else {
-        tileCount = tileCount;
     }
 
     //renderer.debugStr = '<br>featuresPerScr: ' + featureCount + '<br>gridCells: ' + tileCount + '';
 
     //get top features
-    var featureCache = renderer.gmap;
-    var featureCacheSize = renderer.gmapIndex;
-    var topFeatures = renderer.gmapTop;
-    var featureCount2 = featureCount;
+    const featureCache = renderer.gmap;
+    const featureCacheSize = renderer.gmapIndex;
+    const topFeatures = renderer.gmapTop;
+    let featureCount2 = featureCount;
 
     if (featureCount > featureCacheSize) {
         featureCount2 = featureCacheSize;
     }
 
     //distribute top features
-    var tileSize = Math.floor(Math.sqrt((screenLX*screenLY) / tileCount));
-    var hitMap = renderer.gmapHit, usedFeatures = 0;
-    var tileFeatures, count, feature, job;
-    var drawAllLabels = renderer.drawAllLabels;
+    const drawAllLabels = renderer.drawAllLabels;
+    let tileSize = Math.floor(Math.sqrt((screenLX*screenLY) / tileCount));
+    let tileFeatures, count, feature, job, usedFeatures = 0;
 
-    var colors = [
+    const colors = [
         [0, 0, 255, 255],
         [128, 0, 255, 255],
         [255, 0, 0, 255],
@@ -47,10 +44,10 @@ function processGMap(gpu, gl, renderer, screenPixelSize, draw) {
         [128, 255, 128, 255]
     ];
 
-    var colorIndex = 0;
+    let colorIndex = 0;
 
     do {
-        var a,b,c,d,ix,iy,is,pp,tx,ty,mx,my,v,index,o,j;
+        let a,b,c,d,ix,iy,is,pp,tx,ty,mx,my,v,index,o,j;
 
         ix = screenLX / tileSize;
         iy = screenLY / tileSize;
@@ -70,13 +67,13 @@ function processGMap(gpu, gl, renderer, screenPixelSize, draw) {
         c = Math.floor(c * featureCount);
         d = Math.floor(d * featureCount);
 
-        var hitMap = renderer.gmapStore;
-        var hitMapCount = renderer.gmapHit;
+        const hitMap = renderer.gmapStore;
+        const hitMapCount = renderer.gmapHit;
 
         if (renderer.drawGridCells) {
             gpu.setState(renderer.lineLabelState);
 
-            var x = 0, y = 0, j, lj;
+            let x = 0, y = 0, j, lj;
 
             for (j = 0, lj = (my + 1); j < lj; j++) {
                 for (i = 0, li = (mx + 1); i < li; i++) {
@@ -175,19 +172,20 @@ function processGMap(gpu, gl, renderer, screenPixelSize, draw) {
                     job = feature[0];
 
                     //render job
-                    if (!drawAllLabels && feature[6]) { //no-overlap 
+                    if (!drawAllLabels && feature[6]) { //no-overlap
                         pp = feature[5];
                         o = feature[8];
 
-                        if (!renderer.rmap.addRectangle(pp[0]+o[0], pp[1]+o[1], pp[0]+o[2], pp[1]+o[3], feature[7], feature[0].lastSubJob)) {
-                        }
+                        //if (!
+                            renderer.rmap.addRectangle(pp[0]+o[0], pp[1]+o[1], pp[0]+o[2], pp[1]+o[3], feature[7], feature[0].lastSubJob)
+                        //) {}
 
                         if (job.type == VTS_JOB_LINE_LABEL) {
-                            if (renderer.rmap.addLineLabel(job.lastSubJob, depthParams)) {
+                            if (renderer.rmap.addLineLabel(job.lastSubJob, null /*depthParams*/)) {
                                 //renderer.rmap.storeRemovedLineLabel(pp[0]+o[0], pp[1]+o[1], pp[0]+o[2], pp[1]+o[3], feature[7], feature[0].lastSubJob);
                             }
                         } else {
-                            if (renderer.rmap.addRectangle(pp[0]+o[0], pp[1]+o[1], pp[0]+o[2], pp[1]+o[3], feature[7], job.lastSubJob, true, depthParams)) {
+                            if (renderer.rmap.addRectangle(pp[0]+o[0], pp[1]+o[1], pp[0]+o[2], pp[1]+o[3], feature[7], job.lastSubJob, true, null /*depthParams*/)) {
                                 renderer.rmap.storeRemovedRectangle(pp[0]+o[0], pp[1]+o[1], pp[0]+o[2], pp[1]+o[3], feature[7], feature[0].lastSubJob);
                             }
                         }
@@ -226,22 +224,21 @@ function processGMap(gpu, gl, renderer, screenPixelSize, draw) {
 
 
 function sortFeatures(features, top, count, renderer) {
-    var value, feature;
-    var currentIndex = 0;
-    var currentValue2 = top ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
-    var topFeatures = renderer.gmapTop;
-    var topFeaturesIndex = 0;
-    var topFeaturesIndex2 = 0;
+    let value, feature, index;
+    let currentIndex = 0;
+    let currentValue2 = top ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    let topFeaturesIndex = 0;
+    let topFeaturesIndex2 = 0;
 
     //remove feature from cache
-    var featureCache = renderer.gmap, index;
-
+    const featureCache = renderer.gmap;
+    const topFeatures = renderer.gmapTop;
 
     do {
-        var currentValue = top ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
+        let currentValue = top ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
         topFeaturesIndex2 = topFeaturesIndex;
 
-        for (var i = 0, li = features.length; i < li; i++) {
+        for (let i = 0, li = features.length; i < li; i++) {
             index = features[i];
             feature = featureCache[index];
             value = feature[0].reduce[1];
@@ -265,8 +262,8 @@ function sortFeatures(features, top, count, renderer) {
 }
 
 function storeFeatureToHitmap(id, feature, ix, iy, mx, my, hitMap, hcache, hcacheSize) {
-    var x1 = ix - 1, y1 = iy - 1, x,
-        x2 = ix + 1, y2 = iy + 1, index, blockFeatures;
+    let x1 = ix - 1, y1 = iy - 1, x,
+        x2 = ix + 1, y2 = iy + 1, index;//, blockFeatures;
 
     if (x1 < 0) x1 = 0;
     if (y1 < 0) y1 = 0;
@@ -276,7 +273,7 @@ function storeFeatureToHitmap(id, feature, ix, iy, mx, my, hitMap, hcache, hcach
     for (; y1 <= y2; y1++) {
         for (x = x1; x <= x2; x++) {
             index = (y1 * mx + x) * 2;
-            blockFeatures = hitMap[index];
+            //blockFeatures = hitMap[index];
 
             if (!hitMap[index]) {
                 hitMap[index] = hcacheSize;
@@ -303,40 +300,41 @@ function processGMap4(gpu, gl, renderer, screenPixelSize, draw) {
         return;
     }
 
-    var ppi = 96 * (window.devicePixelRatio || 1);
+    const ppi = 96 * (window.devicePixelRatio || 1);
 
-    var maxRadius = renderer.config.mapFeaturesReduceParams[0] * ppi; //mapFeatureRadius
-    var maxHitcount = renderer.config.mapFeaturesReduceParams[1]; //0.6614; //mapFeatureMaxOverlays
+    let maxRadius = renderer.config.mapFeaturesReduceParams[0] * ppi; //mapFeatureRadius
+    const maxHitcount = renderer.config.mapFeaturesReduceParams[1]; //0.6614; //mapFeatureMaxOverlays
 
-    var screenLX = renderer.curSize[0];
-    var screenLY = renderer.curSize[1];
-    var i, li, top = renderer.config.mapFeaturesSortByTop, tmp;
-    var feature, feature2, pp, pp2, o, job;
-    var drawAllLabels = renderer.drawAllLabels;
+    const screenLX = renderer.curSize[0];
+    const screenLY = renderer.curSize[1];
+    //const top = renderer.config.mapFeaturesSortByTop;
+    const drawAllLabels = renderer.drawAllLabels;
+
+    let i, li;
+    let feature, feature2, pp, pp2, o, job;
 
     //get top features
-    var featureCache = renderer.gmap;
-    var featureCacheSize = renderer.gmapIndex;
+    const featureCache = renderer.gmap;
+    const featureCacheSize = renderer.gmapIndex;
 
-    var hcache = renderer.gmap2;
-    var hcacheSize = 1;
-    var hmap = renderer.gmap3;
-    var hmapSize = renderer.gmap3Size;
-    var hmap = renderer.gmap3;
+    const hcache = renderer.gmap2;
+    const hmap = renderer.gmap3;
+    let hcacheSize = 1;
+    let hmapSize = renderer.gmap3Size;
 
 
-    var hmin = 10000;
-    var hmax = 0, h, r;
+    let hmin = 10000;
+    let hmax = 0, h, r, ub, lb;
 
-    var divByDist = (renderer.config.mapFeaturesReduceFactor >= 1);
+    const divByDist = (renderer.config.mapFeaturesReduceFactor >= 1);
 
     if (divByDist) { // imp / dists
         if (renderer.fmaxDist == Number.NEGATIVE_INFINITY || renderer.fminDist == Number.POSITIVE_INFINITY) {
             return;
         }
 
-        var ub = 1 - Math.log(renderer.fminDist) / Math.log(101);
-        var lb = -Math.log(renderer.fmaxDist) / Math.log(101); 
+        ub = 1 - Math.log(renderer.fminDist) / Math.log(101);
+        lb = -Math.log(renderer.fmaxDist) / Math.log(101);
     }
 
     //filter features and sort them by importance
@@ -353,7 +351,7 @@ function processGMap4(gpu, gl, renderer, screenPixelSize, draw) {
             h = Math.round(-5000 + ( ( Math.log(r[1]+1) - Math.log(r[4]) ) / Math.log(101) - lb ) / ( ub-lb ) * 10000) + 5000;
             r[5] = h; //for debug
         } else {
-            h = Math.round(feature[0].reduce[1]);            
+            h = Math.round(feature[0].reduce[1]);
         }
 
         if (h < 0) h = 0;
@@ -364,27 +362,26 @@ function processGMap4(gpu, gl, renderer, screenPixelSize, draw) {
         hmap[h][hmapSize[h]++] = feature;
     }
 
-    var invMaxRadius = 1 / maxRadius, index, ix, iy, features;
-    var mx = Math.floor(screenLX * invMaxRadius);
-    var my = Math.floor(screenLY * invMaxRadius);
-
-    var hitMap = renderer.gmapStore;
-    var hitMapCount = renderer.gmapHit;
+    const invMaxRadius = 1 / maxRadius;
+    const mx = Math.floor(screenLX * invMaxRadius);
+    const my = Math.floor(screenLY * invMaxRadius);
+    const hitMap = renderer.gmapStore;
+    //const hitMapCount = renderer.gmapHit;
+    let index, ix, iy;
 
     //clear hit-map
     for (i = 0, li = (mx+1) * (my+1) * 2; i < li; i+=2) {
         hitMap[i] = 0;
     }
 
-    //var hitCache = renderer.gmapHit2;
-    var hitCacheSize = 0, j, lj, k, lk, hitCount, dx, dy, blockFeatures;
+    let hitCacheSize = 0, j, lj, hitCount, dx, dy;
 
     maxRadius *= maxRadius;
 
     for (i = hmax, li = hmin; i >= 0; i--) {
 
         if (hmapSize[i] > 0) {
-            var features = hmap[i];
+            const features = hmap[i];
 
             for (j = 0, lj = hmapSize[i]; j < lj; j++) {
                 feature = features[j];
@@ -420,12 +417,12 @@ function processGMap4(gpu, gl, renderer, screenPixelSize, draw) {
                     } while (index);
                 }
 
-                // check                
+                // check
                 if (hitCount <= maxHitcount) {
                     index = hitCacheSize;
 
                     //render job
-                    if (!drawAllLabels && feature[6]) { //no-overlap 
+                    if (!drawAllLabels && feature[6]) { //no-overlap
                         pp = feature[5];
                         o = feature[8];
 
@@ -474,37 +471,35 @@ function processGMap5(gpu, gl, renderer, screenPixelSize, draw) {
         return;
     }
 
-    var ppi = 96 * (window.devicePixelRatio || 1);
-
-    var screenLX = renderer.curSize[0];
-    var screenLY = renderer.curSize[1];
-    var i, li, top = renderer.config.mapFeaturesSortByTop, tmp;
-    var feature, feature2, pp, pp2, o, job;
-    var drawAllLabels = renderer.drawAllLabels;
+    //const ppi = 96 * (window.devicePixelRatio || 1);
+    //const screenLX = renderer.curSize[0];
+    //const screenLY = renderer.curSize[1];
+    //const top = renderer.config.mapFeaturesSortByTop;
+    const drawAllLabels = renderer.drawAllLabels;
+    let i, li;
+    let feature, pp, o, job;
 
     //get top features
-    var featureCache = renderer.gmap;
-    var featureCacheSize = renderer.gmapIndex;
+    const featureCache = renderer.gmap;
+    const featureCacheSize = renderer.gmapIndex;
 
-    var hcache = renderer.gmap2;
-    var hcacheSize = 1;
-    var hmap = renderer.gmap3;
-    var hmapSize = renderer.gmap3Size;
-    var hmap = renderer.gmap3;
+    //const hcache = renderer.gmap2;
+    const hmap = renderer.gmap3;
+    //let hcacheSize = 1;
+    let hmapSize = renderer.gmap3Size;
 
+    let hmin = 10000;
+    let hmax = 0, h, r, ub, lb;
 
-    var hmin = 10000;
-    var hmax = 0, h, r;
-
-    var divByDist = (renderer.config.mapFeaturesReduceFactor >= 1);
+    const divByDist = (renderer.config.mapFeaturesReduceFactor >= 1);
 
     if (divByDist) { // imp / dists
         if (renderer.fmaxDist == Number.NEGATIVE_INFINITY || renderer.fminDist == Number.POSITIVE_INFINITY) {
             return;
         }
 
-        var ub = 1 - Math.log(renderer.fminDist) / Math.log(101);
-        var lb = -Math.log(renderer.fmaxDist) / Math.log(101); 
+        ub = 1 - Math.log(renderer.fminDist) / Math.log(101);
+        lb = -Math.log(renderer.fmaxDist) / Math.log(101);
     }
 
     //filter features and sort them by importance
@@ -521,7 +516,7 @@ function processGMap5(gpu, gl, renderer, screenPixelSize, draw) {
             h = Math.round(-5000 + ( ( Math.log(r[1]+1) - Math.log(r[4]) ) / Math.log(101) - lb ) / ( ub-lb ) * 10000) + 5000;
             r[5] = h; //for debug
         } else {
-            h = Math.round(feature[0].reduce[1]);            
+            h = Math.round(feature[0].reduce[1]);
         }
 
         if (h < 0) h = 0;
@@ -532,19 +527,19 @@ function processGMap5(gpu, gl, renderer, screenPixelSize, draw) {
         hmap[h][hmapSize[h]++] = feature;
     }
 
-    var j, lj;
+    let j, lj;
 
     for (i = hmax, li = hmin; i >= 0; i--) {
 
         if (hmapSize[i] > 0) {
-            var features = hmap[i];
+            const features = hmap[i];
 
             for (j = 0, lj = hmapSize[i]; j < lj; j++) {
                 feature = features[j];
                 job = feature[0];
                 pp = feature[5];
 
-                // check                
+                // check
 
                 //render job
                 if (!drawAllLabels && feature[6]) { //no-overlap is always enabled
@@ -582,19 +577,17 @@ function processGMap5(gpu, gl, renderer, screenPixelSize, draw) {
 }
 
 
+// eslint-disable-next-line
 function radixSortFeatures(renderer, input, inputSize, tmp, depthOnly) {
-    var count = inputSize < (1 << 16) ? renderer.radixCountBuffer16 : renderer.radixCountBuffer32; 
-    var item, val, bunit32 = renderer.buffUint32, bfloat32 = renderer.buffFloat32, i, r, pp;
-    var distanceFactor = renderer.config.mapFeaturesReduceFactor;
-    //var screenDistanceFactor = renderer.config.mapFeaturesReduceFactor2 * 0.5, e100 = 1.0/Math.exp(100);
-    //var centerOffset = renderer.config.mapFeaturesReduceFactor3;
+    const count = inputSize < (1 << 16) ? renderer.radixCountBuffer16 : renderer.radixCountBuffer32;
+    const distanceFactor = renderer.config.mapFeaturesReduceFactor;
+    const bunit32 = renderer.buffUint32, bfloat32 = renderer.buffFloat32;
+    let item, val, i, r;
 
-    var depthTest = true;
-
-    var sx = renderer.curSize[0], sy = renderer.curSize[1];
-    var cx = sx * 0.5, cy = sy * 0.5;
-    var invcx = 1.0 / (cx+0.0001), invcy = 1.0 / (cy+0.0001), dx, dy, yy;
-    var invsy = 1.0 / (sy+0.0001);
+    //const sx = renderer.curSize[0], sy = renderer.curSize[1];
+    //const cx = sx * 0.5, cy = sy * 0.5;
+    //const invcx = 1.0 / (cx+0.0001), invcy = 1.0 / (cy+0.0001);
+    //const invsy = 1.0 / (sy+0.0001);
 
     if (count.fill) {
         count.fill(0);
@@ -610,7 +603,7 @@ function radixSortFeatures(renderer, input, inputSize, tmp, depthOnly) {
         r = item[0].reduce;
 
         // optical center
-        //pp = item[5]; 
+        //pp = item[5];
         //yy = Math.pow(pp[1] * invsy, centerOffset) * sy;
         //dx = (cx - pp[0]) * invcx;
         //dy = (cy - yy) * invcx;
@@ -629,8 +622,8 @@ function radixSortFeatures(renderer, input, inputSize, tmp, depthOnly) {
     }
 
     // create summed array
-    for (var j = 0; j < 4; j++) {
-        var t = 0, sum = 0, offset = j * 256;
+    for (let j = 0; j < 4; j++) {
+        let t = 0, sum = 0, offset = j * 256;
 
         for (i = 0; i < 256; i++) {
             t = count[i + offset];
@@ -676,25 +669,26 @@ function processGMap6(gpu, gl, renderer, screenPixelSize, draw) {
         return;
     }
 
-    var featuresPerSquareInch = renderer.config.mapFeaturesReduceParams[1]; //0.6614; //labelsPerSquareInch
-    var ppi = 96 * (window.devicePixelRatio || 1);
-    var screenLX = renderer.curSize[0];
-    var screenLY = renderer.curSize[1];
-    var maxFeatures = Math.ceil((screenLX/ppi)*(screenLY/ppi)*featuresPerSquareInch); 
-    var i, li, top = renderer.config.mapFeaturesSortByTop, tmp, job;
-    var feature, feature2, pp, pp2, o, featureCount = 0;
-    var drawAllLabels = renderer.drawAllLabels;
+    const featuresPerSquareInch = renderer.config.mapFeaturesReduceParams[1]; //0.6614; //labelsPerSquareInch
+    const ppi = 96 * (window.devicePixelRatio || 1);
+    const screenLX = renderer.curSize[0];
+    const screenLY = renderer.curSize[1];
+    let maxFeatures = Math.ceil((screenLX/ppi)*(screenLY/ppi)*featuresPerSquareInch);
+    //const top = renderer.config.mapFeaturesSortByTop;
+    const drawAllLabels = renderer.drawAllLabels;
+    let i, job;
+    let feature, pp, o, featureCount = 0;
 
-    var depthTest = (renderer.config.mapFeaturesReduceFactor2 != 0);
-    var depthOffset = -renderer.config.mapFeaturesReduceFactor3;
-    var depthParams = null;
+    const depthTest = (renderer.config.mapFeaturesReduceFactor2 != 0);
+    const depthOffset = -renderer.config.mapFeaturesReduceFactor3;
+    let depthParams = null;
 
     renderer.debugStr = '<br>featuresPerScr: ' + maxFeatures;
 
     //get top features
-    var featureCache = renderer.gmap;
-    var featureCacheSize = renderer.gmapIndex;
-    var featureCache2 = renderer.gmap2;
+    const featureCache = renderer.gmap;
+    const featureCacheSize = renderer.gmapIndex;
+    const featureCache2 = renderer.gmap2;
 
     if (drawAllLabels) {
         maxFeatures = featureCacheSize;
@@ -707,13 +701,13 @@ function processGMap6(gpu, gl, renderer, screenPixelSize, draw) {
         feature = featureCache[i];
         job = feature[0];
 
-        // check                
+        // check
 
         //render job
         if (!drawAllLabels && feature[6]) { //no-overlap is always enabled
             pp = feature[5];
             o = feature[8];
-            
+
             depthParams = depthTest ? [pp[0],pp[1]+feature[1],job.reduce,depthOffset] : null;
 
             if (job.type == VTS_JOB_LINE_LABEL) {
@@ -749,13 +743,14 @@ function processGMap6(gpu, gl, renderer, screenPixelSize, draw) {
 
 
 function radixDepthSortFeatures(renderer, input, inputSize, tmp) {
-    var count = inputSize < (1 << 16) ? renderer.radixCountBuffer16 : renderer.radixCountBuffer32; 
-    var item, val, bunit32 = renderer.buffUint32, bfloat32 = renderer.buffFloat32, i, r, pp;
-    var distanceFactor = renderer.config.mapFeaturesReduceFactor;
-    //var screenDistanceFactor = renderer.config.mapFeaturesReduceFactor2 * 0.5, e100 = 1.0/Math.exp(100);
-    //var centerOffset = renderer.config.mapFeaturesReduceFactor3;
+    const count = inputSize < (1 << 16) ? renderer.radixCountBuffer16 : renderer.radixCountBuffer32;
+    //const distanceFactor = renderer.config.mapFeaturesReduceFactor;
+    const bunit32 = renderer.buffUint32, bfloat32 = renderer.buffFloat32;
+    let item, val, i;
+    //const screenDistanceFactor = renderer.config.mapFeaturesReduceFactor2 * 0.5, e100 = 1.0/Math.exp(100);
+    //const centerOffset = renderer.config.mapFeaturesReduceFactor3;
 
-    var depthTest = true;
+    //const depthTest = true;
 
     if (count.fill) {
         count.fill(0);
@@ -779,8 +774,8 @@ function radixDepthSortFeatures(renderer, input, inputSize, tmp) {
     }
 
     // create summed array
-    for (var j = 0; j < 4; j++) {
-        var t = 0, sum = 0, offset = j * 256;
+    for (let j = 0; j < 4; j++) {
+        let t = 0, sum = 0, offset = j * 256;
 
         for (i = 0; i < 256; i++) {
             t = count[i + offset];
@@ -823,19 +818,19 @@ function radixDepthSortFeatures(renderer, input, inputSize, tmp) {
 
 
 function fillVMapHoles(vmap, mx, my) {
-    var holesCount = 0, v;
-    var x0, y0, x1, y1, x2, y2;
-    var maxX = mx - 1;
-    var maxY = my - 1;
+    let holesCount = 0, v;
+    let x0, y0, x1, y1, x2, y2;
+    let maxX = mx - 1;
+    let maxY = my - 1;
 
-    for (var j = 0, lj = my; j < lj; j++) {
-        for (var i = 0, li = mx; i < li; i++) {
+    for (let j = 0, lj = my; j < lj; j++) {
+        for (let i = 0, li = mx; i < li; i++) {
 
             v = vmap[j*mx+i];
 
             if (v === null) {
 
-                //find 
+                //find
                 x0 = i - 1;
                 y0 = j - 1;
 
@@ -851,7 +846,7 @@ function fillVMapHoles(vmap, mx, my) {
                 if (x2 > maxX) x2 = maxX;
                 if (y2 > maxY) y2 = maxY;
 
-                var vv = [vmap[y0*mx+x0],
+                const vv = [vmap[y0*mx+x0],
                           vmap[y0*mx+x1],
                           vmap[y0*mx+x2],
                           vmap[y1*mx+x0],
@@ -860,10 +855,10 @@ function fillVMapHoles(vmap, mx, my) {
                           vmap[y2*mx+x1],
                           vmap[y2*mx+x2]];
 
-                var vcount = 0;
-                var vsum = 0;
+                let vcount = 0;
+                let vsum = 0;
 
-                for (var k= 0; k < 8; k++) {
+                for (let k= 0; k < 8; k++) {
                     if (vv[k] !== null) {
                         vcount++;
                         vsum += vv[k];
@@ -889,36 +884,37 @@ function getVMapValue(vmap, x, y, mx, my) {
     x -= 0.5;
     y -= 0.5;
 
-    var maxX = mx - 1;
-    var maxY = my - 1;
+    const maxX = mx - 1;
+    const maxY = my - 1;
 
     if (x < 0) { x = 0; }
     if (y < 0) { y = 0; }
     if (x > maxX) { x = maxX; }
     if (y > maxY) { y = maxY; }
 
-    var ix = Math.floor(x);
-    var iy = Math.floor(y);
-    var fx = x - ix;
-    var fy = y - iy;
+    const ix = Math.floor(x);
+    const iy = Math.floor(y);
+    const fx = x - ix;
+    const fy = y - iy;
 
-    var index = iy * mx;
-    var index2 = (iy == maxY) ? index : index + mx;
-    var ix2 = (ix == maxX) ? ix : ix + 1; 
-    var v00 = vmap[index + ix];
-    var v01 = vmap[index + ix2];
-    var v10 = vmap[index2 + ix];
-    var v11 = vmap[index2 + ix2];
-    var w0 = (v00 + (v01 - v00)*fx);
-    var w1 = (v10 + (v11 - v10)*fx);
-   
+    const index = iy * mx;
+    const index2 = (iy == maxY) ? index : index + mx;
+    const ix2 = (ix == maxX) ? ix : ix + 1;
+    const v00 = vmap[index + ix];
+    const v01 = vmap[index + ix2];
+    const v10 = vmap[index2 + ix];
+    const v11 = vmap[index2 + ix2];
+    const w0 = (v00 + (v01 - v00)*fx);
+    const w1 = (v10 + (v11 - v10)*fx);
+
     return (w0 + (w1 - w0)*fy);
 }
 
 
 function radixDeltaSortFeatures(renderer, input, inputSize, tmp) {
-    var count = inputSize < (1 << 16) ? renderer.radixCountBuffer16 : renderer.radixCountBuffer32; 
-    var item, val, bunit32 = renderer.buffUint32, bfloat32 = renderer.buffFloat32, i, r, pp;
+    const count = inputSize < (1 << 16) ? renderer.radixCountBuffer16 : renderer.radixCountBuffer32;
+    const bunit32 = renderer.buffUint32, bfloat32 = renderer.buffFloat32;
+    let item, val, i;
 
     if (count.fill) {
         count.fill(0);
@@ -942,8 +938,8 @@ function radixDeltaSortFeatures(renderer, input, inputSize, tmp) {
     }
 
     // create summed array
-    for (var j = 0; j < 4; j++) {
-        var t = 0, sum = 0, offset = j * 256;
+    for (let j = 0; j < 4; j++) {
+        let t = 0, sum = 0, offset = j * 256;
 
         for (i = 0; i < 256; i++) {
             t = count[i + offset];
@@ -991,35 +987,36 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
         return;
     }
 
-    var tileCount = renderer.config.mapFeaturesReduceParams[5];
-    var featuresPerSquareInch = renderer.config.mapFeaturesReduceParams[1];
-    var ppi = 96 * (window.devicePixelRatio || 1);
-    var screenLX = renderer.curSize[0];
-    var screenLY = renderer.curSize[1];
-    var maxFeatures = Math.ceil((screenLX/ppi)*(screenLY/ppi)*featuresPerSquareInch); 
-    var featuresPerTile = maxFeatures / (tileCount * tileCount); 
-    var featuresPerTileInt = Math.floor(featuresPerTile); 
-    var featuresPerTileFract = featuresPerTile - featuresPerTileInt; 
-    var tileSizeX = screenLX / tileCount;
-    var tileSizeY = screenLY / tileCount;
+    const tileCount = renderer.config.mapFeaturesReduceParams[5];
+    const featuresPerSquareInch = renderer.config.mapFeaturesReduceParams[1];
+    const ppi = 96 * (window.devicePixelRatio || 1);
+    const screenLX = renderer.curSize[0];
+    const screenLY = renderer.curSize[1];
+
+    let maxFeatures = Math.ceil((screenLX/ppi)*(screenLY/ppi)*featuresPerSquareInch);
+    const featuresPerTile = maxFeatures / (tileCount * tileCount);
+    const featuresPerTileInt = Math.floor(featuresPerTile);
+    const featuresPerTileFract = featuresPerTile - featuresPerTileInt;
+    const tileSizeX = screenLX / tileCount;
+    const tileSizeY = screenLY / tileCount;
 
     renderer.debugStr = '<br>featuresPerScr: ' + maxFeatures + '<br>featuresPerTile: ' + featuresPerTile.toFixed(2);
 
-    var i, li, top = renderer.config.mapFeaturesSortByTop, tmp, job, featureCount = 0;
-    //var feature, feature2, pp, pp2, o, featureCount = 0;
-    //var drawAllLabels = renderer.drawAllLabels;
+    let i, li, job, feature, featureCount = 0, mx, my;
+    //const feature, feature2, pp, pp2, o, featureCount = 0;
+    //const drawAllLabels = renderer.drawAllLabels;
 
-    var depthTest = (renderer.config.mapFeaturesReduceFactor2 != 0);
-    var depthOffset = -renderer.config.mapFeaturesReduceFactor3;
-    var depthParams = null;
+    const depthTest = (renderer.config.mapFeaturesReduceFactor2 != 0);
+    const depthOffset = -renderer.config.mapFeaturesReduceFactor3;
+    let depthParams = null;
 
     //get top features
-    var featureCache = renderer.gmap;
-    var featureCacheSize = renderer.gmapIndex;
-    var featureCache2 = renderer.gmap2;
-    var featureCacheSize2 = 0;
-    var vmap = renderer.gmap4;
-    var drawAllLabels = renderer.drawAllLabels;
+    const featureCache = renderer.gmap;
+    const featureCacheSize = renderer.gmapIndex;
+    const featureCache2 = renderer.gmap2;
+    let featureCacheSize2 = 0;
+    const vmap = renderer.gmap4;
+    const drawAllLabels = renderer.drawAllLabels;
 
     if (drawAllLabels) {
         maxFeatures = featureCacheSize;
@@ -1052,20 +1049,16 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
         } else {
 
             //distribute top features
-            var hitMap = renderer.gmapHit, usedFeatures = 0;
-            var tileFeatures, count, feature;
+            const hitMap = renderer.gmapHit;
+            //const hitMapCount = renderer.gmapHit;
 
-            var ix,iy,is,pp,tx,ty,mx,my,v,v2,index,o,j;
+            let tileFeatures, count;
+            let ix,iy,pp,tx,ty,mx,my,v,v2,index,o;
 
             ix = screenLX / tileSizeX;
             iy = screenLY / tileSizeY;
             mx = Math.round(ix);
             my = Math.round(iy);
-            //ix = ix - mx;
-            //iy = iy - my;
-
-            var hitMap = renderer.gmapStore;
-            var hitMapCount = renderer.gmapHit;
 
             //clear hit-map
             for (i = 0, li = mx * my; i < li; i++) {
@@ -1148,7 +1141,7 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
                 v = job.reduce[6];
                 pp = feature[5];
 
-                var vmax = getVMapValue(vmap, pp[0] / tileSizeX, pp[1] / tileSizeY, mx, my);
+                const vmax = getVMapValue(vmap, pp[0] / tileSizeX, pp[1] / tileSizeY, mx, my);
 
                 if (v >= vmax) {
 
@@ -1158,7 +1151,7 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
                         o = feature[8];
 
                         depthParams = depthTest ? [pp[0],pp[1]+feature[1],job.reduce,depthOffset] : null;
-                        
+
                         if (job.type == VTS_JOB_LINE_LABEL) {
                             if (renderer.rmap.addLineLabel(job.lastSubJob, depthParams)) {
                                 featureCount++;
@@ -1186,7 +1179,7 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
                 } else {
                     //store v delta
                     feature[0].delta = Math.abs(vmax - v);
-                    featureCache2[featureCacheSize2] = feature; 
+                    featureCache2[featureCacheSize2] = feature;
                     featureCacheSize2++;
                 }
             }
@@ -1205,7 +1198,7 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
                         o = feature[8];
 
                         depthParams = depthTest ? [pp[0],pp[1]+feature[1],job.reduce,depthOffset] : null;
-                        
+
                         if (job.type == VTS_JOB_LINE_LABEL) {
                             if (renderer.rmap.addLineLabel(job.lastSubJob, depthParams)) {
                                 featureCount++;
@@ -1242,14 +1235,14 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
     if (renderer.drawGridCells) {
         gpu.setState(renderer.lineLabelState);
 
-        var x = 0, y = 0, j, lj;
+        let x = 0, y = 0, j, lj;
 
         for (j = 0, lj = my; j < lj; j++) {
             for (i = 0, li = mx; i < li; i++) {
                 x = tileSizeX * i;
                 y = tileSizeY * j;
 
-                var v = vmap[j*mx+i];
+                const v = vmap[j*mx+i];
 
                 draw.drawLineString([[x, y, 0.5], [x+tileSizeX, y, 0.5],
                                      [x+tileSizeX, y+tileSizeY, 0.5], [x, y+tileSizeY, 0.5]], true, 1, [0,0,255,255], null, true, null, null, null);
@@ -1265,4 +1258,3 @@ function processGMap7(gpu, gl, renderer, screenPixelSize, draw) {
 
 
 export {processGMap, processGMap4, processGMap5, processGMap6, processGMap7, radixDepthSortFeatures};
-

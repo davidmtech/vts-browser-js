@@ -3,16 +3,16 @@ import {mat4 as mat4_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
 import {utils as utils_} from '../utils/utils';
 import MapOctree_ from './octree';
-import RenderGroup_ from '../renderer/group';
+//import RenderGroup_ from '../renderer/group';
 import MapGeodataProcessor_ from './geodata-processor/processor';
 
 //get rid of compiler mess
 const mat4 = mat4_, math = math_, utils = utils_;
 const MapOctree = MapOctree_;
-const RenderGroup = RenderGroup_;
+//const RenderGroup = RenderGroup_;
 const MapGeodataProcessor = MapGeodataProcessor_;
 
-var MapGeodataView = function(map, geodata, extraInfo) {
+const MapGeodataView = function(map, geodata, extraInfo) {
     this.map = map;
     this.stats = map.stats;
     this.geodata = geodata;
@@ -24,7 +24,7 @@ var MapGeodataView = function(map, geodata, extraInfo) {
     this.surface = extraInfo.surface;
 
     if (!this.surface.geodataProcessor) {
-        var processor = new MapGeodataProcessor(this, this.onGeodataProcessorMessage.bind(this));
+        const processor = new MapGeodataProcessor(this, this.onGeodataProcessorMessage.bind(this));
         processor.setStylesheet(this.surface.stylesheet);
         this.surface.geodataProcessor = processor;
         this.map.geodataProcessors.push(processor);
@@ -56,7 +56,7 @@ MapGeodataView.prototype.kill = function() {
 MapGeodataView.prototype.killGeodataView = function(killedByCache) {
     this.killedByCache = killedByCache;
 
-    for (var i = 0, li = this.gpuGroups.length; i < li; i++) {
+    for (let i = 0, li = this.gpuGroups.length; i < li; i++) {
         this.gpuGroups[i].kill();
     }
 
@@ -78,14 +78,14 @@ MapGeodataView.prototype.killGeodataView = function(killedByCache) {
 
 MapGeodataView.prototype.processPackedCommands = function(buffer, index) {
 
-    var maxIndex = buffer.byteLength;
-    var maxTime = this.map.config.mapMaxGeodataProcessingTime;
-    var t = performance.now(), length, str, data;
-    var view = new DataView(buffer.buffer);
+    const maxIndex = buffer.byteLength;
+    const maxTime = this.map.config.mapMaxGeodataProcessingTime;
+    const view = new DataView(buffer.buffer);
+    let t = performance.now(), length, str, data;
 
     do {
 
-        var command = buffer[index]; index += 1;
+        const command = buffer[index]; index += 1;
 
         switch(command) {
             case VTS_WORKERCOMMAND_GROUP_BEGIN:
@@ -94,7 +94,7 @@ MapGeodataView.prototype.processPackedCommands = function(buffer, index) {
                 str = utils.unint8ArrayToString(new Uint8Array(buffer.buffer, index, length)); index+= length;
                 data = JSON.parse(str);
 
-                this.currentGpuGroup = new RenderGroup(data['id'], data['bbox'], data['origin'], this.gpu, this.renderer);
+                this.currentGpuGroup = this.renderer.gpu.createRenderGroup(data['id'], data['bbox'], data['origin']);
                 this.gpuGroups.push(this.currentGpuGroup);
 
                 //console.log('VTS_WORKERCOMMAND_GROUP_BEGIN ' + (this.tile ? JSON.stringify(this.tile.id) : '[free]'));
@@ -152,7 +152,7 @@ MapGeodataView.prototype.onGeodataProcessorMessage = function(command, message, 
         //console.log('pack size:' + message['buffer'].byteLength);
 
         if (task) {
-            var index = this.processPackedCommands(message['buffer'], message.index);
+            const index = this.processPackedCommands(message['buffer'], message.index);
 
             if (index < 0) {
                 this.map.markDirty();
@@ -204,21 +204,21 @@ MapGeodataView.prototype.directParseNode = function(node, lod) {
 
     this.currentGpuGroup.addRenderJob2(null, null, this.tile, { type: VTS_WORKER_TYPE_NODE_BEGIN, data: {'volume': node.volume, 'precision': node.precision, 'tileset': node.tileset }});
 
-    var meshes = node['meshes'] || [];
-    var i, li;
+    const meshes = node['meshes'] || [];
+    let i, li;
 
     //loop elements
     for (i = 0, li = meshes.length; i < li; i++) {
         this.currentGpuGroup.addRenderJob2(null, null, this.tile, { type: VTS_WORKER_TYPE_MESH, data: { 'path':meshes[i] } });
     }
 
-    var nodes = node['nodes'] || [];
+    const nodes = node['nodes'] || [];
 
     for (i = 0, li = nodes.length; i < li; i++) {
         this.directParseNode(nodes[i], lod+1);
     }
 
-    var loadNodes = node['loadNodes'] || [];
+    const loadNodes = node['loadNodes'] || [];
 
     for (i = 0, li = loadNodes.length; i < li; i++) {
         this.currentGpuGroup.addRenderJob2(null, null, this.tile, { type: VTS_WORKER_TYPE_LOAD_NODE, data: { 'path':loadNodes[i] } });
@@ -234,12 +234,13 @@ MapGeodataView.prototype.directParse = function(data) {
         return;
     }
 
-    var nodes = data['nodes'] || [];
+    const nodes = data['nodes'] || [];
 
-    for (var i = 0, li = nodes.length; i < li; i++) {
+    for (let i = 0, li = nodes.length; i < li; i++) {
 
         //VTS_WORKERCOMMAND_GROUP_BEGIN
-        this.currentGpuGroup = new RenerGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
+        this.currentGpuGroup = this.renderer.gpu.createRenderGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/);
+
         this.gpuGroups.push(this.currentGpuGroup);
 
         this.directParseNode(nodes[i], 0);
@@ -251,7 +252,7 @@ MapGeodataView.prototype.directParse = function(data) {
 
 
 MapGeodataView.prototype.directBinParse = function(path) {
-    this.currentGpuGroup = new RenderGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
+    this.currentGpuGroup = this.renderer.gpu.createRenderGroup(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/);
     this.gpuGroups.push(this.currentGpuGroup);
     this.currentGpuGroup.binPath = path;
     this.currentGpuGroup.octreeParser = new MapOctree(null /*data['id']*/, null /*data['bbox']*/, null /*data['origin']*/, this.gpu, this.renderer);
@@ -264,7 +265,7 @@ MapGeodataView.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) 
         return false;
     }
 
-    var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
+    const doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
 
     if (!this.ready && !this.processing && !doNotLoad && this.surface.stylesheet.isReady()) {
@@ -285,7 +286,7 @@ MapGeodataView.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) 
                 this.map.markDirty();
                 this.ready = true;
             } else {
-                var geodata = this.geodata.geodata;
+                const geodata = this.geodata.geodata;
 
                 this.processing = true;
                 this.killedByCache = false;
@@ -312,7 +313,7 @@ MapGeodataView.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu) 
 
 
 MapGeodataView.prototype.getWorldMatrix = function(bbox, geoPos, matrix) {
-    var m = matrix;
+    let m = matrix;
 
     if (m != null) {
         m[0] = 1; m[1] = 0; m[2] = 0; m[3] = 0;
@@ -333,16 +334,16 @@ MapGeodataView.prototype.getWorldMatrix = function(bbox, geoPos, matrix) {
 MapGeodataView.prototype.draw = function(cameraPos) {
     if (this.ready) {
 
-        var renderer = this.renderer;
-        var tiltAngle = this.tile ? Math.abs(this.tile.tiltAngle) : renderer.cameraTiltFator;
-        var useSuperElevation = renderer.useSuperElevation;
+        const renderer = this.renderer;
+        const tiltAngle = this.tile ? Math.abs(this.tile.tiltAngle) : renderer.cameraTiltFator;
+        const useSuperElevation = renderer.useSuperElevation;
 
-        for (var i = 0, li = this.gpuGroups.length; i < li; i++) {
-            var group = this.gpuGroups[i];
+        for (let i = 0, li = this.gpuGroups.length; i < li; i++) {
+            const group = this.gpuGroups[i];
             group.drawChannel = this.map.draw.drawChannel;
 
             if (group.rootNode || group.binPath) {
-                group.draw(mv, mvp, null, tiltAngle, (this.tile ? this.tile.texelSize : 1));
+                group.draw(null /*mv*/, null /*mvp*/, null, tiltAngle, (this.tile ? this.tile.texelSize : 1));
                 continue;
             }
 
@@ -350,9 +351,9 @@ MapGeodataView.prototype.draw = function(cameraPos) {
                 continue; //TODO: remove empty groups
             }
 
-            var mvp = group.mvp;
-            var mv = group.mv;
-            var mtmp = mvp; //use it as tmp matrix
+            const mvp = group.mvp;
+            const mv = group.mv;
+            const mtmp = mvp; //use it as tmp matrix
 
             if (useSuperElevation) {
                 //mat4.set(renderer.camera.getModelviewFMatrix(), mv);
@@ -361,7 +362,7 @@ MapGeodataView.prototype.draw = function(cameraPos) {
                 mat4.multiply(renderer.camera.getModelviewFMatrix(), this.getWorldMatrix(group.bbox, cameraPos, mtmp), mv);
             }
 
-            var proj = renderer.camera.getProjectionFMatrix();
+            const proj = renderer.camera.getProjectionFMatrix();
             mat4.multiply(proj, mv, mvp);
 
             group.draw(mv, mvp, null, tiltAngle, (this.tile ? this.tile.texelSize : 1));

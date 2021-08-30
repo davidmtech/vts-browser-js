@@ -4,14 +4,14 @@ import {utils as utils_} from '../../../core/utils/utils';
 import {vec3 as vec3_} from '../../../core/utils/matrix';
 
 //get rid of compiler mess
-var dom = Dom_,
-    utils = utils_,
-    vec3 = vec3_,
-    UIControlMeasureIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2lpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpkNjI1MjFjMi1mYzE5LTcyNDUtOTI5My1kNTU3MmE5N2E1MjgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6ODJGRUI2NzE2NzkwMTFFN0EzRUZFNzQ1NEFCMkVFQUQiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ODJGRUI2NzA2NzkwMTFFN0EzRUZFNzQ1NEFCMkVFQUQiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjRBMjkwN0JENjc4QzExRTc5QTQwRjk4NjQzOEI4RDczIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjRBMjkwN0JFNjc4QzExRTc5QTQwRjk4NjQzOEI4RDczIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+k3ySjQAAAdJJREFUeNrclk0oBGEYgHemjZOLm8tSyt9BqT2I1O7JSdSSkpsDxZGLi5MTjn5K4SDh4OfiaPfkIDebOPiPUqKUiLKet96pzzT7MztxMPX0le+b95n3Z2ZZmUwm9NuXHfqLK1smsVhsED5hKkhswc4mYJmHVxgNIvIslyE4hnLYDSqycwiaoCGVSnUFFdk5BH2wKHtBRbYKqlVwbQhGoNU5GETkZHKpggjMqaBFhaGgIltv/mKphRuQss1oZkPuG4oRWTLHlmU5fSlhOYNKSEK7xIUugj+6hmSHpROm2RvL9Q7arqf80IykdDEdgll4IWi/Bm+ECT8Z2R7l+DBKV6N/PoRnEbBuwIKf0nm+8S7RGuzDLaxLMuw/5OuR+bn60ROPt9/pUUQnUEa6A56SyeSWeTYejzs9GkC8ZIpySjxEy1APbdCM6MAlGmeZdIahYIlLVAU9kIA7KZFxrJrA5+bU8RBjBf+eGD26gk0oI4AItiU4dMOqHh+GTylbQT3JU7oj2IMLmNBJrIATKIUoD5L2LfEQJbRPvXAP0iPZj5J92vNl9Fk6mSCZsBV4dwuyflb8XJrRqX6C3iDsFhSdiXOzZlSnwxD2yuBHJv/iX6JvAQYAPSICqA82OnoAAAAASUVORK5CYII=',
-    UIControlMeasureIcon2 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo2Nzg3NzczMzY3OEMxMUU3QjU2QUUxNTNCNzc4MzVBQiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo2Nzg3NzczNDY3OEMxMUU3QjU2QUUxNTNCNzc4MzVBQiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjY3ODc3NzMxNjc4QzExRTdCNTZBRTE1M0I3NzgzNUFCIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjY3ODc3NzMyNjc4QzExRTdCNTZBRTE1M0I3NzgzNUFCIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+owD8TQAAAepJREFUeNrcls8rBGEYx993lIMfxR4kF/+AKMqBg7K1ajelLEWK025tKOTnjVykuAklNgcHuzmQg4MiTtz4Aza3TeGActDr+45nZt41s7tmBwdbn2l35933M9/3eead5UII9tsvjf3FK2uSiGgBKdDtZW6JllXA2DG4A3teRM7LZQl2QRuY9irScghGQRXb5KteRVoOQSMY0895FGkk8JHgSBH0gllzpAeRkeSRBAEwQIIZUJMxukARly3GOZdpivA5DnpAM2iQ5zFx3KE55DIugT6cT+a7PTTlKt9xHAT74AzU6vWJiEVQ4iWR9uXHhkgu3QhYB/JK3zBZE6WoBkE3Ivt9YolOQBd9uwJedQFjC+A8XyJ1J3G+4zNFV+CCmmMejINnY8sQG0wVzZnFlnW2Fd55ezGaIUAtPgzqwAsmv8mYMCLW8DaqdyY1g73w+RMFQRh0glse1RtDHRvDcdJp6XInsScKU3u3gnukSfCoOcoH0YPa3jif/P7zxEqUoPqUkWBZ398YqwdTNHqLdu+YuyTONToEl+AaTIAhUE61qwTtuJC0e4klkssQAn7QTy3+BA5AhRQgfdoovHvJp6iYli5EdTqlBKZA7a7CJFaiHdABUqBUFfyMxBJt06PBrwpskn/xl+hDgAEAH0j0b9rsgVUAAAAASUVORK5CYII=';
+const dom = Dom_,
+      utils = utils_,
+      vec3 = vec3_,
+      UIControlMeasureIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2lpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpkNjI1MjFjMi1mYzE5LTcyNDUtOTI5My1kNTU3MmE5N2E1MjgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6ODJGRUI2NzE2NzkwMTFFN0EzRUZFNzQ1NEFCMkVFQUQiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ODJGRUI2NzA2NzkwMTFFN0EzRUZFNzQ1NEFCMkVFQUQiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjRBMjkwN0JENjc4QzExRTc5QTQwRjk4NjQzOEI4RDczIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjRBMjkwN0JFNjc4QzExRTc5QTQwRjk4NjQzOEI4RDczIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+k3ySjQAAAdJJREFUeNrclk0oBGEYgHemjZOLm8tSyt9BqT2I1O7JSdSSkpsDxZGLi5MTjn5K4SDh4OfiaPfkIDebOPiPUqKUiLKet96pzzT7MztxMPX0le+b95n3Z2ZZmUwm9NuXHfqLK1smsVhsED5hKkhswc4mYJmHVxgNIvIslyE4hnLYDSqycwiaoCGVSnUFFdk5BH2wKHtBRbYKqlVwbQhGoNU5GETkZHKpggjMqaBFhaGgIltv/mKphRuQss1oZkPuG4oRWTLHlmU5fSlhOYNKSEK7xIUugj+6hmSHpROm2RvL9Q7arqf80IykdDEdgll4IWi/Bm+ECT8Z2R7l+DBKV6N/PoRnEbBuwIKf0nm+8S7RGuzDLaxLMuw/5OuR+bn60ROPt9/pUUQnUEa6A56SyeSWeTYejzs9GkC8ZIpySjxEy1APbdCM6MAlGmeZdIahYIlLVAU9kIA7KZFxrJrA5+bU8RBjBf+eGD26gk0oI4AItiU4dMOqHh+GTylbQT3JU7oj2IMLmNBJrIATKIUoD5L2LfEQJbRPvXAP0iPZj5J92vNl9Fk6mSCZsBV4dwuyflb8XJrRqX6C3iDsFhSdiXOzZlSnwxD2yuBHJv/iX6JvAQYAPSICqA82OnoAAAAASUVORK5CYII=',
+      UIControlMeasureIcon2 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo2Nzg3NzczMzY3OEMxMUU3QjU2QUUxNTNCNzc4MzVBQiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo2Nzg3NzczNDY3OEMxMUU3QjU2QUUxNTNCNzc4MzVBQiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjY3ODc3NzMxNjc4QzExRTdCNTZBRTE1M0I3NzgzNUFCIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjY3ODc3NzMyNjc4QzExRTdCNTZBRTE1M0I3NzgzNUFCIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+owD8TQAAAepJREFUeNrcls8rBGEYx993lIMfxR4kF/+AKMqBg7K1ajelLEWK025tKOTnjVykuAklNgcHuzmQg4MiTtz4Aza3TeGActDr+45nZt41s7tmBwdbn2l35933M9/3eead5UII9tsvjf3FK2uSiGgBKdDtZW6JllXA2DG4A3teRM7LZQl2QRuY9irScghGQRXb5KteRVoOQSMY0895FGkk8JHgSBH0gllzpAeRkeSRBAEwQIIZUJMxukARly3GOZdpivA5DnpAM2iQ5zFx3KE55DIugT6cT+a7PTTlKt9xHAT74AzU6vWJiEVQ4iWR9uXHhkgu3QhYB/JK3zBZE6WoBkE3Ivt9YolOQBd9uwJedQFjC+A8XyJ1J3G+4zNFV+CCmmMejINnY8sQG0wVzZnFlnW2Fd55ezGaIUAtPgzqwAsmv8mYMCLW8DaqdyY1g73w+RMFQRh0glse1RtDHRvDcdJp6XInsScKU3u3gnukSfCoOcoH0YPa3jif/P7zxEqUoPqUkWBZ398YqwdTNHqLdu+YuyTONToEl+AaTIAhUE61qwTtuJC0e4klkssQAn7QTy3+BA5AhRQgfdoovHvJp6iYli5EdTqlBKZA7a7CJFaiHdABUqBUFfyMxBJt06PBrwpskn/xl+hDgAEAH0j0b9rsgVUAAAAASUVORK5CYII=';
 
 
-var UIControlMeasure = function(ui, visible, visibleLock) {
+const UIControlMeasure = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('measure',
@@ -49,9 +49,9 @@ var UIControlMeasure = function(ui, visible, visibleLock) {
             + '<div id="vts-measure-undo" class="vts-measure-tools-button">Undo</div>'
             + '<div id="vts-measure-compute" class="vts-measure-tools-button">Compute</div>'
         + '</div>'
-        
+
      + ' </div>', visible, visibleLock);
-     
+
     this.div = this.control.getElement('vts-measure');
 
     this.buttonOff = this.control.getElement('vts-measure-button');
@@ -65,19 +65,19 @@ var UIControlMeasure = function(ui, visible, visibleLock) {
     this.info = this.control.getElement('vts-measure-info');
     this.compute = this.control.getElement('vts-measure-buttons');
 
-    var computeButton = this.control.getElement('vts-measure-undo');
-    computeButton.on('click', this.onCompute.bind(this, 0));
-    computeButton.on('dblclick', this.onDoNothing.bind(this));
-    computeButton = this.control.getElement('vts-measure-compute');
+    const undoButton = this.control.getElement('vts-measure-undo');
+    undoButton.on('click', this.onCompute.bind(this, 0));
+    undoButton.on('dblclick', this.onDoNothing.bind(this));
+    const computeButton = this.control.getElement('vts-measure-compute');
     computeButton.on('click', this.onCompute.bind(this, 1));
     computeButton.on('dblclick', this.onDoNothing.bind(this));
 
-    var clearButton = this.control.getElement('vts-measure-clear');
+    const clearButton = this.control.getElement('vts-measure-clear');
     clearButton.on('click', this.onClear.bind(this));
     clearButton.on('dblclick', this.onDoNothing.bind(this));
 
     this.toolButtons = [];
-    var toolButton = this.control.getElement('vts-measure-position');
+    let toolButton = this.control.getElement('vts-measure-position');
     toolButton.on('click', this.onTool.bind(this, 0));
     toolButton.on('dblclick', this.onDoNothing.bind(this));
     this.toolButtons.push(toolButton);
@@ -122,7 +122,7 @@ var UIControlMeasure = function(ui, visible, visibleLock) {
     } else {
         this.buttonOn.setStyle('display', 'none');
         this.buttonOff.setStyle('display', 'block');
-    }    
+    }
 
     this.onMouseMoveCall = this.onMouseMove.bind(this);
     this.onMouseLeaveCall = this.onMouseLeave.bind(this);
@@ -134,35 +134,35 @@ var UIControlMeasure = function(ui, visible, visibleLock) {
 
 
 UIControlMeasure.prototype.onDoNothing = function(event) {
-    dom.stopPropagation(event);    
+    dom.stopPropagation(event);
 };
 
 
-UIControlMeasure.prototype.onMouseLeave = function(event) {
+UIControlMeasure.prototype.onMouseLeave = function(/*event*/) {
     this.info.setStyle('display', 'none');
 };
 
 
 UIControlMeasure.prototype.onMouseClick = function(event) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var mapElement = this.ui.getMapElement();
-    var state = mapElement.getDraggingState();
+    const mapElement = this.ui.getMapElement();
+    const state = mapElement.getDraggingState();
 
     //if (state['dragging']) { //TODO: why does not work this parameter? Fix it once you have time
       //  return;
     //}
-    var delta = state['absMoved'];
+    const delta = state['absMoved'];
 
     if ((delta[0]+delta[1]) > 0) {
         return;
     }
 
-    var coords = event.getMouseCoords();
-    var clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
+    const coords = event.getMouseCoords();
+    let clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
 
     map.redraw();
 
@@ -170,8 +170,8 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
         return;
     }
 
-    var i, li, res, str;
-    var space = '  ';
+    let i, li, res, str;
+    let space = '  ';
 
     for (i = 0, li = ('' + this.counter).length; i < li; i++) {
         space += ' ';
@@ -186,7 +186,7 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
         str += '\n' + space + clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + this.getTextNumber(clickCoords[2]);
         this.counter++;
 
-    } else if (this.tool == 1) { 
+    } else if (this.tool == 1) {
         if (!this.navCoords || this.navCoords.length == 2) {
             this.navCoords = [clickCoords];
             clickCoords = map.convertCoordsFromNavToPublic(clickCoords, 'fix');
@@ -197,7 +197,7 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
         } else {
             this.navCoords.push(clickCoords);
             clickCoords = map.convertCoordsFromNavToPublic(clickCoords, 'fix');
-            
+
             str = space + 'p2: ' + clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + this.getTextNumber(clickCoords[2]);
             str += '\n' + space + '------------------------';
 
@@ -209,7 +209,7 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
 
             this.counter++;
         }
-    } else if (this.tool == 2) { 
+    } else if (this.tool == 2) {
         if (this.renderCounter != this.counter) {
             this.renderCounter = this.counter;
             this.onTool(2);
@@ -227,7 +227,7 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
 
             str = space + 'p' + this.navCoords.length + ': ' + clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + this.getTextNumber(clickCoords[2]);
         }
-    } else if (this.tool == 3 || this.tool == 4) { 
+    } else if (this.tool == 3 || this.tool == 4) {
         if (this.renderCounter != this.counter) {
             this.renderCounter = this.counter;
             this.onTool(this.tool);
@@ -250,7 +250,7 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
     this.lastCoords = clickCoords;
 
     if (str) {
-        var listElement = this.list.getElement();
+        const listElement = this.list.getElement();
         listElement.value += str + '\n';
         listElement.scrollTop = listElement.scrollHeight;    //scroll list to the last line
     }
@@ -258,22 +258,22 @@ UIControlMeasure.prototype.onMouseClick = function(event) {
 
 
 UIControlMeasure.prototype.onMouseMove = function(event) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var coords = event.getMouseCoords();
-    var clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
+    const coords = event.getMouseCoords();
+    let clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
 
     if (!clickCoords) {
         this.info.setStyle('display', 'none');
-        return;    
+        return;
     }
 
     clickCoords = map.convertCoordsFromNavToPublic(clickCoords, 'fix');
 
-    var str = clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + this.getTextNumber(clickCoords[2]);
+    const str = clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + this.getTextNumber(clickCoords[2]);
 
     coords[0] -= this.divRect.left;
     coords[1] -= this.divRect.top;
@@ -288,7 +288,7 @@ UIControlMeasure.prototype.onMouseMove = function(event) {
 UIControlMeasure.prototype.onSwitch = function() {
     this.measuring = !this.measuring;
 
-    var mapElement = this.ui.getMapElement();
+    const mapElement = this.ui.getMapElement();
 
     if (this.measuring) {
         this.buttonOn.setStyle('display', 'block');
@@ -308,7 +308,7 @@ UIControlMeasure.prototype.onSwitch = function() {
         mapElement.off('mousemove', this.onMouseMoveCall);
         mapElement.off('mouseleave', this.onMouseLeaveCall);
         mapElement.off('click', this.onMouseClickCall);
-        
+
         if (this.mapUpdateDestructor) {
             this.mapUpdateDestructor();
         }
@@ -318,7 +318,7 @@ UIControlMeasure.prototype.onSwitch = function() {
 
     this.compute.setStyle('display', 'none');
 
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (map) {
         map.redraw();
     }
@@ -339,13 +339,13 @@ UIControlMeasure.prototype.onTool = function(tool) {
 
     this.compute.setStyle('display', 'none');
 
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         this.toolButtons[i].setClass('vts-measure-tools-button');
     }
 
     this.toolButtons[tool].setClass('vts-measure-tools-button-selected');
 
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (map) {
         map.redraw();
     }
@@ -357,23 +357,24 @@ UIControlMeasure.prototype.onCompute = function(button) {
         return;
     }
 
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var str, i, li, space;
-    var listElement = this.list.getElement();
+    let str, i, li, space;
+    let coords, coords2, res;
+    const listElement = this.list.getElement();
 
     if (button == 0) { //undo button
         this.navCoords.pop();
     } else { //compute button
         if (this.tool == 2) {
 
-            var distance = 0;
-            var distance2 = 0, coords, coords2, res;
-            var emin = Number.POSITIVE_INFINITY;
-            var emax = Number.NEGATIVE_INFINITY;
+            let distance = 0;
+            let distance2 = 0;
+            let emin = Number.POSITIVE_INFINITY;
+            let emax = Number.NEGATIVE_INFINITY;
 
             space = '  ';
 
@@ -415,7 +416,7 @@ UIControlMeasure.prototype.onCompute = function(button) {
         if (this.tool == 3) {
             console.log(JSON.stringify(this.navCoords));
 
-            var geodata = map.createGeodata();
+            const geodata = map.createGeodata();
             geodata.addPolygon3(this.navCoords, [], null, 'fix', {}, 'tmp-polygon');
             geodata.processHeights('node-by-lod', 62, (function(){
 
@@ -427,9 +428,9 @@ UIControlMeasure.prototype.onCompute = function(button) {
 
                 str = space + '------------------------';
 
-                var poly = geodata.extractGeometry('tmp-polygon');
+                const poly = geodata.extractGeometry('tmp-polygon');
 
-                var area = poly.getSurfaceArea()
+                const area = poly.getSurfaceArea()
 
                 if (this.metric) {
                     str += '\n' +  space + 'area: ' + area.toFixed(2) + ' m\u00B2';
@@ -452,7 +453,7 @@ UIControlMeasure.prototype.onCompute = function(button) {
                     if ((area / 4046.8564224) >= 1) {
                         str += '\n' +  space + '      ' + (area / 4046.8564224).toFixed(2) + ' acres';
                     }
-                    
+
                     if ((area / 2589988.110346) >= 1) {
                         str += '\n' +  space + '      ' + (area / 2589988.110346).toFixed(2) + ' mi\u00B2';
                     }
@@ -465,7 +466,7 @@ UIControlMeasure.prototype.onCompute = function(button) {
 
         if (this.tool == 4) {
 
-            var center = [0,0,0];
+            const center = [0,0,0];
 
             for (i = 0, li = this.navCoords.length; i < li; i++) {
                 coords = map.convertCoordsFromNavToPhys(this.navCoords[i], 'fix');
@@ -478,7 +479,7 @@ UIControlMeasure.prototype.onCompute = function(button) {
             center[1] /= li;
             center[2] /= li;
 
-            var radius = 0, dx, dy, dz, distance;
+            let radius = 0, dx, dy, dz, distance;
 
             for (i = 0, li = this.navCoords.length; i < li; i++) {
                 coords = map.convertCoordsFromNavToPhys(this.navCoords[i], 'fix');
@@ -492,7 +493,7 @@ UIControlMeasure.prototype.onCompute = function(button) {
                 }
             }
 
-            var geodata = map.createGeodata();
+            const geodata = map.createGeodata();
 
             if (radius > 30000) {
                 geodata.addPolygon3(this.navCoords, [], null, 'fix', {}, 'tmp-polygon');
@@ -512,23 +513,23 @@ UIControlMeasure.prototype.onCompute = function(button) {
 
                 str = space + '------------------------';
 
-                var poly = geodata.extractGeometry('tmp-polygon');
+                const poly = geodata.extractGeometry('tmp-polygon');
 
-                var faces = new Array(poly.getElements());
+                const faces = new Array(poly.getElements());
 
                 for (i = 0, li = faces.length; i < li; i++) {
                     faces[i] = poly.getElement(i);
                 }
 
-                var renderer = this.browser.getRenderer();
-                var x, y, north, east;
+                const renderer = this.browser.getRenderer();
+                let x, north, east;
 
                 coords = map.convertCoordsFromPhysToNav(center, 'fix');
 
-                var texelSize = radius * 0.0030; //0.15 texel size for 100m diameter 
-                var core = this.browser.getCore();
+                const texelSize = radius * 0.0030; //0.15 texel size for 100m diameter
+                const core = this.browser.getCore();
 
-                var traceVolumeCall = (function(terrain){
+                const traceVolumeCall = (function(terrain){
 
                     str = listElement.value;
                     str = str.substr(0, str.lastIndexOf('loading data ...'));
@@ -539,22 +540,22 @@ UIControlMeasure.prototype.onCompute = function(button) {
                         return;
                     }
 
-                    var octree = renderer.buildOctreeFromGeometry(terrain);
+                    const octree = renderer.buildOctreeFromGeometry(terrain);
 
-                    var ned = map.getNED(coords, false);
+                    const ned = map.getNED(coords, false);
                     north = ned.direction;
                     east = ned.east;
 
-                    var steps = 25, l, sx, sy, res2, dir = [0,0,0], delta;
-                    var sampleArea = (1.0 / steps) * radius;
-                    var volumeAbove = 0;
-                    var volumeBelow = 0;
+                    let steps = 25, sx, sy, res2, dir = [0,0,0], delta;
+                    let sampleArea = (1.0 / steps) * radius;
+                    let volumeAbove = 0;
+                    let volumeBelow = 0;
 
                     sampleArea *= sampleArea;
 
-                    var y = -steps;
+                    let y = -steps;
 
-                    var traceVolumeLine = (function(){
+                    const traceVolumeLine = (function(){
 
                         for (x = -steps; x <= steps; x++) {
 
@@ -593,13 +594,13 @@ UIControlMeasure.prototype.onCompute = function(button) {
                             str += 'computation progress: ' + (((y + steps) / (steps*2))*100).toFixed(1) + ' %';
                         } else {
                             str = str.substr(0, str.lastIndexOf('computation progress:'));
-                            
+
                             if (this.metric) {
                                 str += 'volume above: ' + volumeAbove.toFixed(2) + ' m\u00B3';
                                 str += '\n' +  space + 'volume below: ' + volumeBelow.toFixed(2) + ' m\u00B3';
                                 str += '\n' +  space + 'volume combined: ' + (volumeAbove + volumeBelow).toFixed(2) + ' m\u00B3' + '\n';
                             } else {
-                                var yd2m = 0.764554857984;
+                                const yd2m = 0.764554857984;
                                 str += 'volume above: ' + (volumeAbove/yd2m).toFixed(2) + ' yd\u00B3';
                                 str += '\n' +  space + 'volume below: ' + (volumeBelow/yd2m).toFixed(2) + ' yd\u00B3';
                                 str += '\n' +  space + 'volume combined: ' + ((volumeAbove + volumeBelow)/yd2m).toFixed(2) + ' yd\u00B3' + '\n';
@@ -629,7 +630,8 @@ UIControlMeasure.prototype.onCompute = function(button) {
                 listElement.scrollTop = listElement.scrollHeight;    //scroll list to the last line
                 str = null;
 
-                var destructor = map.getSurfaceAreaGeometry(coords, radius, 'texelSize', texelSize, traceVolumeCall, false);
+                // eslint-disable-next-line
+                const destructor = map.getSurfaceAreaGeometry(coords, radius, 'texelSize', texelSize, traceVolumeCall, false);
 
             }
 
@@ -648,15 +650,15 @@ UIControlMeasure.prototype.onCompute = function(button) {
 };
 
 UIControlMeasure.prototype.hitFace = function(origin, dir, face) {
-    var EPSILON = 0.0000001; 
-    var v1 = face[0];
-    var v2 = face[1];  
-    var v3 = face[2];
+    const EPSILON = 0.0000001;
+    const v1 = face[0];
+    const v2 = face[1];
+    const v3 = face[2];
 
-    var h = [0,0,0], q = [0,0,0], s;
-    var a,f,u,v;
-    var edge1 = [v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]];
-    var edge2 = [v3[0] - v1[0], v3[1] - v1[1], v3[2] - v1[2]];
+    let h = [0,0,0], q = [0,0,0], s;
+    let a,f,u,v;
+    const edge1 = [v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]];
+    const edge2 = [v3[0] - v1[0], v3[1] - v1[1], v3[2] - v1[2]];
 
     vec3.cross(dir, edge2, h);
     a = vec3.dot(edge1, h);
@@ -680,7 +682,7 @@ UIControlMeasure.prototype.hitFace = function(origin, dir, face) {
     }
 
     // At this stage we can compute t to find out where the intersection point is on the line.
-    var t = f * vec3.dot(edge2, q);
+    const t = f * vec3.dot(edge2, q);
     //if (t > EPSILON) { // ray intersection
         return [true, t]; //[origin[0] + dir[0] * t, origin[1] + dir[1] * t, origin[2] + dir[2] * t ]];
     //} else { // This means that there is a line intersection but not a ray intersection.
@@ -690,14 +692,14 @@ UIControlMeasure.prototype.hitFace = function(origin, dir, face) {
 
 
 UIControlMeasure.prototype.hitFaces = function(coords, dir, faces) {
-    var hit = false, t = Number.POSITIVE_INFINITY;
+    let hit = false, t = Number.POSITIVE_INFINITY;
 
-    for (var i = 0, li = faces.length; i < li; i++) {
-        var res = this.hitFace(coords, dir, faces[i]);
+    for (let i = 0, li = faces.length; i < li; i++) {
+        const res = this.hitFace(coords, dir, faces[i]);
 
         if (res[0]) {
             hit = true;
-            
+
             if (res[1] < t) {
                 t = res[1];
             }
@@ -714,13 +716,13 @@ UIControlMeasure.prototype.onClear = function() {
     this.lastCoords = null;
     this.navCoords = null;
 
-    var listElement = this.list.getElement();
+    const listElement = this.list.getElement();
     listElement.value = '';
     listElement.scrollTop = 0;
 
     this.compute.setStyle('display', 'none');
 
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (map) {
         map.redraw();
     }
@@ -728,23 +730,21 @@ UIControlMeasure.prototype.onClear = function() {
 
 
 UIControlMeasure.prototype.update = function() {
-    //var button = this.control.getElement('vts-measure-button');
-    
-    var left = 10 + (this.ui.config.controlZoom ? 70 : 0) +
-                (this.ui.config.controlSpace ? 35 : 0);
-    
+    const left = 10 + (this.ui.config.controlZoom ? 70 : 0) +
+                 (this.ui.config.controlSpace ? 35 : 0);
+
     this.div.setStyle('left', left + 'px');
     this.listPanel.setStyle('display', this.measuring ? 'block' : 'none');
 };
 
 
 UIControlMeasure.prototype.onMapUpdate = function() {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var renderer = this.browser.getRenderer();
+    const renderer = this.browser.getRenderer();
 
     if (!this.circleImage) {
         this.circleImage = utils.loadImage(
@@ -760,7 +760,7 @@ UIControlMeasure.prototype.onMapUpdate = function() {
         return;
     }
 
-    var i, li, coords, points, wpoints;
+    let i, li, coords, points;
 
     switch(this.tool) {
         case 0: //point
@@ -796,7 +796,7 @@ UIControlMeasure.prototype.onMapUpdate = function() {
 
                 if (li > 1) {
 
-                    var points2 = [], points3 = [], tmp;
+                    let points2 = [], points3 = [], tmp;
 
                     for (i = 0, li = this.navCoords.length - 1; i < li; i++) {
                         tmp = map.getGeodesicLinePoints(this.navCoords[i], this.navCoords[i+1]);
@@ -858,7 +858,7 @@ UIControlMeasure.prototype.onMapUpdate = function() {
     if ((this.tool == 2 || this.tool == 3 || this.tool == 4) && points) {
         if (points.length < 2 || this.renderCounter != this.counter) {
             this.compute.setStyle('display', 'none');
-            return;    
+            return;
         }
 
         coords = points[points.length - 1];
@@ -873,7 +873,7 @@ UIControlMeasure.prototype.onMapUpdate = function() {
 };
 
 UIControlMeasure.prototype.getTextNumber = function(value) {
-    var m2ft = 3.28084, km2mi = 0.621371;
+    const m2ft = 3.28084, km2mi = 0.621371;
 
     if (value >= 100000) {
         return (this.metric) ? (value*0.001).toFixed(2) + 'km' : (value*0.001*km2mi).toFixed(2) + 'mi';
@@ -883,4 +883,3 @@ UIControlMeasure.prototype.getTextNumber = function(value) {
 };
 
 export {UIControlMeasure , UIControlMeasureIcon, UIControlMeasureIcon2};
-

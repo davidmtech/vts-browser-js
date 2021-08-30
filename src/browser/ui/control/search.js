@@ -6,32 +6,32 @@ import {vec3 as vec3_} from '../../../core/utils/matrix';
 import {math as math_} from '../../../core/utils/math';
 
 //get rid of compiler mess
-var dom = Dom_;
-var vec3 = vec3_;
-var math = math_;
-var utils = utils_;
-var filterSearch = filterSearch_;
-var nofilterSearch = nofilterSearch_;
+const dom = Dom_;
+const vec3 = vec3_;
+const math = math_;
+const utils = utils_;
+const filterSearch = filterSearch_;
+const nofilterSearch = nofilterSearch_;
 
-var UIControlSearch = function(ui, visible, visibleLock) {
+const UIControlSearch = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
-    
-    var element = this.browser.config.controlSearchElement;
+
+    let element = this.browser.config.controlSearchElement;
     if (element) {
         if (typeof element === 'string') {
             element = document.getElementById(element);
         }
     }
-    
+
     this.control = this.ui.addControl('search',
       '<div class="vts-search">'
-      + '<div class="vts-search-input"><input type="text" id="vts-search-input" autocomplete="off" spellcheck="false" placeholder="Search location..."></div>'      
-      + '<div id="vts-search-list" class="vts-search-list"></div>'      
+      + '<div class="vts-search-input"><input type="text" id="vts-search-input" autocomplete="off" spellcheck="false" placeholder="Search location..."></div>'
+      + '<div id="vts-search-list" class="vts-search-list"></div>'
       + '</div>', visible, visibleLock, element);
 
     this.input = this.control.getElement('vts-search-input');
-    
+
     //this.input.on("change", this.onChange.bind(this));
     this.input.on('input', this.onChange.bind(this));
     this.input.on('keydown', this.onKeyUp.bind(this));
@@ -49,7 +49,7 @@ var UIControlSearch = function(ui, visible, visibleLock) {
     this.mapElement.on('mousedown', this.onDrag.bind(this), window);
     this.mapElement.on('mousewheel', this.onDrag.bind(this), window);
 
-    this.ignoreDrag = false; 
+    this.ignoreDrag = false;
 
     //old template '//cdn.melown.com/vtsapi/geocode?q={value}&format=json&lang=en-US&addressdetails=1&limit=20';
     //this.urlTemplate = '//cdn.melown.com/vtsapi/geocode/v3.0/{lat}/{long}/{value}';
@@ -73,8 +73,8 @@ var UIControlSearch = function(ui, visible, visibleLock) {
 
 
 UIControlSearch.prototype.onDoNothing = function(event) {
-    dom.preventDefault(event);    
-    dom.stopPropagation(event);    
+    dom.preventDefault(event);
+    dom.stopPropagation(event);
 };
 
 
@@ -103,25 +103,25 @@ UIControlSearch.prototype.moveSelector = function(delta) {
     if (this.itemIndex >= this.data.length) {
         this.itemIndex = this.data.length - 1;
     }
-    
+
     if (this.itemIndex < 0) {
         this.itemIndex = 0;
     }
-    
+
     this.updateList(this.data);
 };
 
 
 UIControlSearch.prototype.updateList = function(json) {
     if (Array.isArray(json)) {
-        var data = json, item, list = '';
+        let data = json, item, list = '';
         data = data.slice(0,10);
         this.data = data;
 
-        for (var i = 0, li = data.length; i < li; i++) {
+        for (let i = 0, li = data.length; i < li; i++) {
             item = data[i];
 
-            var title = '';
+            let title = '';
 
             if (this.coords && i == 0) {
                 title = 'location: ';
@@ -144,15 +144,15 @@ UIControlSearch.prototype.updateList = function(json) {
             } else {
                 list += '<div id="vts-search-item' + i + '"'+ ' class="vts-search-listitem">' + title + '</div>';
             }
-                
+
         }
-        
+
         this.list.setHtml(list);
 
-        for (i = 0, li = data.length; i < li; i++) {
-            var id = 'vts-search-item' + i;
+        for (let i = 0, li = data.length; i < li; i++) {
+            const id = 'vts-search-item' + i;
             item = this.control.getElement(id);
-            
+
             if (item) {
                 item.on('click', this.onSelectItem.bind(this, i));
                 item.on('mouseenter', this.onHoverItem.bind(this, i));
@@ -168,12 +168,17 @@ UIControlSearch.prototype.updateList = function(json) {
 };
 
 UIControlSearch.prototype.solveSRS = function(srs) {
+    const map = this.browser.getMap();
+    if (!map) {
+        return;
+    }
+
     if (srs.indexOf('+proj=') == -1) { //no proj4 string
         srs = map.getSrsInfo(srs);
         if (srs && srs['srsDef']) {
             srs = srs['srsDef'];
         } else {
-            srs = this.coordsSrs;            
+            srs = this.coordsSrs;
         }
     }
 
@@ -181,44 +186,44 @@ UIControlSearch.prototype.solveSRS = function(srs) {
 };
 
 UIControlSearch.prototype.onSelectItem = function(index) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
-    
-    //sort list with polygons
-    var pos = map.getPosition();
-    var refFrame = map.getReferenceFrame();
-    var navigationSrsId = refFrame['navigationSrs'];
-    var navigationSrs = map.getSrsInfo(navigationSrsId);
-    var physicalSrsId = refFrame['physicalSrs'];
-    var physicalSrs = map.getSrsInfo(physicalSrsId);
 
-    var proj4 = this.browser.getProj4();
-    var srs = this.browser.config.controlSearchSrs || this.coordsSrs;
+    //sort list with polygons
+    let pos = map.getPosition();
+    const refFrame = map.getReferenceFrame();
+    const navigationSrsId = refFrame['navigationSrs'];
+    const navigationSrs = map.getSrsInfo(navigationSrsId);
+    const physicalSrsId = refFrame['physicalSrs'];
+    const physicalSrs = map.getSrsInfo(physicalSrsId);
+
+    const proj4 = this.browser.getProj4();
+    let srs = this.browser.config.controlSearchSrs || this.coordsSrs;
     srs = this.solveSRS(srs);
 
-    var coords = proj4(navigationSrs['srsDef'], srs, pos.getCoords());
+    let coords = proj4(navigationSrs['srsDef'], srs, pos.getCoords());
 
     pos = map.convertPositionHeightMode(pos, "float", true);
 
-    var item = this.data[index];
+    const item = this.data[index];
     if (item) {
-        var coords = [item['lon'], item['lat']];
-        
-        //conver coords from location srs to map navigation srs         
+        coords = [item['lon'], item['lat']];
+
+        //conver coords from location srs to map navigation srs
         coords = proj4(srs, navigationSrs['srsDef'], coords);
         coords[2] = 0;
 
         pos.setCoords(coords);
 
-        var viewExtent = 6667;                
+        let viewExtent = 6667;
 
         if (item.bbox) {
-            var lat1 = parseFloat(item.bbox[0]);
-            var lat2 = parseFloat(item.bbox[1]);
-            var lon1 = parseFloat(item.bbox[2]);
-            var lon2 = parseFloat(item.bbox[3]);
+            const lat1 = parseFloat(item.bbox[0]);
+            const lat2 = parseFloat(item.bbox[1]);
+            const lon1 = parseFloat(item.bbox[2]);
+            const lon2 = parseFloat(item.bbox[3]);
 
             item.polygon = [
                 [lon1, lat1], [(lon2+lon1)*0.5, lat1], [lon2, lat1],
@@ -228,28 +233,28 @@ UIControlSearch.prototype.onSelectItem = function(index) {
         }
 
         if (item.polygon && item.type != 'continent') {
-            var points = item.polygon;
+            const points = item.polygon;
 
             //convert point to physical coords
-            var cameraPosition = proj4(srs, physicalSrs['srsDef'], coords);
-            var cameraVector = [-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]];
+            const cameraPosition = proj4(srs, physicalSrs['srsDef'], coords);
+            const cameraVector = [-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]];
             vec3.normalize(cameraVector);
 
-            for (var i = 0, li = points.length; i < li; i++) {
+            for (let i = 0, li = points.length; i < li; i++) {
                 //convert point to physical coords
                 coords = proj4(srs, physicalSrs['srsDef'], [points[i][0], points[i][1], 0]);
 
-                var ab = cameraVector;
-                var av = [coords[0] - cameraPosition[0], coords[1] - cameraPosition[1], coords[2] - cameraPosition[2]];
+                const ab = cameraVector;
+                const av = [coords[0] - cameraPosition[0], coords[1] - cameraPosition[1], coords[2] - cameraPosition[2]];
 
                 //final R3 bv  = v.sub( b ) ;
-                var b = [cameraPosition[0] + cameraVector[0], cameraPosition[1] + cameraVector[1], cameraPosition[2] + cameraVector[2]];
-                var bv = [coords[0] - b[0], coords[1] - b[1], coords[2] - b[2]];
+                const b = [cameraPosition[0] + cameraVector[0], cameraPosition[1] + cameraVector[1], cameraPosition[2] + cameraVector[2]];
+                const bv = [coords[0] - b[0], coords[1] - b[1], coords[2] - b[2]];
 
-                var af = [0,0,0];
+                const af = [0,0,0];
                 vec3.cross(ab, av, af);
 
-                var d = (vec3.length(bv) / vec3.length(ab)) * 2;
+                const d = (vec3.length(bv) / vec3.length(ab)) * 2;
 
                 if (d > viewExtent) {
                     viewExtent = d;
@@ -265,30 +270,30 @@ UIControlSearch.prototype.onSelectItem = function(index) {
             //try to guess view extent from location type
             switch(item.type) {
             case 'peak':        viewExtent = 20000;   break;
-            case 'city':        viewExtent = 30000;   break;                
+            case 'city':        viewExtent = 30000;   break;
             case 'street':      viewExtent = 4000;    break;
             case 'residential': viewExtent = 3000;    break;
-            case 'continent':   viewExtent = 8550000; break;             
-            case 'pos':         viewExtent = 150000;  break;             
+            case 'continent':   viewExtent = 8550000; break;
+            case 'pos':         viewExtent = 150000;  break;
             }
         }
-        
-        pos.setViewExtent(viewExtent);                
 
-        var orientation = [0,-60,0];
+        pos.setViewExtent(viewExtent);
+
+        let orientation = [0,-60,0];
 
         //reduce tilt when you are far off the planet
         if (pos.getViewMode() == 'obj') {
             if (navigationSrs['a']) {
-                var distance = (pos.getViewExtent()*0.5) / Math.tan(math.radians(pos.getFov()*0.5));
-                var factor = Math.min(distance / (navigationSrs['a']*0.5), 1.0);
-                var maxTilt = 20 + ((-90) - 20) * factor; 
-                var minTilt = -90; 
-                
+                const distance = (pos.getViewExtent()*0.5) / Math.tan(math.radians(pos.getFov()*0.5));
+                const factor = Math.min(distance / (navigationSrs['a']*0.5), 1.0);
+                const maxTilt = 20 + ((-90) - 20) * factor;
+                const minTilt = -90;
+
                 if (orientation[1] > maxTilt) {
                     orientation[1] = maxTilt;
                 }
-        
+
                 if (orientation[1] < minTilt) {
                     orientation[1] = minTilt;
                 }
@@ -297,13 +302,13 @@ UIControlSearch.prototype.onSelectItem = function(index) {
 
         pos.setOrientation(orientation);
         map.setPosition(pos);
-        
+
         this.itemIndex = index;
         this.lastSearch = item['title'];
-        
-        var element = this.input.getElement();  
+
+        const element = this.input.getElement();
         element.value = this.lastSearch;
-        element.blur(); //defocus 
+        element.blur(); //defocus
     }
 
     this.hideList();
@@ -321,23 +326,23 @@ UIControlSearch.prototype.onHoverItem = function(index) {
 
 
 UIControlSearch.prototype.onListLoaded = function(counter, data) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
     if (this.searchCounter == counter) {
 
-        var pos = map.getPosition();
-        var refFrame = map.getReferenceFrame();
-        var navigationSrsId = refFrame['navigationSrs'];
-        var navigationSrs = map.getSrsInfo(navigationSrsId);
+        const pos = map.getPosition();
+        const refFrame = map.getReferenceFrame();
+        const navigationSrsId = refFrame['navigationSrs'];
+        const navigationSrs = map.getSrsInfo(navigationSrsId);
 
-        var proj4 = this.browser.getProj4();
-        var srs = this.browser.config.controlSearchSrs || this.coordsSrs;
+        const proj4 = this.browser.getProj4();
+        let srs = this.browser.config.controlSearchSrs || this.coordsSrs;
         srs = this.solveSRS(srs);
 
-        var coords = proj4(navigationSrs['srsDef'], srs, pos.getCoords());
+        const coords = proj4(navigationSrs['srsDef'], srs, pos.getCoords());
 
         //check data format
         if (!(data['data'] && Array.isArray(data['data']) && data['header'] && data['header']['type'] == 'search')) {
@@ -370,7 +375,7 @@ UIControlSearch.prototype.onListLoadError = function() {
 
 UIControlSearch.prototype.onFocus = function() {
     this.lastSearch = '';
-    var element = this.input.getElement();  
+    const element = this.input.getElement();
     element.value = this.lastSearch;
     this.hideList();
 };
@@ -384,25 +389,25 @@ UIControlSearch.prototype.onKeyPress = function(event) {
 
 
 UIControlSearch.prototype.onKeyUp = function(event) {
-    var code = event.getKeyCode();
-    
+    const code = event.getKeyCode();
+
     switch(code) {
     case 38:  //up
         this.moveSelector(-1);
         dom.preventDefault(event);
-        dom.stopPropagation(event);    
+        dom.stopPropagation(event);
         break;
 
     case 40:  //down
-        this.moveSelector(1); 
+        this.moveSelector(1);
         dom.preventDefault(event);
-        dom.stopPropagation(event);    
+        dom.stopPropagation(event);
         break;
 
     case 9:  //tab
     case 13: //enter
-        
-        this.onSelectItem(Math.max(0,this.itemIndex), null); 
+
+        this.onSelectItem(Math.max(0,this.itemIndex), null);
         break;
     }
 };
@@ -415,8 +420,8 @@ UIControlSearch.prototype.parseLatLon = function(value) {
 
     value = value.replace(',',' ');
     value = (value.replace(/  +/g, ' ')).trim().toLowerCase();
-    var words = value.split(' '), lat, lon, i;
-    var lastChar, lastChar2, skip, part, numbers, num;
+    let words = value.split(' '), lat, lon, i;
+    let lastChar, lastChar2, skip, part, numbers, num;
 
     //simple case of two numbers
     if (words.length == 2 && value.indexOf('n') == -1 && value.indexOf('s') == -1 &&
@@ -426,7 +431,7 @@ UIControlSearch.prototype.parseLatLon = function(value) {
         lastChar2 = words[1].charAt(words[1].length - 1);
         skip = false;
 
-        //are numbers in degrees? 
+        //are numbers in degrees?
         if (lastChar == '°' || lastChar == "'" || lastChar == '"') {
             if (lastChar2 == '°' || lastChar2 == "'" || lastChar2 == '"') {
                 words[0] = words[0] + 'n';
@@ -458,12 +463,12 @@ UIControlSearch.prototype.parseLatLon = function(value) {
        return null;
     }
 
-    var parts = value.split(/[°'"]+/).join(' ').split(/[^\w\S]+/);
+    const parts = value.split(/[°'"]+/).join(' ').split(/[^\w\S]+/);
 
     //check wheteher it make sence to pase it further
     lat = 0, lon = 0, numbers = 0;
 
-    var lengthCheck = false;
+    let lengthCheck = false;
 
     for (i in parts) {
         part = parts[i];
@@ -476,7 +481,7 @@ UIControlSearch.prototype.parseLatLon = function(value) {
             if (!isNaN(num)) {
                 numbers++;
                 lengthCheck = false;
-            } 
+            }
 
             if (!lengthCheck || (part.length == 1)) {
                 if (lastChar == 'w' || lastChar == 'e') {
@@ -489,6 +494,7 @@ UIControlSearch.prototype.parseLatLon = function(value) {
             }
 
         } else {
+            // eslint-disable-next-line
             numbers++;
         }
     }
@@ -498,17 +504,17 @@ UIControlSearch.prototype.parseLatLon = function(value) {
     }
 
     // parse complex lat lon in degrees with directions
-    var directions = [];
-    var coords = [];
-    var dd = 0;
-    var pow = 0;
-    var numberCount = 0;
+    let directions = [];
+    let coords = [];
+    let dd = 0;
+    let pow = 0;
+    let numberCount = 0;
 
     for (i in parts) {
 
         // we end on a direction
         if (isNaN(parts[i])) {
-            var direction = parts[i];
+            let direction = parts[i];
             num = parseFloat(parts[i]);
 
             if (!isNaN(num)) {
@@ -542,7 +548,7 @@ UIControlSearch.prototype.parseLatLon = function(value) {
     }
 
     if (directions[0] == 'w' || directions[0] == 'e') {
-        var tmp = coords[0];
+        const tmp = coords[0];
         coords[0] = coords[1];
         coords[1] = tmp;
     }
@@ -559,67 +565,66 @@ UIControlSearch.prototype.parseLatLon = function(value) {
 }
 
 UIControlSearch.prototype.onChange = function() {
-    var value = this.input.getElement().value;
+    let value = this.input.getElement().value;
     value = value.trim();
 
     //console.log("value: " + value + "  last-value: " + this.lastSearch);
 
     if (value == this.lastSearch) {
         //console.log("value-same");
-        return;        
-    }
-    
-    this.lastSearch = value;
-    
-    if (value == '') {
-        //console.log("value-null");
-        this.hideList();        
+        return;
     }
 
-    var map = this.browser.getMap();
+    this.lastSearch = value;
+
+    if (value == '') {
+        //console.log("value-null");
+        this.hideList();
+    }
+
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
-    
+
     //sort list with polygons
-    var pos = map.getPosition();
-    var refFrame = map.getReferenceFrame();
-    var navigationSrsId = refFrame['navigationSrs'];
-    var navigationSrs = map.getSrsInfo(navigationSrsId);
-    var proj4 = this.browser.getProj4();
-    var srs = this.browser.config.controlSearchSrs || this.coordsSrs;
+    const pos = map.getPosition();
+    const refFrame = map.getReferenceFrame();
+    const navigationSrsId = refFrame['navigationSrs'];
+    const navigationSrs = map.getSrsInfo(navigationSrsId);
+    const proj4 = this.browser.getProj4();
+    let srs = this.browser.config.controlSearchSrs || this.coordsSrs;
     srs = this.solveSRS(srs);
 
-    var coords = proj4(navigationSrs['srsDef'], srs, pos.getCoords());
+    const coords = proj4(navigationSrs['srsDef'], srs, pos.getCoords());
 
 
     this.coords = this.parseLatLon(value);
-   
-    var url = this.processTemplate(this.browser.config.controlSearchUrl || this.urlTemplate, { 'value':value, 'lat':coords[1], 'long':coords[0] });
+
+    const url = this.processTemplate(this.browser.config.controlSearchUrl || this.urlTemplate, { 'value':value, 'lat':coords[1], 'long':coords[0] });
     //console.log(url);
     this.searchCounter++;
     this.itemIndex = -1;
-   
+
     utils.loadJSON(url, this.onListLoaded.bind(this, this.searchCounter), this.onListLoadError.bind(this));
 };
 
 
 UIControlSearch.prototype.onDrag2 = function() {
-    this.ignoreDrag = true; 
-    //var element = this.input.getElement();  
+    this.ignoreDrag = true;
 };
 
 
 UIControlSearch.prototype.onDrag = function() {
     if (this.ignoreDrag) {
         this.ignoreDrag = false;
-        return; 
-    } 
+        return;
+    }
 
-    var element = this.input.getElement();  
+    const element = this.input.getElement();
     element.value = this.lastSearch;
     element.blur(); //defocus'
-    this.hideList(); 
+    this.hideList();
 };
 
 

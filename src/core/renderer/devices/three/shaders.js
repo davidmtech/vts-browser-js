@@ -1,7 +1,7 @@
 
-var GpuShaders = {};
+const ThreeShaders = {};
 
-GpuShaders.tileVertexShader =
+ThreeShaders.tileVertexShader =
 
     '#ifdef onlyFog\n'+
         'varying float vFogFactor;\n'+
@@ -126,7 +126,7 @@ GpuShaders.tileVertexShader =
         '#endif\n'+
     '}';
 
-GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
+ThreeShaders.tileFragmentShader = 'precision mediump float;\n'+
 
     '#ifdef clip4\n'+
         'uniform float uClip[4];\n'+
@@ -308,7 +308,7 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
     '}';
 
 
-    GpuShaders.bbox2VertexShader =
+    ThreeShaders.bbox2VertexShader =
         //'attribute float position;\n'+
         'uniform float uPoints[8*3];\n'+
         'void main(){ \n'+
@@ -317,13 +317,13 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
         '}';
 
 
-    GpuShaders.bboxFragmentShader = 'precision mediump float;\n'+
+    ThreeShaders.bboxFragmentShader = 'precision mediump float;\n'+
         'void main() {\n'+
             'gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n'+
         '}';
 
 
-    GpuShaders.textVertexShader =
+    ThreeShaders.textVertexShader =
         'uniform mat4 uProj;\n'+
         'attribute vec3 color;\n'+
         //'attribute vec2 uv;\n'+
@@ -336,7 +336,7 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
         '}';
 
 
-    GpuShaders.textFragmentShader = 'precision mediump float;\n'+
+    ThreeShaders.textFragmentShader = 'precision mediump float;\n'+
         'uniform sampler2D map;\n'+
         'varying vec3 vColor;\n'+
         'varying vec2 vUv;\n'+
@@ -346,4 +346,4 @@ GpuShaders.tileFragmentShader = 'precision mediump float;\n'+
         '}';
 
 
-export default GpuShaders;
+export default ThreeShaders;

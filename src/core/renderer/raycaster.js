@@ -2,16 +2,16 @@
 import {vec3 as vec3_} from '../utils/matrix';
 
 //get rid of compiler mess
-var vec3 = vec3_;
+const vec3 = vec3_;
 
 
-var Octree = function() {
+const Octree = function() {
     this.root = null;
     this.maxItemsPerNode = 20;
     this.maxDepth = 20;
 
     this.depthCount = [];
-    for (var i = 0; i < 1000; i++) {
+    for (let i = 0; i < 1000; i++) {
         this.depthCount[i] = 0;
     }
 
@@ -52,7 +52,7 @@ Octree.prototype.buildFromGeometry = function(data) {
         return;
     }
 
-    var i, li, j, lj, k, lk, v, item, submeshes, submesh, bbox, index,
+    let i, li, j, lj, k, lk, v, submeshes, submesh, bbox, index,
         minX, minY, minZ, maxX, maxY, maxZ, geometry, vertices;
 
     minX = minY = minZ = Number.POSITIVE_INFINITY;
@@ -67,7 +67,7 @@ Octree.prototype.buildFromGeometry = function(data) {
             for (j = 0, lj = submeshes.length; j < lj; j++) {
                 submesh = submeshes[j];
                 bbox = submesh["bbox"];
-                
+
                 if (bbox[0][0] < minX) minX = bbox[0][0];
                 if (bbox[0][1] < minY) minY = bbox[0][1];
                 if (bbox[0][2] < minZ) minZ = bbox[0][2];
@@ -121,7 +121,7 @@ Octree.prototype.buildFromGeometry = function(data) {
 };
 
 
-var OctreeNode = function(min, max) {
+const OctreeNode = function(min, max) {
     this.min = min;
     this.max = max;
     this.children = null;
@@ -131,13 +131,13 @@ var OctreeNode = function(min, max) {
 OctreeNode.prototype.add = function(item, octree, depth) {
     if (this.children) {
         if (!depth) {
-            depth = 0; 
+            depth = 0;
         }
 
-        for (var i = 0; i < 8; i++) {
-            var child = this.children[i],
-                min = child.min,
-                max = child.max;
+        for (let i = 0; i < 8; i++) {
+            const  child = this.children[i],
+                   min = child.min,
+                   max = child.max;
 
             if (item[0] < max[0] && item[3] > min[0] &&
                 item[1] < max[1] && item[4] > min[1] &&
@@ -163,7 +163,7 @@ OctreeNode.prototype.add = function(item, octree, depth) {
 };
 
 OctreeNode.prototype.split = function(octree, depth) {
-    var min = this.min,
+    let min = this.min,
         max = this.max,
         mid = [(max[0] + min[0]) * 0.5, (max[1] + min[1]) * 0.5, (max[2] + min[2]) * 0.5],
         i, li, j;
@@ -178,7 +178,7 @@ OctreeNode.prototype.split = function(octree, depth) {
     this.depthCount[depth]++;
 
     for (i = 0; i < 8; i++) {
-        var combination = octree.pattern[i];
+        const combination = octree.pattern[i];
 
         this.children[i] = new OctreeNode(
             [
@@ -195,15 +195,15 @@ OctreeNode.prototype.split = function(octree, depth) {
         );
     }
 
-    var items = this.items;
+    const items = this.items;
 
     //distribute items
     if (items) {
         for (i = 0, li = items.length; i < li; i++) {
-            var item = items[i];
+            const item = items[i];
 
             for (j = 0; j < 8; j++) {
-                var child = this.children[j];
+                const child = this.children[j];
                 min = child.min;
                 max = child.max;
 
@@ -218,11 +218,11 @@ OctreeNode.prototype.split = function(octree, depth) {
         }
     }
 
-    this.items = null;   
+    this.items = null;
 };
 
 
-var OctreeRaycaster = function() {
+const OctreeRaycaster = function() {
 
     // A lookup-table containing octant ids. Used to determine the exit plane from an octant.
     this.octantTable = [
@@ -247,14 +247,14 @@ var OctreeRaycaster = function() {
  * Determining the first octant requires knowing which of the t0s is the
  * largest. The tms of the other axes must also be compared against that
  * largest t0.
- * 
+ *
  * tx0, ty0,tz0 - Ray projection parameter.
  * txm, tym, tzm - Ray projection parameter mean.
  * returns - index of the first octant that the ray travels through.
  */
 
 OctreeRaycaster.prototype.findEntryOctant = function(tx0, ty0, tz0, txm, tym, tzm) {
-    var entry = 0;
+    let entry = 0;
 
     // Find the entry plane.
     if(tx0 > ty0 && tx0 > tz0) {
@@ -304,8 +304,8 @@ OctreeRaycaster.prototype.findEntryOctant = function(tx0, ty0, tz0, txm, tym, tz
  */
 
 OctreeRaycaster.prototype.findNextOctant = function(currentOctant, tx1, ty1, tz1) {
-    var min;
-    var exit = 0;
+    let min;
+    let exit = 0;
 
     // Find the exit plane.
     if (tx1 < ty1) {
@@ -338,9 +338,9 @@ OctreeRaycaster.prototype.findNextOctant = function(currentOctant, tx1, ty1, tz1
  */
 
 OctreeRaycaster.prototype.raycastOctant = function(octant, tx0, ty0, tz0, tx1, ty1, tz1, intersects) {
-    var children = octant.children;
-    var currentOctant;
-    var txm, tym, tzm;
+    const children = octant.children;
+    let currentOctant;
+    let txm, tym, tzm;
 
     if (tx1 >= 0.0 && ty1 >= 0.0 && tz1 >= 0.0) {
 
@@ -422,14 +422,14 @@ OctreeRaycaster.prototype.raycastOctant = function(octant, tx0, ty0, tz0, tx1, t
 }
 
 OctreeRaycaster.prototype.hitFace = function(origin, dir, index, vertices) {
-    var EPSILON = 0.0000001,
+    const EPSILON = 0.0000001,
         v1 = [vertices[index], vertices[index+1], vertices[index+2]],
         v2 = [vertices[index+3], vertices[index+4], vertices[index+5]],
-        v3 = [vertices[index+6], vertices[index+7], vertices[index+8]];
-
-    var h = [0,0,0], q = [0,0,0], s, a, f, u, v,
+        v3 = [vertices[index+6], vertices[index+7], vertices[index+8]],
         edge1 = [v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]],
         edge2 = [v3[0] - v1[0], v3[1] - v1[1], v3[2] - v1[2]];
+
+    let h = [0,0,0], q = [0,0,0], s, a, f, u, v;
 
     vec3.cross(dir, edge2, h);
     a = vec3.dot(edge1, h);
@@ -453,7 +453,7 @@ OctreeRaycaster.prototype.hitFace = function(origin, dir, index, vertices) {
     }
 
     // At this stage we can compute t to find out where the intersection point is on the line.
-    var t = f * vec3.dot(edge2, q);
+    let t = f * vec3.dot(edge2, q);
     //if (t > EPSILON) { // ray intersection
         return [true, t]; //[origin[0] + dir[0] * t, origin[1] + dir[1] * t, origin[2] + dir[2] * t ]];
     //} else { // This means that there is a line intersection but not a ray intersection.
@@ -474,29 +474,29 @@ OctreeRaycaster.prototype.hitFace = function(origin, dir, index, vertices) {
 
 OctreeRaycaster.prototype.intersectOctree = function(rayPos, rayDir, octree, intersects) {
     // Translate the octree extents to the scene origin.
-    var min = [0,0,0];
-    var max = [octree.root.max[0] - octree.root.min[0],
+    const min = [0,0,0];
+    const max = [octree.root.max[0] - octree.root.min[0],
                octree.root.max[1] - octree.root.min[1],
-               octree.root.max[2] - octree.root.min[2]] 
+               octree.root.max[2] - octree.root.min[2]]
 
-    var dimensions = [max[0], max[1], max[2]];
-    var halfDimensions = [dimensions[0]*0.5, dimensions[1]*0.5, dimensions[2]*0.5];
+    const dimensions = [max[0], max[1], max[2]];
+    const halfDimensions = [dimensions[0]*0.5, dimensions[1]*0.5, dimensions[2]*0.5];
 
-    var origin = [rayPos[0],rayPos[1],rayPos[2]];
-    var direction = [rayDir[0], rayDir[1], rayDir[2]];
+    const origin = [rayPos[0],rayPos[1],rayPos[2]];
+    const direction = [rayDir[0], rayDir[1], rayDir[2]];
 
-    var invDirX, invDirY, invDirZ;
-    var tx0, tx1, ty0, ty1, tz0, tz1;
+    let invDirX, invDirY, invDirZ;
+    let tx0, tx1, ty0, ty1, tz0, tz1;
 
-    var center = [(octree.root.max[0] + octree.root.min[0]) * 0.5,
+    const center = [(octree.root.max[0] + octree.root.min[0]) * 0.5,
                   (octree.root.max[1] + octree.root.min[1]) * 0.5,
-                  (octree.root.max[2] + octree.root.min[2]) * 0.5] 
+                  (octree.root.max[2] + octree.root.min[2]) * 0.5]
 
     // Translate the ray to the center of the octree.
     //origin.sub(octree.getCenter(v[2])).add(halfDimensions);
-    origin[0] = (origin[0] - center[0]) + halfDimensions[0]; 
-    origin[1] = (origin[1] - center[1]) + halfDimensions[1]; 
-    origin[2] = (origin[2] - center[2]) + halfDimensions[2]; 
+    origin[0] = (origin[0] - center[0]) + halfDimensions[0];
+    origin[1] = (origin[1] - center[1]) + halfDimensions[1];
+    origin[2] = (origin[2] - center[2]) + halfDimensions[2];
 
     // Reset all flags.
     this.flags = 0;
@@ -541,15 +541,15 @@ OctreeRaycaster.prototype.intersectOctree = function(rayPos, rayDir, octree, int
 };
 
 OctreeRaycaster.prototype.intersectOctants = function(rayPos, rayDir, octants) {
-    var hits = [];
-    var t = Number.POSITIVE_INFINITY;
+    let hits = [];
+    let t = Number.POSITIVE_INFINITY;
 
-    for (var i = 0, li = octants.length; i < li; i++) {
-        var items = octants[i].items;
+    for (let i = 0, li = octants.length; i < li; i++) {
+        const items = octants[i].items;
 
-        for (var j = 0, lj = items.length; j < lj; j++) {
-            var item = items[j];
-            var res = this.hitFace(rayPos, rayDir, item[7], item[6]);
+        for (let j = 0, lj = items.length; j < lj; j++) {
+            const item = items[j];
+            const res = this.hitFace(rayPos, rayDir, item[7], item[6]);
 
             if (res[0] && res[1] < t) {
                 t = res[1];

@@ -3,11 +3,11 @@ import {utils as utils_} from '../utils/utils';
 import BBox_ from '../renderer/bbox';
 
 //get rid of compiler mess
-var BBox = BBox_;
-var utils = utils_;
+const BBox = BBox_;
+const utils = utils_;
 
 
-var MapVirtualSurface = function(map, json) {
+const MapVirtualSurface = function(map, json) {
     this.map = map;
     this.id = null;
     this.metaUrl = '';
@@ -33,27 +33,27 @@ MapVirtualSurface.prototype.parseJson = function(json) {
     this.strId = this.id ? this.id.join(';') : null;
 
     if (this.id) {
-        var tmp = this.id.slice();
-        tmp.sort(); 
+        const tmp = this.id.slice();
+        tmp.sort();
         this.strId = tmp.join(';');
     }
 
     if (json['extents']) {
-        var ll = json['extents']['ll'];
-        var ur = json['extents']['ur'];
+        const ll = json['extents']['ll'];
+        const ur = json['extents']['ur'];
         this.extents = new BBox(ll[0], ll[1], ll[2], ur[0], ur[1], ur[2]);
     } else {
         this.extents = new BBox(0,0,0,1,1,1);
     }
 
-    this.specificity = Math.pow(2,this.lodRange[0]) / ((this.tileRange[1][0] - this.tileRange[1][0]+1)*(this.tileRange[1][1] - this.tileRange[1][1]+1));    
+    this.specificity = Math.pow(2,this.lodRange[0]) / ((this.tileRange[1][0] - this.tileRange[1][0]+1)*(this.tileRange[1][1] - this.tileRange[1][1]+1));
 
     utils.loadBinary(this.mappingUrl, this.onMappingFileLoaded.bind(this), this.onMappingFileLoadError.bind(this), (utils.useCredentials ? (this.jsonUrl.indexOf(this.map.url.baseUrl) != -1) : false), this.map.core.xhrParams);
 };
 
 
 MapVirtualSurface.prototype.onMappingFileLoaded = function(data) {
-    this.parseMappingFile(new DataView(data));            
+    this.parseMappingFile(new DataView(data));
     this.ready = true;
     this.map.refreshView();
 };
@@ -64,9 +64,9 @@ MapVirtualSurface.prototype.onMappingFileLoadError = function() {
 
 
 MapVirtualSurface.prototype.parseMappingFile = function(data) {
-    var index = 0;
+    let index = 0;
 
-    var magic = '';
+    let magic = '';
     magic += String.fromCharCode(data.getUint8(index, true)); index += 1;
     magic += String.fromCharCode(data.getUint8(index, true)); index += 1;
 
@@ -74,21 +74,21 @@ MapVirtualSurface.prototype.parseMappingFile = function(data) {
         return false;
     }
 
-    var count = data.getUint16(index, true); index += 2;
+    let count = data.getUint16(index, true); index += 2;
 
-    for (var i = 0; i < count; i++) {
-        var size = data.getUint8(index, true); index += 1;
-        var id = [];
+    for (let i = 0; i < count; i++) {
+        const size = data.getUint8(index, true); index += 1;
+        const id = [];
 
-        for (var j = 0; j < size; j++) {
-            var s = data.getUint16(index, true); index += 2;
+        for (let j = 0; j < size; j++) {
+            let s = data.getUint16(index, true); index += 2;
             s = this.id[s];
-            
+
             if (s) {
                 id.push(s);
             }
         }
-        
+
         if (id.length == 1) { //get surface
             this.surfaces.push(this.map.getSurface(id[0]));
         } else { //get glue
@@ -96,7 +96,7 @@ MapVirtualSurface.prototype.parseMappingFile = function(data) {
         }
     }
 
-    return true;    
+    return true;
 };
 
 
@@ -116,7 +116,7 @@ MapVirtualSurface.prototype.processUrl = function(url, fallback) {
     }
 
     url = url.trim();
-    
+
     if (url.indexOf('://') != -1) { //absolute
         return url;
     } else if (url.indexOf('//') == 0) {  //absolute without schema
@@ -124,20 +124,20 @@ MapVirtualSurface.prototype.processUrl = function(url, fallback) {
     } else if (url.indexOf('/') == 0) {  //absolute without host
         return this.baseUrlOrigin + url;
     } else {  //relative
-        return this.baseUrl + url; 
+        return this.baseUrl + url;
     }
 };
 
 
 MapVirtualSurface.prototype.hasTile = function(id) {
-    var shift = id[0] - this.lodRange[0];
+    const shift = id[0] - this.lodRange[0];
 
     if (shift < 0) {
         return false;
     }
 
-    var x = id[1] >> shift;
-    var y = id[2] >> shift;
+    const x = id[1] >> shift;
+    const y = id[2] >> shift;
 
     if (id[0] < this.lodRange[0] || id[0] > this.lodRange[1] ||
         x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
@@ -150,25 +150,25 @@ MapVirtualSurface.prototype.hasTile = function(id) {
 
 
 MapVirtualSurface.prototype.hasTile2 = function(id) {
-    var shift = id[0] - this.lodRange[0];
-    var above = (shift < 0);
+    let shift = id[0] - this.lodRange[0];
+    const above = (shift < 0);
 
     if (id[0] < this.lodRange[0]) {
         shift = -shift;
-        var x1 = this.tileRange[0][0] >> shift;
-        var y1 = this.tileRange[0][1] >> shift;
-        var x2 = this.tileRange[1][0] >> shift;
-        var y2 = this.tileRange[1][1] >> shift;
-    
+        const x1 = this.tileRange[0][0] >> shift;
+        const y1 = this.tileRange[0][1] >> shift;
+        const x2 = this.tileRange[1][0] >> shift;
+        const y2 = this.tileRange[1][1] >> shift;
+
         if (id[0] > this.lodRange[1] ||
             id[1] < x1 || id[1] > x2 ||
             id[2] < y1 || id[2] > y2 ) {
             return [false , false];
         }
     } else {
-        var x = id[1] >> shift;
-        var y = id[2] >> shift;
-    
+        const x = id[1] >> shift;
+        const y = id[2] >> shift;
+
         if (id[0] > this.lodRange[1] ||
             x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
             y < this.tileRange[0][1] || y > this.tileRange[1][1] ) {
@@ -185,11 +185,11 @@ MapVirtualSurface.prototype.hasMetatile = function(id) {
         return false;
     }
 
-    var shift = id[0] - this.lodRange[0];
+    let shift = id[0] - this.lodRange[0];
 
     if (shift >= 0) {
-        var x = id[1] >> shift;
-        var y = id[2] >> shift;
+        const x = id[1] >> shift;
+        const y = id[2] >> shift;
 
         if (x < this.tileRange[0][0] || x > this.tileRange[1][0] ||
             y < this.tileRange[0][1] || y > this.tileRange[1][1] ) {
@@ -221,4 +221,3 @@ MapVirtualSurface.prototype.getMetaUrl = function(id, skipBaseUrl) {
 
 
 export default MapVirtualSurface;
-

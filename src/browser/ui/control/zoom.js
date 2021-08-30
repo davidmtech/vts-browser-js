@@ -2,10 +2,10 @@
 import Dom_ from '../../utility/dom';
 
 //get rid of compiler mess
-var dom = Dom_;
+const dom = Dom_;
 
 
-var UIControlZoom = function(ui, visible, visibleLock) {
+const UIControlZoom = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('zoom',
@@ -22,19 +22,19 @@ var UIControlZoom = function(ui, visible, visibleLock) {
 
      + ' </div>', visible, visibleLock);
 
-    var plus = this.control.getElement('vts-zoom-plus');
+    const plus = this.control.getElement('vts-zoom-plus');
     plus.on('click', this.onZoomIn.bind(this));
     plus.on('dblclick', this.onDoNothing.bind(this));
 
-    var minus = this.control.getElement('vts-zoom-minus');
+    const minus = this.control.getElement('vts-zoom-minus');
     minus.on('click', this.onZoomOut.bind(this));
     minus.on('dblclick', this.onDoNothing.bind(this));
 };
 
 
 UIControlZoom.prototype.onDoNothing = function(event) {
-    dom.preventDefault(event);    
-    dom.stopPropagation(event);    
+    dom.preventDefault(event);
+    dom.stopPropagation(event);
 };
 
 
@@ -53,7 +53,7 @@ UIControlZoom.prototype.repeat = function(count, factor, delay) {
         return;
     }
 
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
@@ -62,9 +62,9 @@ UIControlZoom.prototype.repeat = function(count, factor, delay) {
         this.browser.autopilot.setAutorotate(0);
         this.browser.autopilot.setAutopan(0,0);
     }
-    
-    var controller = this.browser.controlMode.getCurrentController();
-    
+
+    const controller = this.browser.controlMode.getCurrentController();
+
     if (controller.viewExtentDeltas) {
         controller.viewExtentDeltas.push(factor);
     }

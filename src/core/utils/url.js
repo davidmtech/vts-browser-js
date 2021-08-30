@@ -1,13 +1,13 @@
 
-var utilsUrl = {};
+const utilsUrl = {};
 
 
 utilsUrl.isSameOrigin = function(url) {
     if (typeof url !== 'string') {
         return false;
     }
-    var docHost = document.location.hostname;
-    var parser = utilsUrl.parse(url);
+    const docHost = document.location.hostname;
+    const parser = utilsUrl.parse(url);
     return parser['hostname'] === docHost;
 };
 
@@ -17,24 +17,24 @@ utilsUrl.parse = function(url) {
         return null;
     }
 
-    var parser = document.createElement('a');
+    const parser = document.createElement('a');
     parser['href'] = url;
     return parser;
 };
 
 
 utilsUrl.getParamsFromUrl = function(url) {
-    var parser = utilsUrl.parse(url);
-    var queryString = {};
-    var query = parser['search'].substring(1);
-    var vars = query.split('&');
+    const parser = utilsUrl.parse(url);
+    const queryString = {};
+    const query = parser['search'].substring(1);
+    const vars = query.split('&');
     if (!(vars.length == 1 && vars[0] == '')) {
-        for (var i=0; i < vars.length; i++) {
-            var pair = vars[i].split('=');
+        for (let i = 0; i < vars.length; i++) {
+            const pair = vars[i].split('=');
             if (typeof queryString[pair[0]] === 'undefined') {
                 queryString[pair[0]] = pair[1];
             } else if (typeof queryString[pair[0]] === 'string') {
-                var arr = [ queryString[pair[0]], pair[1] ];
+                const arr = [ queryString[pair[0]], pair[1] ];
                 queryString[pair[0]] = arr;
             } else {
                 queryString[pair[0]].push(pair[1]);
@@ -46,9 +46,9 @@ utilsUrl.getParamsFromUrl = function(url) {
 
 
 utilsUrl.getHost = function(url) {
-    var location = document.createElement('a');
+    const location = document.createElement('a');
     location.href = url;
-    return location.hostname; 
+    return location.hostname;
 };
 
 
@@ -59,7 +59,7 @@ utilsUrl.getSchema = function(url) {
     } else if (url.indexOf('https://') != -1) {
         return 'https:';
     } else {
-        var location = document.createElement('a');
+        const location = document.createElement('a');
         location.href = url;
         return location.protocol;
     }
@@ -67,14 +67,14 @@ utilsUrl.getSchema = function(url) {
 
 
 utilsUrl.getOrigin = function(url) {
-    var location = document.createElement('a');
+    const location = document.createElement('a');
     location.href = url;
 
     if (!location.origin) {  //IE11 hack
       return location.protocol + "//" + location.hostname + (location.port ? ':' + location.port: '');
     }
 
-    return location.origin; 
+    return location.origin;
 };
 
 
@@ -84,7 +84,7 @@ utilsUrl.getBase = function(url) {
 
 
 utilsUrl.makeAbsolute = function(href) {
-    var link = document.createElement("a");
+    const link = document.createElement("a");
     link.href = href;
     return link.href;
 };
@@ -96,10 +96,10 @@ utilsUrl.getProcessUrl = function(url, originUrl) {
 
     url = url.trim();
     originUrl= originUrl.trim();
-    var baseUrl = utilsUrl.getBase(originUrl);
-    var baseUrlSchema = utilsUrl.getSchema(originUrl);
-    var baseUrlOrigin = utilsUrl.getOrigin(originUrl); 
-   
+    const baseUrl = utilsUrl.getBase(originUrl);
+    const baseUrlSchema = utilsUrl.getSchema(originUrl);
+    const baseUrlOrigin = utilsUrl.getOrigin(originUrl);
+
     if (url.indexOf('://') != -1) { //absolute
         return url;
     } else if (url.indexOf('//') == 0) {  //absolute without schema
@@ -107,7 +107,7 @@ utilsUrl.getProcessUrl = function(url, originUrl) {
     } else if (url.indexOf('/') == 0) {  //absolute without host
         return baseUrlOrigin + url;
     } else {  //relative
-        return baseUrl + url; 
+        return baseUrl + url;
     }
 };
 

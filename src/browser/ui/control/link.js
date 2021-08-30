@@ -2,10 +2,10 @@
 import Dom_ from '../../utility/dom';
 
 //get rid of compiler mess
-var dom = Dom_;
+const dom = Dom_;
 
 
-var UIControlLink = function(ui, visible, visibleLock) {
+const UIControlLink = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('link',
@@ -20,12 +20,12 @@ var UIControlLink = function(ui, visible, visibleLock) {
               + '<textarea id="vts-link-text-input" rows="4" cols="50" wrap="hard"></textarea>'
             + '</div>'
         + '</div>'
-        
+
      + ' </div>', visible, visibleLock);
-     
+
     this.div = this.control.getElement('vts-link');
 
-    var button = this.control.getElement('vts-link-button');
+    const button = this.control.getElement('vts-link-button');
     button.on('click', this.onSwitch.bind(this));
     button.on('dblclick', this.onDoNothing.bind(this));
 
@@ -38,7 +38,7 @@ var UIControlLink = function(ui, visible, visibleLock) {
 
 
 UIControlLink.prototype.onDoNothing = function(event) {
-    dom.stopPropagation(event);    
+    dom.stopPropagation(event);
 };
 
 
@@ -50,18 +50,16 @@ UIControlLink.prototype.onSwitch = function() {
 
 
 UIControlLink.prototype.update = function() {
-    //var button = this.control.getElement('vts-link-button');
-    
-    var left = 10 + (this.ui.config.controlZoom ? 70 : 0) +
+    const left = 10 + (this.ui.config.controlZoom ? 70 : 0) +
                 (this.ui.config.controlSpace ? 35 : 0);
-    
+
     this.div.setStyle('left', left + 'px');
     this.linkPanel.setStyle('display', this.linkVisible ? 'block' : 'none');
 };
 
 
 UIControlLink.prototype.updateLink = function() {
-    var linkValue =  this.browser.getLinkWithCurrentPos();
+    const linkValue =  this.browser.getLinkWithCurrentPos();
     if (this.link.getElement().value != linkValue) {
         this.link.getElement().value = linkValue;
     }
@@ -69,4 +67,3 @@ UIControlLink.prototype.updateLink = function() {
 
 
 export default UIControlLink;
-

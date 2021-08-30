@@ -3,11 +3,11 @@ import {utils as utils_} from '../utils/utils';
 //import GpuTexture_ from '../renderer/gpu/texture';
 
 //get rid of compiler mess
-var utils = utils_;
-//var GpuTexture = GpuTexture_;
+const utils = utils_;
+//const GpuTexture = GpuTexture_;
 
 
-var MapSubtexture = function(map, path, type, tile, internal) {
+const MapSubtexture = function(map, path, type, tile, internal) {
     this.map = map;
     this.stats = map.stats;
     this.tile = tile; // used only for stats
@@ -88,11 +88,14 @@ MapSubtexture.prototype.killGpuTexture = function(killedByCache) {
 */
 
     if (this.gpuTexture != null) {
-        //this.stats.gpuTextures -= this.gpuTexture.size;
-        //this.gpuTexture.kill();
 
         this.stats.gpuTextures -= this.gpuSize;
-        this.gpuTexture.dispose();
+
+        if (this.map.renderer.device === VTS_DEVICE_THREE) {
+            this.gpuTexture.dispose();
+        } else {
+            this.gpuTexture.kill();
+        }
 
 
         this.stats.graphsFluxTexture[1][0]++;
@@ -120,7 +123,7 @@ MapSubtexture.prototype.killGpuTexture = function(killedByCache) {
 
 
 MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, texture) {
-    var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
+    const doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.draw.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
 
     if (this.neverReady) {
@@ -165,7 +168,7 @@ MapSubtexture.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, t
     }
 
     if (this.loadState == 2) { //loaded
-        var t;
+        let t;
 
         if (!doNotLoad && this.cacheItem) {
             this.map.resourcesCache.updateItem(this.cacheItem);
@@ -257,8 +260,8 @@ MapSubtexture.prototype.onLoad = function(header, url, onLoaded, onError) {
     this.mapLoaderCallLoaded = onLoaded;
     this.mapLoaderCallError = onError;
 
-    var onerror = this.onLoadError.bind(this);
-    var onload = this.onLoaded.bind(this);
+    const onerror = this.onLoadError.bind(this);
+    const onload = this.onLoaded.bind(this);
 
     if (header) {
         this.checkStatus = 1;
@@ -319,7 +322,7 @@ MapSubtexture.prototype.onBinaryLoaded = function(data, direct, filesize) {
     if (this.map.config.mapAsyncImageDecode) {
         createImageBitmap(data).then(this.onLoaded.bind(this, false));
     } else {
-        var image = new Image();
+        const image = new Image();
         image.onerror = this.onLoadError.bind(this, true, null);
         image.onload = this.onLoaded.bind(this, true, null);
         this.image = image;
@@ -343,7 +346,7 @@ MapSubtexture.prototype.onLoaded = function(killBlob, bitmap) {
         this.image.naturalHeight = bitmap.height;
     }
 
-    var size = this.image.naturalWidth * this.image.naturalHeight * (this.heightMap ? 3 : 3);
+    const size = this.image.naturalWidth * this.image.naturalHeight * (this.heightMap ? 3 : 3);
     this.gpuSize = this.image.naturalWidth * this.image.naturalHeight * 4;  //aproximate size
 
     //if (!this.image.complete) {
@@ -375,14 +378,14 @@ MapSubtexture.prototype.onLoadHead = function(downloadAll, url, onLoaded, onErro
     this.mapLoaderCallLoaded = onLoaded;
     this.mapLoaderCallError = onError;
 
-    var onerror = this.onLoadHeadError.bind(this, downloadAll);
-    var onload = this.onHeadLoaded.bind(this, downloadAll);
+    const onerror = this.onLoadHeadError.bind(this, downloadAll);
+    const onload = this.onHeadLoaded.bind(this, downloadAll);
 
     this.checkStatus = 1;
 
     if (downloadAll) {
         //utils.loadBinary(url, onload, onerror, (utils.useCredentials ? (this.mapLoaderUrl.indexOf(this.map.url.baseUrl) != -1) : false), this.map.core.xhrParams, 'blob');
-        this.map.loader.processLoadBinary(url, onLoad, onerror, null, 'texture');
+        this.map.loader.processLoadBinary(url, onload, onerror, null, 'texture');
     } else {
         utils.headRequest(url, onload, onerror, (utils.useCredentials ? (this.mapLoaderUrl.indexOf(this.map.url.baseUrl) != -1) : false), this.map.core.xhrParams, 'blob');
     }
@@ -486,12 +489,12 @@ MapSubtexture.prototype.buildGpuTexture = function () {
     if (this.map.config.mapCheckTextureSize && (this.image.naturalWidth > 1024 || this.image.naturalHeight > 1024)) {
         console.log('very large texture: ' + this.image.naturalWidth + 'x' + this.image.naturalHeight + ' ' + this.mapLoaderUrl);
 
-        /*var size = 16;
-        var data = new Uint8Array( size * size * 4 );
+        /*const size = 16;
+        const data = new Uint8Array( size * size * 4 );
 
-        for (var i = 0; i < size; i++) {
-            for (var j = 0; j < size; j++) {
-                var index = (i*size+j)*4;
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                const index = (i*size+j)*4;
                 data[index] = 0;
                 data[index + 1] = 0;
                 data[index + 2] = 0;
@@ -499,19 +502,22 @@ MapSubtexture.prototype.buildGpuTexture = function () {
             }
         }*/
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 16;
-        canvas.height = 16;
-
-        const context = canvas.getContext('2d');
-
         //this.gpuTexture = new GpuTexture(this.map.renderer.gpu);
         //this.gpuTexture.createFromData(size, size, data);
 
-        this.gpuTexture = this.map.renderer.createTexture({ image: canvas, width: this.image.naturalWidth, height: this.image.naturalHeight});
+        if (this.map.renderer.device === VTS_DEVICE_THREE) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 16;
+            canvas.height = 16;
 
+            // eslint-disable-next-line
+            const context = canvas.getContext('2d');
 
-        //this.gpuTexture = this.map.renderer.blackTexture;
+            this.gpuTexture = this.map.renderer.gpu.createTexture({ image: canvas, width: this.image.naturalWidth, height: this.image.naturalHeight});
+        } else {
+            this.gpuTexture = this.map.renderer.gpu.blackTexture;
+        }
+
         this.gpuTexture.gpuSize = 16*16*4; //this.image.naturalWidth * this.image.naturalHeight * 4;
         return;
     }
@@ -519,9 +525,10 @@ MapSubtexture.prototype.buildGpuTexture = function () {
     //this.gpuTexture = new GpuTexture(this.map.renderer.gpu, null, this.map.core);
     //this.gpuTexture.createFromImage(this.image, (this.type == VTS_TEXTURETYPE_CLASS) ? 'nearest' : 'linear', false);
 
-    this.gpuTexture = this.map.renderer.createTexture({ image: this.image, width: this.image.naturalWidth, height: this.image.naturalHeight});
-    this.gpuSize = this.gpuTexture.gpuSize;
+    this.gpuTexture = this.map.renderer.gpu.createTexture({ image: this.image, width: this.image.naturalWidth, height: this.image.naturalHeight,
+                                                            filter: (this.type == VTS_TEXTURETYPE_CLASS) ? 'nearest' : 'linear', repeat: false});
 
+    this.gpuSize = this.gpuTexture.gpuSize;
     this.stats.gpuTextures += this.gpuSize;
 
     this.stats.graphsFluxTexture[0][0]++;
@@ -532,10 +539,10 @@ MapSubtexture.prototype.buildGpuTexture = function () {
 
 
 MapSubtexture.prototype.buildHeightMap = function () {
-    var canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = this.image.naturalWidth;
     canvas.height = this.image.naturalHeight;
-    var ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     ctx.drawImage(this.image, 0, 0);
     this.imageData = ctx.getImageData(0, 0, this.image.naturalWidth, this.image.naturalHeight).data;
     this.imageExtents = [this.image.naturalWidth, this.image.naturalHeight];

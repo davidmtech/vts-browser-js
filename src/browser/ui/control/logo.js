@@ -1,5 +1,5 @@
 
-var UIControlLogo = function(ui, visible, visibleLock) {
+const UIControlLogo = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.control = this.ui.addControl("logo",
       '<a class="vts-logo"'
@@ -10,4 +10,3 @@ var UIControlLogo = function(ui, visible, visibleLock) {
 
 
 export default UIControlLogo;
-

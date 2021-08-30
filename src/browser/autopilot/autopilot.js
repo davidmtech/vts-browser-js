@@ -1,6 +1,6 @@
 
 
-var Autopilot = function(browser) {
+const Autopilot = function(browser) {
     this.browser = browser;
     this.trajectory = [];
     this.flightDuration = 1;
@@ -45,27 +45,27 @@ Autopilot.prototype.getAutopan = function() {
 };
 
 Autopilot.prototype.flyToDAH = function(distance, azimuth, height, options) {
-    var map = this.browser.core.map;
+    const map = this.browser.core.map;
     if (!map) {
         return;
     }
-    
+
     options = options || {};
-    
-    var trajectory = map.generatePIHTrajectory(map.getPosition(), distance, azimuth, height, options);
-    this.setTrajectory(trajectory, options['samplePeriod'] || 10, options); 
+
+    const trajectory = map.generatePIHTrajectory(map.getPosition(), distance, azimuth, height, options);
+    this.setTrajectory(trajectory, options['samplePeriod'] || 10, options);
 };
 
 
 Autopilot.prototype.flyTo = function(position, options) {
-    var map = this.browser.core.map;
+    const map = this.browser.core.map;
     if (!map) {
         return;
     }
-    
+
     options = options || {};
-    var trajectory = map.generateTrajectory(map.getPosition(), position, options);
-    this.setTrajectory(trajectory, options['samplePeriod'] || 10, options); 
+    const trajectory = map.generateTrajectory(map.getPosition(), position, options);
+    this.setTrajectory(trajectory, options['samplePeriod'] || 10, options);
 };
 
 
@@ -90,32 +90,32 @@ Autopilot.prototype.setTrajectory = function(trajectory, sampleDuration, options
 
     this.speed = options['speed'] || 1.0;
     if (this.finished) {
-        this.lastControlMode = this.browser.getControlMode().getCurrentControlMode(); 
+        this.lastControlMode = this.browser.getControlMode().getCurrentControlMode();
     }
     this.browser.getControlMode().setCurrentControlMode('disabled');
 
     this.trajectory = trajectory;
     this.sampleDuration = sampleDuration;
     //this.
-    
+
     this.browser.callListener('fly-start', { 'startPosition' : this.trajectory[0],
         'endPosition' : this.trajectory[this.trajectory.length - 1],
         'options' : options
     });
-    
+
     this.timeStart = performance.now();
     this.finished = false;
 };
 
 
 Autopilot.prototype.tick = function() {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var time = performance.now(), pos;
-    var timeFactor =  (time - this.lastTime) / 1000; 
+    let time = performance.now(), pos;
+    const timeFactor =  (time - this.lastTime) / 1000;
     this.lastTime = time;
 
     if (this.browser.ui && this.browser.ui.loading &&
@@ -126,12 +126,12 @@ Autopilot.prototype.tick = function() {
 
     if (this.autoRotate != 0) {
         pos = map.getPosition();
-        var o = pos.getOrientation();
+        const o = pos.getOrientation();
         o[0] = (o[0] + this.autoRotate*timeFactor) % 360;
         pos.setOrientation(o);
         map.setPosition(pos);
     }
-    
+
     if (this.autoPan != 0) {
         pos = map.getPosition();
         pos = map.movePositionCoordsTo(pos, this.autoPanAzimuth, pos.getViewExtent()*(this.autoPan*0.01)*timeFactor, 0);
@@ -141,14 +141,14 @@ Autopilot.prototype.tick = function() {
     if (this.finished || !this.trajectory) {
         return;
     }
-    
+
     time = time - this.timeStart;
-    var sampleIndex =  Math.floor((time / this.sampleDuration)*this.speed);
-    var totalSamples = this.trajectory.length - 1; 
+    const sampleIndex =  Math.floor((time / this.sampleDuration)*this.speed);
+    const totalSamples = this.trajectory.length - 1;
 
     if (sampleIndex < totalSamples) {
         //interpolate
-        map.setPosition(this.trajectory[sampleIndex]);        
+        map.setPosition(this.trajectory[sampleIndex]);
         //console.log(JSON.stringify(this.trajectory[sampleIndex]));
 
         this.browser.callListener('fly-progress', { 'position' : this.trajectory[sampleIndex],
@@ -158,38 +158,37 @@ Autopilot.prototype.tick = function() {
     } else {
         map.setPosition(this.trajectory[totalSamples]);
         //console.log(JSON.stringify(this.trajectory[totalSamples]));
-    } 
-    
+    }
+
     if (sampleIndex >= this.trajectory.length) {
         this.browser.callListener('fly-end', { 'position' : this.trajectory[totalSamples] });
 
         this.browser.getControlMode().setCurrentControlMode(this.lastControlMode);
         this.finished = true;
-    } 
+    }
 };
 
 
 Autopilot.prototype.generateTrajectory = function(p1, p2, options) {
-    var map = this.browser.core.map;
+    const map = this.browser.core.map;
     if (!map) {
         return;
     }
-    
+
     options = options || {};
     return map.generateTrajectory(p1, p2, options);
 };
 
 
 Autopilot.prototype.generatePIHTrajectory = function(position, azimuth, distance, options) {
-    var map = this.browser.core.map;
+    const map = this.browser.core.map;
     if (!map) {
         return;
     }
-    
+
     options = options || {};
     return map.generatePIHTrajectory(position, azimuth, distance, options);
 };
 
 
 export default Autopilot;
-

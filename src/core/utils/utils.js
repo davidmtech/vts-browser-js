@@ -3,11 +3,11 @@ import {math as math_} from './math';
 import {utilsUrl as utilsUrl_} from './url';
 
 //get rid of compiler mess
-var math = math_;
-var utilsUrl = utilsUrl_;
+const math = math_;
+const utilsUrl = utilsUrl_;
 
 
-var utils = {};
+const utils = {};
 utils.useCredentials = false;
 utils.instanceCounter = 0;
 
@@ -32,7 +32,7 @@ utils.validateNumber = function(value, minValue, maxValue, defaultValue) {
 
 utils.validateNumberArray = function(array, arraySize, minValues, maxValues, defaultValues) {
     if (Array.isArray(array) && array.length == arraySize) {
-        for (var i = 0; i < arraySize; i++) {
+        for (let i = 0; i < arraySize; i++) {
             array[i] = math.clamp(array[i], minValues[i], maxValues[i]);
         }
         return array;
@@ -52,7 +52,7 @@ utils.validateString = function(value, defaultValue) {
 
 
 utils.padNumber = function(n, width) {
-    var z = '0';
+    const z = '0';
 
     if (n < 0) {
         n = (-n) + '';
@@ -66,8 +66,8 @@ utils.padNumber = function(n, width) {
 
 
 utils.decodeFloat16 = function(binary) {
-    var exponent = (binary & 0x7C00) >> 10;
-    var fraction = binary & 0x03FF;
+    const exponent = (binary & 0x7C00) >> 10;
+    const fraction = binary & 0x03FF;
     return (binary >> 15 ? -1 : 1) * (
         exponent ?
         (
@@ -96,12 +96,12 @@ utils.simpleWikiLinks = (function obj(str, plain) {
         return '';
     }
 
-    var str2 = utils.simpleFmtObj(str, {'copy':'&copy;', 'Y': (new Date().getFullYear())}); 
-    
+    const str2 = utils.simpleFmtObj(str, {'copy':'&copy;', 'Y': (new Date().getFullYear())});
+
     return str2.replace(/\[([^\]]*)\]/g, function(s, match) {
         match  = match.trim();
-        var urls = match.split(' ');//, 1);
-        
+        const urls = match.split(' ');//, 1);
+
         if (urls[0].indexOf('//') != -1) {
             if (plain) {
                 if (urls.length > 1) {
@@ -117,7 +117,7 @@ utils.simpleWikiLinks = (function obj(str, plain) {
                 }
             }
         }
-        
+
         return match;
     });
 });
@@ -135,7 +135,7 @@ utils.simpleFmtObjOrCall = (function obj(str, obj, call) {
 
 
 utils.getABGRFromHexaCode = (function(code) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(code);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(code);
 
     return result ?
     [ parseInt(result[4], 16),
@@ -159,21 +159,21 @@ utils.isPowerOfTwo = (function(value) {
 
 utils.nearestPowerOfTwo = (function(value) {
     return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
-});   
+});
 
 
 utils.fitToPowerOfTwo = (function(value) {
     return Math.pow(2, Math.ceil(Math.log(value) / Math.LN2));
-});   
+});
 
 
 utils.getHash = function(str) {
     if (!str || str.length === 0) {
-        return 0;    
+        return 0;
     }
 
-    var hash = 0, c;
-    for (var i = 0, li = str.length; i < li; i++) {
+    let hash = 0, c;
+    for (let i = 0, li = str.length; i < li; i++) {
         c   = str.charCodeAt(i);
         hash  = ((hash << 5) - hash) + c;
         hash |= 0; // Convert to 32bit integer
@@ -198,7 +198,7 @@ utils.convertYCbCr2RGB = function(y, cb, cr) {
 
 
 utils.convertHSL2RGB = function(h, s, l){
-   var r, g, b, m, c, x;
+   let r, g, b, m, c, x;
 
     h /= 60;
     if (h < 0) h = 6 - (-h % 6);
@@ -225,7 +225,7 @@ utils.convertHSL2RGB = function(h, s, l){
     }
 
     m = l - c / 2
-    
+
     return [(r + m),
             (g + m),
             (b + m)];
@@ -233,16 +233,16 @@ utils.convertHSL2RGB = function(h, s, l){
 
 
 utils.getHashColor = function(str) {
-    var h = utils.getHash(str);
-    var c = utils.convertRGB2YCbCr(h&255,(h>>8)&255,(h>>16)&255);
+    const h = utils.getHash(str);
+    const c = utils.convertRGB2YCbCr(h&255,(h>>8)&255,(h>>16)&255);
     c[0] = math.clamp(c[0], 50, 200);
     return utils.convertRGB2YCbCr(c[0],c[1],c[2]);
 };
 
 
 utils.getHashColor2 = function(counter) {
-    var h = Math.floor(counter / 18);
-    var l = 50;
+    let h = Math.floor(counter / 18);
+    let l = 50;
 
     if (h >= 1) {
         if (h % 2) {
@@ -264,8 +264,8 @@ utils.loadText = function(path, onLoaded, onError, withCredentials, xhrParams) {
 
 
 utils.loadXML = function(path, onLoaded, onError, withCredentials, xhrParams) {
-    var onLoaded2 = (function(data){
-        var parser = new DOMParser();
+    const onLoaded2 = (function(data){
+        const parser = new DOMParser();
         data = parser.parseFromString(data, 'text/xml');
         if (onLoaded) {
             onLoaded(data);
@@ -277,49 +277,48 @@ utils.loadXML = function(path, onLoaded, onError, withCredentials, xhrParams) {
 
 
 utils.loadJSON = function(path, onLoaded, onError, skipParse, withCredentials, xhrParams) {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
 
     //xhr.onload  = (function() {
     xhr.onreadystatechange = (function (){
 
         switch (xhr.readyState) {
-        case 0 : // UNINITIALIZED
-        case 1 : // LOADING
-        case 2 : // LOADED
-        case 3 : // INTERACTIVE
+        case 0: // UNINITIALIZED
+        case 1: // LOADING
+        case 2: // LOADED
+        case 3: // INTERACTIVE
             break;
-        case 4 : // COMPLETED
-    
-            if (xhr.status >= 400 || xhr.status == 0) {
-                if (onError) {
-                    onError(xhr.status);
-                }
-                break;
-            }
-    
-            var data = xhr.response;
-            var parsedData = data;
-                
-            if (!skipParse) {
-                try {
-                        //var parsedData = skipParse ? data : eval("("+data+")");
-                    parsedData = JSON.parse(data);
-                } catch(e) {
-                    // eslint-disable-next-line
-                    console.log('JSON Parse Error ('+path+'): ' + (e['message'] ? e['message'] : ''));
-                        
-                    if (onError ) {
+        case 4: // COMPLETED
+            {
+                if (xhr.status >= 400 || xhr.status == 0) {
+                    if (onError) {
                         onError(xhr.status);
                     }
-                
-                    return;
+                    break;
+                }
+
+                const data = xhr.response;
+                let parsedData = data;
+
+                if (!skipParse) {
+                    try {
+                        parsedData = JSON.parse(data);
+                    } catch(e) {
+                        // eslint-disable-next-line
+                        console.log('JSON Parse Error ('+path+'): ' + (e['message'] ? e['message'] : ''));
+
+                        if (onError ) {
+                            onError(xhr.status);
+                        }
+
+                        return;
+                    }
+                }
+
+                if (onLoaded) {
+                    onLoaded(parsedData);
                 }
             }
-                
-            if (onLoaded) {
-                onLoaded(parsedData);
-            }
-    
             break;
         }
 
@@ -334,7 +333,7 @@ utils.loadJSON = function(path, onLoaded, onError, skipParse, withCredentials, x
 
     xhr.open('GET',  path, true);
     xhr.withCredentials = withCredentials;
-    
+
     if (xhrParams && xhrParams['token'] /*&& xhrParams["tokenHeader"]*/) {
         //xhr.setRequestHeader(xhrParams["tokenHeader"], xhrParams["token"]); //old way
         xhr.setRequestHeader('Accept', 'token/' + xhrParams['token'] + ', */*');
@@ -344,63 +343,57 @@ utils.loadJSON = function(path, onLoaded, onError, skipParse, withCredentials, x
         xhr.overrideMimeType('text/xml; charset=' + xhrParams['charset']);
         //xhr.setRequestHeader('Content-type', xhrParams['Content-type']);
     }
-    
+
     xhr.send('');
 };
 
 
 utils.loadBinary = function(path, onLoaded, onError, withCredentials, xhrParams, responseType) {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = (function (){
 
         switch (xhr.readyState) {
-        case 0 : // UNINITIALIZED
-        case 1 : // LOADING
-        case 2 : // LOADED
-        case 3 : // INTERACTIVE
+        case 0: // UNINITIALIZED
+        case 1: // LOADING
+        case 2: // LOADED
+        case 3: // INTERACTIVE
             break;
-        case 4 : // COMPLETED
-    
-            if (xhr.status >= 400 || xhr.status == 0) {
-                if (onError) {
-                    onError(xhr.status);
+        case 4: // COMPLETED
+            {
+                if (xhr.status >= 400 || xhr.status == 0) {
+                    if (onError) {
+                        onError(xhr.status);
+                    }
+                    break;
                 }
-                break;
-            }
-    
-            var abuffer = xhr.response;
-                    
-            if (!abuffer) {
-                if (onError) {
-                    onError();
+
+                const abuffer = xhr.response;
+
+                if (!abuffer) {
+                    if (onError) {
+                        onError();
+                    }
+                    break;
                 }
-                break;
+
+                if (onLoaded) {
+                    onLoaded(abuffer);
+                }
             }
-                    
-                    //if (!responseType || responseType == "arraybuffer") {
-                        //var data = new DataView(abuffer);
-                    //} else {
-                      //  var data = abuffer;
-                    //}
-    
-            if (onLoaded) {
-                onLoaded(abuffer);
-            }
-    
             break;
-    
+
         default:
-    
+
             if (onError) {
                 onError();
             }
-    
+
             break;
         }
 
     }).bind(this);
-    
+
     /*
     xhr.onerror  = (function() {
         if (onError) {
@@ -421,8 +414,8 @@ utils.loadBinary = function(path, onLoaded, onError, withCredentials, xhrParams,
 };
 
 
-utils.headRequest = function(url, onLoaded, onError, withCredentials, xhrParams) { 
-    var xhr = new XMLHttpRequest();
+utils.headRequest = function(url, onLoaded, onError, withCredentials, xhrParams) {
+    const xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = (function (){
 
@@ -438,13 +431,13 @@ utils.headRequest = function(url, onLoaded, onError, withCredentials, xhrParams)
                     //onLoaded(xhr.getResponseHeader("X-VE-Tile-Info"), xhr.status);
             }
             break;
-    
+
         default:
-    
+
             if (onError != null) {
                 onError();
             }
-    
+
             break;
         }
 
@@ -470,7 +463,7 @@ utils.headRequest = function(url, onLoaded, onError, withCredentials, xhrParams)
 
 
 utils.loadImage = function(url, onload, onerror, withCredentials, direct) {
-    var image = new Image();
+    const image = new Image();
     image.onerror = onerror;
     image.onload = onload;
 
@@ -488,8 +481,7 @@ utils.getParamsFromUrl = function(url) {
 };
 
 
-//var textDecoderUtf8 = null; //(typeof TextDecoder !== 'undefined') ? (new TextDecoder('utf-8')) : null;
-var textDecoderUtf8 = (typeof TextDecoder !== 'undefined') ? (new TextDecoder('utf-8')) : null;
+const textDecoderUtf8 = (typeof TextDecoder !== 'undefined') ? (new TextDecoder('utf-8')) : null;
 
 utils.unint8ArrayToString = function(array) {
     if (textDecoderUtf8) {
@@ -498,12 +490,12 @@ utils.unint8ArrayToString = function(array) {
 //        return String.fromCharCode.apply(null, new Uint8Array(array.buffer));
 
         /*
-        var buff = new Uint16Array(array.buffer, array.byteOffset, array.byteLength);
-        var getChar = String.fromCharCode;
-        //var buff2 = new Array(buff.length);
-        var str = '';
+        const buff = new Uint16Array(array.buffer, array.byteOffset, array.byteLength);
+        const getChar = String.fromCharCode;
+        //const buff2 = new Array(buff.length);
+        const str = '';
 
-        for (var i = 0, li = buff.length; i < li; i++) {
+        for (let i = 0, li = buff.length; i < li; i++) {
             //buff2[i] = getChar(buff[i]);
             str += getChar(buff[i]);
         }
@@ -512,14 +504,14 @@ utils.unint8ArrayToString = function(array) {
         //return buff2.join('');
         */
 
-        var s = '';
-        //var code_points2 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
-        var code_points2 = new Uint8Array(array.byteLength);
+        let s = '';
+        //const code_points2 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+        const code_points2 = new Uint8Array(array.byteLength);
         code_points2.set(array);
-        var code_points = new Uint32Array(code_points2.buffer);
+        const code_points = new Uint32Array(code_points2.buffer);
 
-        for (var i = 0, li = code_points.length; i < li; ++i) {
-          var cp = code_points[i];
+        for (let i = 0, li = code_points.length; i < li; ++i) {
+          let cp = code_points[i];
           if (cp <= 0xFFFF) {
             s += String.fromCharCode(cp);
           } else {

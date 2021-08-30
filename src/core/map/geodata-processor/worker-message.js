@@ -2,7 +2,7 @@
 import {globals as globals_, stringToUint8Array as stringToUint8Array_ } from './worker-globals.js';
 
 //get rid of compiler mess
-var globals = globals_, stringToUint8Array = stringToUint8Array_;
+const globals = globals_, stringToUint8Array = stringToUint8Array_;
 var tmpVertexBuffer = new Uint8Array(65536*4*4*4*4);
 var tmpVertexBuffer2 = new Uint8Array(65536*4*4*4*4);
 var packedEvents = [];
@@ -32,15 +32,16 @@ function postPackedMessage(message, transferables) {
 
 function postGroupMessageFast(command, type, message, buffers, signature) {
 
-    var message2 = stringToUint8Array(JSON.stringify(message));
-    var messageSize = 1+1+4+message2.byteLength, i, li;
+    const message2 = stringToUint8Array(JSON.stringify(message));
+    let messageSize = 1+1+4+message2.byteLength;
 
-    for (i = 0, li = buffers.length; i < li; i++) {
+    for (let i = 0, li = buffers.length; i < li; i++) {
         messageSize += 4+buffers[i].byteLength;
     }
 
-    var buff = new Uint8Array(messageSize);
-    var view = new DataView(buff.buffer), index = 0, index2 = 0;
+    const buff = new Uint8Array(messageSize);
+    const view = new DataView(buff.buffer);
+    let index = 0, index2 = 0;
 
     view.setUint8(index, command); index += 1;
     view.setUint8(index, type); index += 1;
@@ -48,7 +49,7 @@ function postGroupMessageFast(command, type, message, buffers, signature) {
     buff.set(message2, index); index += message2.byteLength;
     index2 = index;
 
-    for (i = 0, li = buffers.length; i < li; i++) {
+    for (let i = 0, li = buffers.length; i < li; i++) {
         view.setUint32(index, buffers[i].length); index += 4;
         buff.set( new Uint8Array(buffers[i].buffer), index); index += buffers[i].byteLength;
     }
@@ -58,10 +59,11 @@ function postGroupMessageFast(command, type, message, buffers, signature) {
 
 
 function postGroupMessageLite(command, type, number) {
-    var messageSize = 1+1+4, index = 0;
+    const messageSize = 1+1+4;
+    let index = 0;
 
-    var buff = new ArrayBuffer(messageSize);
-    var view = new DataView(buff), index = 0;
+    const buff = new ArrayBuffer(messageSize);
+    const view = new DataView(buff);
 
     view.setUint8(index, command); index += 1;
     view.setUint8(index, type); index += 1;
@@ -73,16 +75,16 @@ function postGroupMessageLite(command, type, number) {
 
 function postGroupMessageDirect(command, type, message, buffersIndex, signature, hitable, totalPoints, job2) {
 
-    if (globals.messageBufferIndex >= globals.messageBufferSize) { 
-        var oldBuffer = globals.messageBuffer; 
+    if (globals.messageBufferIndex >= globals.messageBufferSize) {
+        const oldBuffer = globals.messageBuffer;
         globals.messageBufferSize += 65536;
         globals.messageBuffer = new Array(globals.messageBufferSize);
-        
-        for (var i = 0, li = globals.messageBufferIndex; i < li; i++) {
+
+        for (let i = 0, li = globals.messageBufferIndex; i < li; i++) {
             globals.messageBuffer[i] = oldBuffer[i];
         }
     }
-    
+
     globals.messageBuffer[globals.messageBufferIndex] = { command: command, type: type, job : message, buffersIndex: buffersIndex, signature: signature, hitable: hitable, totalPoints: totalPoints, job2: job2 };
     globals.messageBufferIndex++;
     globals.messagePackSize += message.byteLength;
@@ -90,10 +92,10 @@ function postGroupMessageDirect(command, type, message, buffersIndex, signature,
 
 
 function setToTmpBuffer(index, buffer2, offset) {
-    var buffer = (index == 1) ? tmpVertexBuffer2 : tmpVertexBuffer;
+    let buffer = (index == 1) ? tmpVertexBuffer2 : tmpVertexBuffer;
 
     if (buffer.byteLength <= buffer2.byteLength + offset) {
-        var buffer3 = new Uint8Array(buffer.byteLength * 2);
+        const buffer3 = new Uint8Array(buffer.byteLength * 2);
         buffer3.set(buffer, 0);
         buffer = buffer3;
 
@@ -111,21 +113,21 @@ function setToTmpBuffer(index, buffer2, offset) {
 function optimizeGroupMessages() {
 
     //loop messages
-    var messages = globals.messageBuffer;
-    var j, lk, k, message2, job2, bufferSize, buffer, view, index, length, buff, buff2, index, count, totalVertices;
+    const messages = globals.messageBuffer;
+    let j, lk, k, message2, bufferSize, buffer, view, length, index, count, totalVertices;
 
 
-    for (var i = 0, li = globals.messageBufferIndex; i < li; i++) {
-        var message = messages[i];
-        var job = message.job;
-        var type = message.type;
-        var signature = message.signature;
+    for (let i = 0, li = globals.messageBufferIndex; i < li; i++) {
+        const message = messages[i];
+        //const job = message.job;
+        const type = message.type;
+        const signature = message.signature;
 
         //console.log('command: ' + message.command + ' type:' + message.type);
-        
-        if (!message.hitable && !message.reduced && 
+
+        if (!message.hitable && !message.reduced &&
             (type >= VTS_WORKER_TYPE_FLAT_LINE && type <= VTS_WORKER_TYPE_POLYGON)) {
-            
+
             switch(type) {
             case VTS_WORKER_TYPE_POLYGON:
             case VTS_WORKER_TYPE_FLAT_LINE:
@@ -171,7 +173,7 @@ function optimizeGroupMessages() {
                 }
 
                 break;
-                    
+
             case VTS_WORKER_TYPE_PIXEL_LINE:
             case VTS_WORKER_TYPE_LINE_LABEL:
             case VTS_WORKER_TYPE_FLAT_RLINE:
@@ -204,6 +206,8 @@ function optimizeGroupMessages() {
                         length = (new DataView(message2.job)).getUint32(message2.buffersIndex);
                         //console.log('count:' + count + ' totalPoints:' + message2.totalPoints + ' length:' + length + ' jobl:' + message2.job.byteLength + ' remaning:' + (message2.job.byteLength - (message2.buffersIndex+4)) + ' bufferSize:' + bufferSize + ' totalVertices:' + totalVertices);
                         length *= 4;
+
+                        // eslint-disable-next-line
                         totalVertices += length;
 
 
@@ -217,15 +221,15 @@ function optimizeGroupMessages() {
                         bufferSize += length;
 
                         if (type == VTS_WORKER_TYPE_LINE_LABEL) {
-                            var files = message.job2['files'];
-                            var files2 = message2.job2['files'];
+                            const files = message.job2['files'];
+                            const files2 = message2.job2['files'];
 
                             for (k = 0, lk = files2.length; k < lk; k++) {
                                 if (!files[k]) {
                                     files[k] = [];
                                 }
 
-                                for (var m = 0, lm = files2[k].length; m < lm; m++) {
+                                for (let m = 0, lm = files2[k].length; m < lm; m++) {
                                     if (files[k].indexOf(files2[k][m]) == -1) {
                                         files[k].push(files2[k][m]);
                                     }
@@ -240,7 +244,7 @@ function optimizeGroupMessages() {
                     //create new message with merged vertices
 
                     if (type == VTS_WORKER_TYPE_LINE_LABEL) { //we have to rebuild header
-                        var buffjob = stringToUint8Array(JSON.stringify(message.job2));
+                        const buffjob = stringToUint8Array(JSON.stringify(message.job2));
 
                         buffer = new Uint8Array(1+1+4+buffjob.byteLength+2*(4+bufferSize));
                         view = new DataView(buffer.buffer), index = 0;
@@ -271,14 +275,15 @@ function optimizeGroupMessages() {
 
                 break;
             }
-        
+
         }
     }
 
-    var buffer = new Uint8Array(globals.messagePackSize), index = 0;
+    buffer = new Uint8Array(globals.messagePackSize);
+    index = 0;
 
-    for (var i = 0, li = globals.messageBufferIndex; i < li; i++) {
-        var message = globals.messageBuffer[i];
+    for (let i = 0, li = globals.messageBufferIndex; i < li; i++) {
+        const message = globals.messageBuffer[i];
 
         if (!message.reduced) {
             buffer.set(new Uint8Array(message.job), index);
@@ -292,7 +297,7 @@ function optimizeGroupMessages() {
 
     globals.messageBufferIndex = 0;
     globals.messagePackSize = 0;
-} 
+}
 
 
 function postPackedMessages() {
@@ -310,4 +315,3 @@ function postPackedMessages() {
 
 
 export {optimizeGroupMessages, postGroupMessageFast, postGroupMessageLite, postPackedMessage, postPackedMessages};
-

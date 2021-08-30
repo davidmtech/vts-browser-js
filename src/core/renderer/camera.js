@@ -3,11 +3,11 @@ import {vec3 as vec3_, vec4 as vec4_, mat4 as mat4_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
 
 //get rid of compiler mess
-var vec3 = vec3_, vec4 = vec4_, mat4 = mat4_;
-var math = math_;
+const vec3 = vec3_, vec4 = vec4_, mat4 = mat4_;
+const math = math_;
 
 
-var Camera = function(parent, fov, near, far) {
+const Camera = function(parent, fov, near, far) {
     this.parent = parent;
     this.position = [0,0,0];
     this.orientation = [0,0,0];
@@ -97,7 +97,7 @@ Camera.prototype.setParams = function(fov, near, far) {
 
 
 Camera.prototype.clone = function(newFov) {
-    var camera = new Camera(this. parent, (newFov != null) ? newFov : this.getFov(), this.getNear(), this.getFar());
+    const camera = new Camera(this. parent, (newFov != null) ? newFov : this.getFov(), this.getNear(), this.getFar());
 
     camera.setPosition(this.getPosition());
     camera.setOrientation(this.getOrientation());
@@ -170,10 +170,10 @@ Camera.prototype.getMvpFMatrix = function() {
 Camera.prototype.scaleFactor = function(worldPos, returnDist) {
     if (this.dirty) this.update();
 
-    //var camPos = vec4.create();
+    //const camPos = vec4.create();
     //mat4.multiplyVec4(this.modelview, worldPos, camPos);
     mat4.multiplyVec3(this.modelview, worldPos, this.scaleFactorVec);
-    var dist = vec3.length(this.scaleFactorVec); // distance from camera
+    const dist = vec3.length(this.scaleFactorVec); // distance from camera
 
     // the expression "projection(0,0) / depth" is the derivative of the
     // screen X position by the camera space X coordinate.
@@ -183,7 +183,7 @@ Camera.prototype.scaleFactor = function(worldPos, returnDist) {
 
     if (returnDist) {
         if (dist < this.near) return [Number.POSITIVE_INFINITY, dist];
-        return [this.projection[0] / dist, dist]; 
+        return [this.projection[0] / dist, dist];
         //return [(this.projection[5]*0.5) / dist, dist]; //projection by sy
     }
 
@@ -203,7 +203,7 @@ Camera.prototype.scaleFactor2 = function(dist) {
 
 
 Camera.prototype.distance = function(worldPos) {
-    var delta = vec3.create();
+    const delta = vec3.create();
     vec3.subtract(this.position, worldPos, delta);
     return vec3.length(delta);
 };
@@ -213,7 +213,7 @@ Camera.prototype.distance = function(worldPos) {
 Camera.prototype.pointVisible = function(point, shift) {
     if (this.dirty) this.update();
 
-    var p;
+    let p;
 
     if (shift) {
         p = [ point[0] - shift[0], point[1] - shift[1], point[2] - shift[2], 1 ];
@@ -222,7 +222,7 @@ Camera.prototype.pointVisible = function(point, shift) {
     }
 
     // test all frustum planes quickly
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         // check if point lie on the negative side of the frustum plane
         if (vec4.dot(this.frustumPlanes[i], p) < 0) {
             return false;
@@ -237,9 +237,9 @@ Camera.prototype.pointVisible = function(point, shift) {
 // Returns true if the box intersects the camera frustum.
 Camera.prototype.pointsVisible = function(points, shift) {
     if (this.dirty) this.update();
-   
-    var planes = this.frustumPlanes;
-    var lj = points.length, sx, sy, sz;
+
+    const planes = this.frustumPlanes;
+    let lj = points.length, sx, sy, sz;
 
     if (shift) {
         sx = shift[0];
@@ -250,15 +250,15 @@ Camera.prototype.pointsVisible = function(points, shift) {
         sy = 0;
         sz = 0;
     }
-        
-    var dot = vec4.dot3;
+
+    const dot = vec4.dot3;
 
     // test all frustum planes quickly
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         // check if all points lie on the negative side of the frustum plane
-        var negative = true;
-        var plane = planes[i];
-        for (var j = 0; j < lj; j+=3) {
+        let negative = true;
+        const plane = planes[i];
+        for (let j = 0; j < lj; j+=3) {
             if (dot(plane, points, j, sx, sy, sz) >= 0) {
                 //return false;
                 negative = false;
@@ -274,9 +274,9 @@ Camera.prototype.pointsVisible = function(points, shift) {
 
 Camera.prototype.pointsVisible2 = function(points, shift) {
     if (this.dirty) this.update();
-   
-    var planes = this.frustumPlanes;
-    var lj = points.length, sx, sy, sz;
+
+    const planes = this.frustumPlanes;
+    let lj = points.length, sx, sy, sz;
 
     if (shift) {
         sx = shift[0];
@@ -287,15 +287,15 @@ Camera.prototype.pointsVisible2 = function(points, shift) {
         sy = 0;
         sz = 0;
     }
-        
-    var dot = vec4.dot3;
+
+    const dot = vec4.dot3;
 
     // test all frustum planes quickly
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         // check if all points lie on the negative side of the frustum plane
-        var negative = true;
-        var plane = planes[i];
-        for (var j = 0; j < lj; j++) {
+        let negative = true;
+        const plane = planes[i];
+        for (let j = 0; j < lj; j++) {
             if (dot(plane, points[j], 0, sx, sy, sz) >= 0) {
                 //return false;
                 negative = false;
@@ -313,57 +313,57 @@ Camera.prototype.pointsVisible2 = function(points, shift) {
 Camera.prototype.bboxVisible = function(bbox, shift) {
     if (this.dirty) this.update();
 
-    var min = bbox.min;
-    var max = bbox.max;
-    var points = this.bboxPoints;
-    var p, minX, minY, minZ, maxX, maxY, maxZ;
+    const min = bbox.min;
+    const max = bbox.max;
+    const points = this.bboxPoints;
+    let p, minX, minY, minZ, maxX, maxY, maxZ;
 
     if (shift) {
-        minX = min[0] - shift[0];        
-        minY = min[1] - shift[1];        
-        minZ = min[2] - shift[2];        
-       
-        maxX = max[0] - shift[0];        
-        maxY = max[1] - shift[1];        
-        maxZ = max[2] - shift[2];        
-    } else {
-        minX = min[0];        
-        minY = min[1];        
-        minZ = min[2];        
+        minX = min[0] - shift[0];
+        minY = min[1] - shift[1];
+        minZ = min[2] - shift[2];
 
-        maxX = max[0];        
-        maxY = max[1];        
-        maxZ = max[2];        
+        maxX = max[0] - shift[0];
+        maxY = max[1] - shift[1];
+        maxZ = max[2] - shift[2];
+    } else {
+        minX = min[0];
+        minY = min[1];
+        minZ = min[2];
+
+        maxX = max[0];
+        maxY = max[1];
+        maxZ = max[2];
     }
 
     p = points[0];
-    p[0] = minX;  p[1] = minY; p[2] = minZ; 
+    p[0] = minX;  p[1] = minY; p[2] = minZ;
     p = points[1];
-    p[0] = minX;  p[1] = minY; p[2] = maxZ; 
+    p[0] = minX;  p[1] = minY; p[2] = maxZ;
     p = points[2];
-    p[0] = minX;  p[1] = maxY; p[2] = minZ; 
+    p[0] = minX;  p[1] = maxY; p[2] = minZ;
     p = points[3];
-    p[0] = minX;  p[1] = maxY; p[2] = maxZ; 
+    p[0] = minX;  p[1] = maxY; p[2] = maxZ;
 
     p = points[4];
-    p[0] = maxX;  p[1] = minY; p[2] = minZ; 
+    p[0] = maxX;  p[1] = minY; p[2] = minZ;
     p = points[5];
-    p[0] = maxX;  p[1] = minY; p[2] = maxZ; 
+    p[0] = maxX;  p[1] = minY; p[2] = maxZ;
     p = points[6];
-    p[0] = maxX;  p[1] = maxY; p[2] = minZ; 
+    p[0] = maxX;  p[1] = maxY; p[2] = minZ;
     p = points[7];
-    p[0] = maxX;  p[1] = maxY; p[2] = maxZ; 
+    p[0] = maxX;  p[1] = maxY; p[2] = maxZ;
 
 
-    var dot = vec4.dot2;
-    var planes = this.frustumPlanes;
+    const dot = vec4.dot2;
+    const planes = this.frustumPlanes;
 
     // test all frustum planes quickly
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         // check if all points lie on the negative side of the frustum plane
-        var negative = true;
-        var plane = planes[i];
-        for (var j = 0; j < 8; j++) {
+        let negative = true;
+        const plane = planes[i];
+        for (let j = 0; j < 8; j++) {
             if (dot(plane, points[j]) >= 0) {
                 //return false;
                 negative = false;
@@ -377,7 +377,7 @@ Camera.prototype.bboxVisible = function(bbox, shift) {
     return true;
 };
 
-
+// eslint-disable-next-line
 Camera.prototype.update = function(zoffset) {
     // modelview matrix, this is essentially the inverse of a matrix that
     // brings the camera from the origin to its world position (the inverse
@@ -410,9 +410,9 @@ Camera.prototype.update = function(zoffset) {
     // transform the frustum planes to the world space, remember that
     // planes in homogeneous coordinates transform as p' = M^{-T} * p, where
     // M^{-T} is the transpose of inverse of M
-    var mvpt = mat4.create();
+    const mvpt = mat4.create();
     mat4.transpose(this.mvp, mvpt); //without zoffset
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         this.frustumPlanes[i] = mat4.multiplyVec4(mvpt, this.frustumPlanes[i]);
     }
 

@@ -1,5 +1,5 @@
 
-var UIControlLoading = function(ui, visible) {
+const UIControlLoading = function(ui, visible) {
     this.ui = ui;
     this.control = this.ui.addControl('loading',
       '<div id="vts-loading" class="vts-loading">'
@@ -22,10 +22,10 @@ var UIControlLoading = function(ui, visible) {
         this.control.getElement('vts-loading-dot4'),
         this.control.getElement('vts-loading-dot5')
     ];
-    
+
     this.time = Date.now();
     this.hiding = null;
-    
+
     //setTimeout(this.hide.bind(this), 5000);
 };
 
@@ -49,24 +49,24 @@ UIControlLoading.prototype.show = function() {
 
 UIControlLoading.prototype.hide = function() {
     this.hiding = Date.now();
-    
-    var search = this.ui.config.controlSearch;
+
+    let search = this.ui.config.controlSearch;
     if (search && !this.ui.browser.config.controlSearchUrl) { //enable search for melown2015 reference frame only
-        var map = this.ui.browser.getMap();
+        const map = this.ui.browser.getMap();
         if (map) {
             //search = (map.getReferenceFrame()["id"] == "melown2015");
-            
-            var radius = map.getSrsInfo(map.getReferenceFrame()['physicalSrs'])['a'];
-            
+
+            const radius = map.getSrsInfo(map.getReferenceFrame()['physicalSrs'])['a'];
+
             if (radius < (6378137 + 50000) && radius > (6378137 - 50000)) { //is it earth
-                search = true;  
+                search = true;
             } else {
-                search = false;  
+                search = false;
             }
             //search = (map.getSrsInfo(map.getReferenceFrame()["physical"]) == "melown2015");
         }
-    } 
-   
+    }
+
     this.ui.setControlVisible('compass', this.ui.config.controlCompass, false);
     this.ui.setControlVisible('zoom', this.ui.config.controlZoom, false);
     this.ui.setControlVisible('space', this.ui.config.controlSpace, false);
@@ -82,13 +82,13 @@ UIControlLoading.prototype.hide = function() {
 
 
 UIControlLoading.prototype.update = function() {
-    var timer = Date.now();
-    var timeDelta;
+    const timer = Date.now();
+    let timeDelta;
 
-    if (this.hiding) { 
+    if (this.hiding) {
         timeDelta = (timer - this.hiding) * 0.001;
         this.loading.setStyle('opacity', (1-Math.min(1.0, timeDelta*2)) + '' );
-        
+
         if (timeDelta > 0.5) {
             this.control.setVisible(false);
         }
@@ -99,24 +99,24 @@ UIControlLoading.prototype.update = function() {
 
     //sine wave
     /*
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         this.dots[i].setStyle("top", (Math.sin(((Math.PI*1.5)/5)*i+timeDelta*Math.PI*2)*10)+"%");
     }*/
 
-    //opacity    
-    for (var i = 0; i < 5; i++) {
+    //opacity
+    for (let i = 0; i < 5; i++) {
         //this.dots[i].setStyle("opacity", (Math.sin(((Math.PI*1.5)/5)*i+timeDelta*Math.PI*2)*60+20)+"%");
         this.dots[i].setStyle('opacity', (Math.sin(((Math.PI*1.5)/5)*i-timeDelta*Math.PI*2)*0.6+0.2));
     }
 
-    var map = this.ui.browser.getMap();
+    const map = this.ui.browser.getMap();
     if (!map) {
         return;
     }
 
-    var stats = map.getStats();
+    const stats = map.getStats();
 
-    if ((stats['surfaces'] == 0 && stats['freeLayers'] == 0) ||  //nothing to load 
+    if ((stats['surfaces'] == 0 && stats['freeLayers'] == 0) ||  //nothing to load
         ((timer - this.time) > 7000) || //loading takes too long
         (stats['downloading'] == 0 && stats['lastDownload'] > 0 && (timer - stats['lastDownload']) > 1000) || //or everything loaded
         (stats['bestMeshTexelSize'] != 0 && stats['bestMeshTexelSize'] <= (stats['texelSizeFit'] * 3) || //or resolution is good enough

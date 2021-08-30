@@ -1,5 +1,5 @@
 
-var MapBody = function(map, json) {
+const MapBody = function(map, json) {
     //this.map = map;
     //this.id = json["id"] || null;
     this.parse(json);

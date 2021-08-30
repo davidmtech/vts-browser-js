@@ -4,19 +4,19 @@ import {math as math_} from '../utils/math';
 import {vec3 as vec3_, mat4 as mat4_} from '../utils/matrix';
 
 //get rid of compiler mess
-var math = math_;
-//var GpuTexture = GpuTexture_;
-var vec3 = vec3_, mat4 = mat4_;
+const math = math_;
+//const GpuTexture = GpuTexture_;
+const vec3 = vec3_, mat4 = mat4_;
 
 
-var InspectorReplay = function(inspector) {
+const InspectorReplay = function(inspector) {
     this.inspector = inspector;
     this.core = inspector.core;
 };
 
 
 InspectorReplay.prototype.init = function() {
-    var inspector = this.inspector;
+    const inspector = this.inspector;
     inspector.addStyle(
         '#vts-replay-panel {'
             + 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;'
@@ -218,12 +218,12 @@ InspectorReplay.prototype.showPanel = function() {
     this.element.style.display = 'block';
     this.panelVisible = true;
 
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
+    const replay = map.draw.replay;
     this.updateFileInfo(replay.loadedIndex);
     this.updateLoadGraphs();
 };
@@ -277,12 +277,12 @@ InspectorReplay.prototype.onSliderChange = function(type, button) {
         }
     }
 
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
+    const replay = map.draw.replay;
 
     if (type == 'lod') {
         replay.lod = parseFloat(this.lodText.value);
@@ -305,12 +305,12 @@ InspectorReplay.prototype.onTextChange = function(type) {
         this.timeSlider.value = this.timeText.value;
     }
 
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
+    const replay = map.draw.replay;
 
     if (type == 'lod') {
         replay.lod = parseFloat(this.lodText.value);
@@ -325,21 +325,21 @@ InspectorReplay.prototype.onTextChange = function(type) {
 
 
 InspectorReplay.prototype.generateCameraLines = function(camera) {
-    var renderer = this.core.getRendererInterface();
-    var p1 = camera.position;
-    var p2 = camera.center;
+    const renderer = this.core.getRendererInterface();
+    let p1 = camera.position;
+    const p2 = camera.center;
 
     this.cameraLines = [p1, p2];
 /*
-    var screenSize = renderer.getCanvasSize();
+    const screenSize = renderer.getCanvasSize();
 
-    var v1 = map.getScreenRay(0+1,0+1);
-    var v2 = map.getScreenRay(screenSize[0]-1,0+1);
-    var v3 = map.getScreenRay(screenSize[0]-1,screenSize[1]-1);
-    var v4 = map.getScreenRay(0+1,screenSize[1]-1);
-    var v5 = map.getScreenRay(screenSize[0]*0.5,screenSize[1]*0.5);
+    const v1 = map.getScreenRay(0+1,0+1);
+    const v2 = map.getScreenRay(screenSize[0]-1,0+1);
+    const v3 = map.getScreenRay(screenSize[0]-1,screenSize[1]-1);
+    const v4 = map.getScreenRay(0+1,screenSize[1]-1);
+    const v5 = map.getScreenRay(screenSize[0]*0.5,screenSize[1]*0.5);
 
-    var l = camera.distance;
+    const l = camera.distance;
 
     //l = map.getPositionViewExtent(pos);
 
@@ -360,10 +360,10 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
 /*
     this.cameraLines2 = [p1];
 
-    for (var y = 0; y < screenSize[1]*0.5; y += 100) {
-        for (var x = screenSize[0]*0.5; x < screenSize[0]; x += 100) {
+    for (let y = 0; y < screenSize[1]*0.5; y += 100) {
+        for (let x = screenSize[0]*0.5; x < screenSize[0]; x += 100) {
 
-            var v1 = map.getScreenRay(x,y);
+            const v1 = map.getScreenRay(x,y);
             vec3.scale(v1, l);
             vec3.add(v1, p1);
 
@@ -373,28 +373,28 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
 */
     this.cameraLines2 = [[p1], [p1], [p1], [p1]];
 
-    var segments = 16;
+    let segments = 16;
 
-    var map2 = this.core.getMap();
+    const map2 = this.core.getMap();
 
-    var m2 = map2.camera.getRotationviewMatrix();
-    var m = mat4.create();
+    const m2 = map2.camera.getRotationviewMatrix();
+    const m = mat4.create();
     mat4.inverse(m2, m);
 
     this.cameraMatrix = m;
 
-    var a = Math.tan(math.radians(map2.camera.getFov()));
-    var b = a * map2.camera.getAspect();
-    var c = Math.sqrt(a*a + b*b);
+    const a = Math.tan(math.radians(map2.camera.getFov()));
+    const b = a * map2.camera.getAspect();
+    const c = Math.sqrt(a*a + b*b);
 
-    var dfov = Math.atan(c/1);
+    const dfov = Math.atan(c/1);
 
-    var l = camera.cameraDistance / segments;
-    var l2 = 0.5 * l * Math.tan(dfov);
-    var l3 = l2 * map2.camera.getAspect();
-    var v1, v2, v3, v4;
+    let l = camera.cameraDistance / segments;
+    let l2 = 0.5 * l * Math.tan(dfov);
+    let l3 = l2 * map2.camera.getAspect();
+    let v1, v2, v3, v4;
 
-    for (var i = 0; i < segments; i++) {
+    for (let i = 0; i < segments; i++) {
         v1 = [-l3, -l2, -l];
         v2 = [l3, -l2, -l];
         v3 = [l3, l2, -l];
@@ -429,7 +429,7 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
     l2 = 0.5 * l * Math.tan(dfov);
     l3 = l2 * map2.camera.getAspect();
 
-    for (i = 0; i < segments; i++) {
+    for (let i = 0; i < segments; i++) {
         v1 = [-l3, -l2, -l];
         v2 = [l3, -l2, -l];
         v3 = [l3, l2, -l];
@@ -468,7 +468,7 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
 
     p1 = [0,0,0];
 
-    var vertices = [ p1[0], p1[1], p1[2],
+    const vertices = [ p1[0], p1[1], p1[2],
         v1[0], v1[1], v1[2],
         v2[0], v2[1], v2[2],
 
@@ -485,12 +485,12 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
         v1[0], v1[1], v1[2]
     ];
 
-    var uvs = [ 0,0, 0,0, 0,0,
+    const uvs = [ 0,0, 0,0, 0,0,
         0,0, 0,0, 0,0,
         0,0, 0,0, 0,0,
         0,0, 0,0, 0,0 ];
 
-    var normals = [ 0,0,1, 0,0,1, 0,0,1,
+    const normals = [ 0,0,1, 0,0,1, 0,0,1,
         0,0,1, 0,0,1, 0,0,1,
         0,0,1, 0,0,1, 0,0,1,
         0,0,1, 0,0,1, 0,0,1 ];
@@ -508,12 +508,12 @@ InspectorReplay.prototype.generateCameraLines = function(camera) {
 
 
 InspectorReplay.prototype.itemButton = function(item, button) {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
+    const replay = map.draw.replay;
 
     switch (item) {
     case 'DrawnTiles':
@@ -547,7 +547,7 @@ InspectorReplay.prototype.itemButton = function(item, button) {
     case 'Camera':
 
         if (button == 'S') {
-            var camera = replay.camera = {
+            const camera = replay.camera = {
                 distance : map.camera.distance,
                 position : map.camera.position.slice(),
                 vector : map.camera.vector.slice(),
@@ -575,15 +575,15 @@ InspectorReplay.prototype.itemButton = function(item, button) {
 
 
 InspectorReplay.prototype.switchItem = function(item, htmlId) {
-    var element = document.getElementById(htmlId);
+    const element = document.getElementById(htmlId);
     //element.checked;
     //this.applyMapView();
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
+    const replay = map.draw.replay;
 
     switch (item) {
     case 'DrawnTiles':
@@ -616,15 +616,18 @@ InspectorReplay.prototype.switchItem = function(item, htmlId) {
         break;
 
     case 'Globe':
-        var renderer = this.core.getRenderer();
+        {
+            const renderer = this.core.getRenderer();
 
-        if (!this.globeTexture) {
-            var texture = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAEACAMAAADyTj5VAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo0Mzk4RkVFMzlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo0Mzk4RkVFNDlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjQzOThGRUUxOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjQzOThGRUUyOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+5rvbhAAAAAZQTFRFwcHBLS0tMDfv/wAAAiZJREFUeNrs2LENAEEIA0HTf9ME5DTgIZn8ta+TnLjymzuW6kMIwIcQgA8hAAqAAmBdAM4O4E/wBPgQAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACEIAPIQAfwg7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABSAAH0IAPoQAfAgB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQAPxcAQYAZt2IEFFJhxsAAAAASUVORK5CYII=';
-            this.globeTexture = new GpuTexture(renderer.gpu, texture, this.core, null, true);
+            if (!this.globeTexture) {
+                const texture = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAEACAMAAADyTj5VAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo0Mzk4RkVFMzlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo0Mzk4RkVFNDlGNjUxMUU2OTBDM0I0OEM1NjU0RURBMyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjQzOThGRUUxOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjQzOThGRUUyOUY2NTExRTY5MEMzQjQ4QzU2NTRFREEzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+5rvbhAAAAAZQTFRFwcHBLS0tMDfv/wAAAiZJREFUeNrs2LENAEEIA0HTf9ME5DTgIZn8ta+TnLjymzuW6kMIwIcQgA8hAAqAAmBdAM4O4E/wBPgQAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACoAAoANoBnB2AngAKgAKgACgACoB2AGcHoCeAAqAAKAAKgAKgHcDZAegJoAAoAAqAAqAAaAdwdgB6AigACoACEIAPIQAfwg7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABSAAH0IAPoQAfAgB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQALQDODsAPQEUAAVAAVAAFADtAM4OQE8ABUABUAAUAAVAO4CzA9ATQAFQABQABUAB0A7g7AD0BFAAFAAFQAFQAPxcAQYAZt2IEFFJhxsAAAAASUVORK5CYII=';
+                //this.globeTexture = new GpuTexture(renderer.gpu, texture, this.core, null, true);
+                this.globeTexture = renderer.gpu.createTexture({ image: texture, repeat: true});
+            }
+
+            this.drawGlobe = element.checked;
+            //this.drawGlobe = this.drawGlobe;
         }
-
-        this.drawGlobe = element.checked;
-        this.drawGlobe = this.drawGlobe;
         break;
     }
 
@@ -633,20 +636,20 @@ InspectorReplay.prototype.switchItem = function(item, htmlId) {
 
 
 InspectorReplay.prototype.updateLoadGraphs = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
-    var loaded = replay.loaded;
-    var index = replay.loadedIndex;
+    const replay = map.draw.replay;
+    const loaded = replay.loaded;
+    let index = replay.loadedIndex;
 
     this.timeSlider.max = loaded.length;
 
-    var ctx;
-    var lx = 340;
-    var ly = 30;
+    let ctx;
+    const lx = 340;
+    const ly = 30;
 
     this.ctxMeshes.fillStyle = '#000000';
     this.ctxMeshes.fillRect(0, 0, lx, ly);
@@ -663,8 +666,8 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
     this.ctxThreads.fillStyle = '#000000';
     this.ctxThreads.fillRect(0, 0, lx, ly);
 
-    var i = Math.floor(replay.loadedIndex / lx) * lx, li = (lx-1);
-    var shift = i, file;
+    let i = Math.floor(replay.loadedIndex / lx) * lx, li = (lx-1);
+    let shift = i, file;
 
     for (i = 0; i < li; i++) {
         file = loaded[i + shift];
@@ -680,10 +683,10 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
                 continue;
             }
 
-            var grey = Math.round(Math.min(255, 60+20 * Math.max(1, file.duration / 300)));
+            let grey = Math.round(Math.min(255, 60+20 * Math.max(1, file.duration / 300)));
             ctx.fillStyle='rgb('+grey+','+grey+','+grey+')';
 
-            var h = (file.duration / 300) * 30;
+            let  h = (file.duration / 300) * 30;
             ctx.fillRect(i, ly, 1, -h);
 
             //interval
@@ -699,13 +702,13 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
         }
     }
 
-    var minMeshes = Number.MAX_VALUE, maxMeshes = 0, avgMeshes = 0, avgMeshesCount = 0;
-    var minTextures = Number.MAX_VALUE, maxTextures = 0, avgTextures = 0, avgTexturesCount = 0;
-    var minTextures2 = Number.MAX_VALUE, maxTextures2 = 0, avgTextures2 = 0, avgTextures2Count = 0;
-    var minGeodata = Number.MAX_VALUE, maxGeodata = 0, avgGeodata = 0, avgGeodataCount = 0;
-    var minMetatiles = Number.MAX_VALUE, maxMetatiles = 0, avgMetatiles = 0, avgMetatilesCount = 0;
-    var minThreads = Number.MAX_VALUE, maxThreads = 0, avgThreads = 0, avgThreadsCount = 0;
-    var minIntervals = Number.MAX_VALUE, maxIntervals = 0, avgIntervals = 0, avgIntervalsCount = 0;
+    let minMeshes = Number.MAX_VALUE, maxMeshes = 0, avgMeshes = 0, avgMeshesCount = 0;
+    let minTextures = Number.MAX_VALUE, maxTextures = 0, avgTextures = 0, avgTexturesCount = 0;
+    let minTextures2 = Number.MAX_VALUE, maxTextures2 = 0, avgTextures2 = 0, avgTextures2Count = 0;
+    let minGeodata = Number.MAX_VALUE, maxGeodata = 0, avgGeodata = 0, avgGeodataCount = 0;
+    let minMetatiles = Number.MAX_VALUE, maxMetatiles = 0, avgMetatiles = 0, avgMetatilesCount = 0;
+    let minThreads = Number.MAX_VALUE, maxThreads = 0, avgThreads = 0, avgThreadsCount = 0;
+    let minIntervals = Number.MAX_VALUE, maxIntervals = 0, avgIntervals = 0, avgIntervalsCount = 0;
 
     li = loaded.length;
 
@@ -817,13 +820,13 @@ InspectorReplay.prototype.updateLoadGraphs = function() {
 
 
 InspectorReplay.prototype.updateFileInfo = function(index) {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var replay = map.draw.replay;
-    var file = replay.loaded[index];
+    const replay = map.draw.replay;
+    const file = replay.loaded[index];
 
     if (file) {
         this.timeInfo.innerHTML = ''
@@ -841,12 +844,12 @@ InspectorReplay.prototype.updateFileInfo = function(index) {
 
 
 InspectorReplay.prototype.buildReplayCombo = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var items = [
+    const items = [
         ['Drawn Tiles',1],
         ['Drawn Tiles - Free Layers',1],
         ['Traced Nodes',1],
@@ -856,7 +859,7 @@ InspectorReplay.prototype.buildReplayCombo = function() {
         ['Globe',0]
     ];
 
-    var keys = [
+    const keys = [
         'DrawnTiles',
         'DrawnTilesFreeLayers',
         'TracedNodes',
@@ -866,7 +869,7 @@ InspectorReplay.prototype.buildReplayCombo = function() {
         'Globe'
     ];
 
-    var html = '', i, li, htmlId;
+    let html = '', i, li, htmlId;
 
     for (i = 0, li = items.length; i < li; i++) {
         html += '<div id="vts-replay-item-' + keys[i] + '" class="vts-replay-item">'
@@ -890,7 +893,7 @@ InspectorReplay.prototype.buildReplayCombo = function() {
     for (i = 0, li = items.length; i < li; i++) {
         htmlId = 'vts-replay-checkbox-' + keys[i];
         document.getElementById(htmlId).onchange = this.switchItem.bind(this, keys[i], htmlId);
-        //var htmlId = "vts-replay-item-" + keys[i];
+        //htmlId = "vts-replay-item-" + keys[i];
         //document.getElementById(htmlId).onclick = this.selectReplayItem.bind(this, keys[i]);
 
         if (items[i][1] > 0) {

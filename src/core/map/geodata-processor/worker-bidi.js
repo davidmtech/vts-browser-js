@@ -15,7 +15,7 @@
 
 // Character types for symbols from 0000 to 00FF.
 // Source: ftp://ftp.unicode.org/Public/UNIDATA/UnicodeData.txt
-var baseTypes = [
+const baseTypes = [
   'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'S', 'B', 'S',
   'WS', 'B', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN', 'BN',
   'BN', 'BN', 'BN', 'BN', 'B', 'B', 'B', 'S', 'WS', 'ON', 'ON', 'ET',
@@ -44,7 +44,7 @@ var baseTypes = [
 // http://unicode.org/charts/PDF/U0600.pdf), so we replace it with an
 // empty string and issue a warning if we encounter this character. The
 // empty string is required to properly index the items after it.
-var arabicTypes = [
+const arabicTypes = [
   'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'ON', 'ON', 'AL', 'ET', 'ET', 'AL',
   'CS', 'AL', 'ON', 'ON', 'NSM', 'NSM', 'NSM', 'NSM', 'NSM', 'NSM', 'NSM',
   'NSM', 'NSM', 'NSM', 'NSM', 'AL', 'AL', '', 'AL', 'AL', 'AL', 'AL', 'AL',
@@ -78,7 +78,8 @@ function isEven(i) {
 }
 
 function findUnequal(arr, start, value) {
-  for (var j = start, jj = arr.length; j < jj; ++j) {
+  let j, jj;
+  for (j = start, jj = arr.length; j < jj; ++j) {
     if (arr[j] !== value) {
       return j;
     }
@@ -87,14 +88,14 @@ function findUnequal(arr, start, value) {
 }
 
 function setValues(arr, start, end, value) {
-  for (var j = start; j < end; ++j) {
+  for (let j = start; j < end; ++j) {
     arr[j] = value;
   }
 }
 
 function reverseValues(arr, arr2, start, end) {
-  for (var i = start, j = end - 1; i < j; ++i, --j) {
-    var temp = arr[i];
+  for (let i = start, j = end - 1; i < j; ++i, --j) {
+    let temp = arr[i];
     arr[i] = arr[j];
     arr[j] = temp;
     temp = arr2[i];
@@ -119,8 +120,8 @@ var types = [];
 var indices = [];
 
 function bidi(str, startLevel, vertical) {
-  var isLTR = true;
-  var strLength = str.length;
+  let isLTR = true;
+  let strLength = str.length;
   if (strLength === 0 || vertical) {
     return createBidiText(str, isLTR, vertical);
   }
@@ -128,15 +129,15 @@ function bidi(str, startLevel, vertical) {
   // Get types and fill arrays
   chars.length = strLength;
   types.length = strLength;
-  var numBidi = 0;
+  let numBidi = 0;
 
-  var i, ii;
+  let i, ii;
   for (i = 0; i < strLength; ++i) {
     chars[i] = str.charAt(i);
     indices[i] = i;
 
-    var charCode = str.charCodeAt(i);
-    var charType = 'L';
+    let charCode = str.charCodeAt(i);
+    let charType = 'L';
     if (charCode <= 0x00ff) {
       charType = baseTypes[charCode];
     } else if (0x0590 <= charCode && charCode <= 0x05f4) {
@@ -174,7 +175,7 @@ function bidi(str, startLevel, vertical) {
     }
   }
 
-  var levels = [];
+  let levels = [];
   for (i = 0; i < strLength; ++i) {
     levels[i] = startLevel;
   }
@@ -182,16 +183,16 @@ function bidi(str, startLevel, vertical) {
   /*
    X1-X10: skip most of this, since we are NOT doing the embeddings.
    */
-  var e = (isOdd(startLevel) ? 'R' : 'L');
-  var sor = e;
-  var eor = sor;
+  let e = (isOdd(startLevel) ? 'R' : 'L');
+  let sor = e;
+  let eor = sor;
 
   /*
    W1. Examine each non-spacing mark (NSM) in the level run, and change the
    type of the NSM to the type of the previous character. If the NSM is at the
    start of the level run, it will get the type of sor.
    */
-  var lastType = sor;
+  let lastType = sor;
   for (i = 0; i < strLength; ++i) {
     if (types[i] === 'NSM') {
       types[i] = lastType;
@@ -206,7 +207,7 @@ function bidi(str, startLevel, vertical) {
    the type of the European number to Arabic number.
    */
   lastType = sor;
-  var t;
+  let t;
   for (i = 0; i < strLength; ++i) {
     t = types[i];
     if (t === 'EN') {
@@ -249,7 +250,7 @@ function bidi(str, startLevel, vertical) {
   for (i = 0; i < strLength; ++i) {
     if (types[i] === 'EN') {
       // do before
-      var j;
+      let j;
       for (j = i - 1; j >= 0; --j) {
         if (types[j] !== 'ET') {
           break;
@@ -299,13 +300,13 @@ function bidi(str, startLevel, vertical) {
    */
   for (i = 0; i < strLength; ++i) {
     if (types[i] === 'ON') {
-      var end = findUnequal(types, i + 1, 'ON');
-      var before = sor;
+      let end = findUnequal(types, i + 1, 'ON');
+      let before = sor;
       if (i > 0) {
         before = types[i - 1];
       }
 
-      var after = eor;
+      let after = eor;
       if (end + 1 < strLength) {
         after = types[end + 1];
       }
@@ -373,9 +374,9 @@ function bidi(str, startLevel, vertical) {
    */
 
   // find highest level & lowest odd level
-  var highestLevel = -1;
-  var lowestOddLevel = 99;
-  var level;
+  let highestLevel = -1;
+  let lowestOddLevel = 99;
+  let level;
   for (i = 0, ii = levels.length; i < ii; ++i) {
     level = levels[i];
     if (highestLevel < level) {
@@ -389,7 +390,7 @@ function bidi(str, startLevel, vertical) {
   // now reverse between those limits
   for (level = highestLevel; level >= lowestOddLevel; --level) {
     // find segments to reverse
-    var start = -1;
+    let start = -1;
     for (i = 0, ii = levels.length; i < ii; ++i) {
       if (levels[i] < level) {
         if (start >= 0) {
@@ -424,7 +425,7 @@ function bidi(str, startLevel, vertical) {
 
   // Finally, return string
   for (i = 0, ii = chars.length; i < ii; ++i) {
-    var ch = chars[i];
+    let ch = chars[i];
     if (ch === '<' || ch === '>') {
       chars[i] = '';
     }
@@ -435,4 +436,3 @@ function bidi(str, startLevel, vertical) {
 export {
   bidi
 };
-

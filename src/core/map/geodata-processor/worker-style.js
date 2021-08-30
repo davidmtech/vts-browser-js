@@ -3,27 +3,27 @@ import {globals as globals_, simpleFmtCall as simpleFmtCall_, getHash as getHash
 import {areTextCharactersAvailable as areTextCharactersAvailable_, hasLatin as hasLatin_, isCJK as isCJK_ } from './worker-text.js';
 
 //get rid of compiler mess
-var globals = globals_;
-var clamp = clamp_;
-var simpleFmtCall = simpleFmtCall_;
-var getHash = getHash_;
-var hasLatin = hasLatin_, isCJK = isCJK_;
-var areTextCharactersAvailable = areTextCharactersAvailable_;
+const globals = globals_;
+const clamp = clamp_;
+const simpleFmtCall = simpleFmtCall_;
+const getHash = getHash_;
+const hasLatin = hasLatin_, isCJK = isCJK_;
+const areTextCharactersAvailable = areTextCharactersAvailable_;
 
 
-var getLayer = function(layerId, featureType, index) {
-    var layer = globals.stylesheetData.layers[layerId];
+function getLayer(layerId, featureType, index) {
+    const layer = globals.stylesheetData.layers[layerId];
     if (layer == null) {
         logError('wrong-Layer', layerId, null, null, index, featureType);
         return {};
     } else {
         return layer;
     }
-};
+}
 
 
-var getLayerExpresionValue = function(layer, value, feature, lod, key, depth) {
-    var finalValue;
+function getLayerExpresionValue(layer, value, feature, lod, key, depth) {
+    let finalValue;
     if (!depth) {
         depth = 0;
     }
@@ -38,7 +38,7 @@ var getLayerExpresionValue = function(layer, value, feature, lod, key, depth) {
         if (value.length > 0) {
 
             switch (value.charAt(0)) {
-                case '#': 
+                case '#':
                 case '$':
                 case '@':
                 case '&':
@@ -54,12 +54,12 @@ var getLayerExpresionValue = function(layer, value, feature, lod, key, depth) {
             }
 
 
-            return simpleFmtCall(value, (function(str){  
+            return simpleFmtCall(value, (function(str){
 
                 if (str.length > 0) {
 
                     switch (str.charAt(0)) {
-                        case '#': 
+                        case '#':
                         case '$':
                         case '@':
                         case '&':
@@ -70,7 +70,7 @@ var getLayerExpresionValue = function(layer, value, feature, lod, key, depth) {
                             if (typeof finalValue == 'undefined') {
                                 logError('wrong-expresion', layer['$$layer-id'], value, value, null, 'feature-property');
                             }
-        
+
                             return finalValue;
                     }
 
@@ -102,24 +102,24 @@ var getLayerExpresionValue = function(layer, value, feature, lod, key, depth) {
 
         break;
     }
-    
+
     return value;
-};
+}
 
 
-var hasLayerProperty = function(layer, key) {
+function hasLayerProperty(layer, key) {
     return (typeof layer[key] !== 'undefined');
-};
+}
 
 
-var getLayerPropertyValue = function(layer, key, feature, lod) {
-    var value = getLayerPropertyValueInner(layer, key, feature, lod);
+function getLayerPropertyValue(layer, key, feature, lod) {
+    const value = getLayerPropertyValueInner(layer, key, feature, lod);
     return validateLayerPropertyValue(layer['$$layer-id'], key, value);
-};
+}
 
 
-var getLayerPropertyValueInnerString = function(layer, key, feature, lod, value, depth) {
-    var finalValue = value;
+function getLayerPropertyValueInnerString(layer, key, feature, lod, value, depth) {
+    let finalValue = value;
 
     //is it feature property, variable or constant?
     switch(value.charAt(0)) {
@@ -127,7 +127,7 @@ var getLayerPropertyValueInnerString = function(layer, key, feature, lod, value,
         case '@': finalValue = globals.stylesheetConstants[value]; break;
         case '%': finalValue = globals.stylesheetVariables[value.substr(1)]; break;
         case '&': finalValue = globals.stylesheetLocals[value]; break;
-        case '#': 
+        case '#':
             //debugger;
             switch(value) {
                 case '#id':        return feature.id;
@@ -174,13 +174,12 @@ var getLayerPropertyValueInnerString = function(layer, key, feature, lod, value,
     }
 
     return finalValue;
-};
+}
 
-var getLayerPropertyValueInner = function(layer, key, feature, lod, value, depth) {
-    var index = 0, i, li, finalValue, root, v1, v2, v3, v4;
-    var tmpValue;
+function getLayerPropertyValueInner(layer, key, feature, lod, value, depth) {
+    let index = 0, i, li, finalValue, root, v1, v2, v3, v4;
+    let tmpValue;
 
-    
     if ((typeof value) === 'undefined') {
         /*
         if (layer[key]) {
@@ -209,7 +208,7 @@ var getLayerPropertyValueInner = function(layer, key, feature, lod, value, depth
                 return finalValue;
             } else {
                 logError('wrong-object', layer['$$layer-id'], key, value, null, 'feature-property');
-                
+
                 if (root) {
                     return getDefaultLayerPropertyValue(key);
                 } else {
@@ -221,471 +220,477 @@ var getLayerPropertyValueInner = function(layer, key, feature, lod, value, depth
         return value;
 
     case 'object':
-
-            //is it null?
-        if (value == null) {
-            if (root) {
-                return getDefaultLayerPropertyValue(key);
-            } else {
-                return void(0);
+        {
+                //is it null?
+            if (value == null) {
+                if (root) {
+                    return getDefaultLayerPropertyValue(key);
+                } else {
+                    return void(0);
+                }
             }
-        }
 
-        //is it array (rgb, rgba, vec2)?
-        if (Array.isArray(value)) {
+            //is it array (rgb, rgba, vec2)?
+            if (Array.isArray(value)) {
 
-            if (key == 'icon-source') {
-                //index++;
-                if (globals.stylesheetBitmaps[value[0]] == null) {
-                    logError('wrong-object', layer['$$layer-id'], key, value, null, 'bitmap');
+                if (key == 'icon-source') {
+                    //index++;
+                    if (globals.stylesheetBitmaps[value[0]] == null) {
+                        logError('wrong-object', layer['$$layer-id'], key, value, null, 'bitmap');
 
-                    if (root) {
-                        return getDefaultLayerPropertyValue(key);
-                    } else {
-                        return void(0);
+                        if (root) {
+                            return getDefaultLayerPropertyValue(key);
+                        } else {
+                            return void(0);
+                        }
                     }
                 }
-            }
 
-            if (key != 'filter') {
-                tmpValue = new Array(value.length);
+                if (key != 'filter') {
+                    tmpValue = new Array(value.length);
 
-                for (i = index, li = value.length; i < li; i++) {
-                    tmpValue[i] = getLayerPropertyValueInner(layer, key, feature, lod, value[i], depth + 1);
+                    for (i = index, li = value.length; i < li; i++) {
+                        tmpValue[i] = getLayerPropertyValueInner(layer, key, feature, lod, value[i], depth + 1);
+                    }
+
+                    return tmpValue;
                 }
 
-                return tmpValue;
+                return value;
+            }
+
+            let functionName, functionValue, functionError, finalValue;
+
+            for (functionName in value) {
+                break;
+            }
+
+            if (!functionName) {
+                if (root) {
+                    return getDefaultLayerPropertyValue(key);
+                } else {
+                    return void(0);
+                }
+            }
+
+            functionValue = value[functionName];
+
+            switch (functionName) {
+                case 'if':
+
+                    if (!Array.isArray(functionValue) || functionValue.length != 3) {
+                        functionError = true;
+                    } else {
+                        if (getFilterResult(functionValue[0], feature, globals.featureType, globals.groupId, layer, key, lod, 0)) {
+                            finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
+                        } else {
+                            finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
+                        }
+
+                        if (typeof finalValue === 'undefined') {
+                            functionError = true;
+                        } else {
+                            return finalValue;
+                        }
+                    }
+
+                    break;
+
+                case 'add':
+                case 'sub':
+                case 'mul':
+                case 'div':
+                case 'mod':
+                case 'pow':
+                case 'tofixed':
+                case 'atan2':
+                case 'random':
+
+                    if (!Array.isArray(functionValue) || functionValue.length != 2) {
+                        functionError = true;
+                    } else {
+
+                        v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
+                        v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
+
+                        if (typeof v1 !== 'number' || typeof v2 !== 'number') {
+                            functionError = true;
+                        } else {
+                            switch (functionName) {
+                                case 'add':    return v1 + v2;
+                                case 'sub':    return v1 - v2;
+                                case 'mul':    return v1 * v2;
+                                case 'div':    return v1 / v2;
+                                case 'mod':    return v1 % v2;
+                                case 'pow':    return Math.pow(v1, v2);
+                                case 'atan2':  return Math.atan2(v1, v2);
+                                case 'tofixed': return v1.tofixed(v2);
+                                case 'random': return v1 + Math.random() * (v2-v1);
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 'clamp':
+
+                    if (!Array.isArray(functionValue) || functionValue.length != 3) {
+                        functionError = true;
+                    } else {
+
+                        v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
+                        v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
+                        v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
+
+                        if (typeof v1 !== 'number' || typeof v2 !== 'number' || typeof v3 !== 'number') {
+                            functionError = true;
+                        } else {
+                            return clamp(v1, v2, v3);
+                        }
+                    }
+
+                    break;
+
+                case 'logScale':
+                case 'log-scale':
+
+                    if (!Array.isArray(functionValue) || functionValue.length < 2) {
+                        functionError = true;
+                    } else {
+
+                        v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
+                        v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
+                        v3 = 0, v4 = 100;
+
+                        if (functionValue.length > 2) {
+                            v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
+
+                            if (typeof v3 !== 'number') {
+                                functionError = true;
+                            }
+                        }
+
+                        if (functionValue.length > 3) {
+                            v4 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[3], depth + 1);
+
+                            if (typeof v4 !== 'number') {
+                                functionError = true;
+                            }
+                        }
+
+                        if (functionError || typeof v1 !== 'number' || typeof v2 !== 'number') {
+                            functionError = true;
+                        } else {
+                            const imax = v4, imin = v3, smax = v2;
+                            let s = v1, p, i;
+
+                            if (s > smax) s = smax;
+
+                            p = (imax - imin) / Math.log(smax + 1);
+                            i = p * Math.log(s + 1) + imin;
+
+                            return i;
+                        }
+                    }
+
+                    break;
+
+
+                case 'sgn':
+                case 'sin':
+                case 'cos':
+                case 'tan':
+                case 'asin':
+                case 'acos':
+                case 'atan':
+                case 'sqrt':
+                case 'abs':
+                case 'log':
+                case 'round':
+                case 'floor':
+                case 'ceil':
+                case 'deg2rad':
+                case 'rad2deg':
+
+                    functionValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue, depth + 1);
+
+                    if (typeof functionValue !== 'number') {
+                        functionError = true;
+                    } else {
+                        switch (functionName) {
+                            case 'sgn':  return functionValue < 0 ? -1 : 1;
+                            case 'sin':  return Math.sin(functionValue);
+                            case 'cos':  return Math.cos(functionValue);
+                            case 'tan':  return Math.tan(functionValue);
+                            case 'asin': return Math.asin(functionValue);
+                            case 'acos': return Math.acos(functionValue);
+                            case 'atan': return Math.atan(functionValue);
+                            case 'sqrt': return Math.sqrt(functionValue);
+                            case 'abs':  return Math.abs(functionValue);
+                            case 'log':  return Math.log(functionValue);
+                            case 'round': return Math.round(functionValue);
+                            case 'floor': return Math.floor(functionValue);
+                            case 'ceil':  return Math.ceil(functionValue);
+                            case 'deg2rad':  return (functionValue / 180) * Math.PI;
+                            case 'rad2deg':  return (functionValue / Math.PI) * 180;
+                        }
+                    }
+
+                    break;
+
+                case 'strlen':
+                case 'trim':
+                case 'str2num':
+                case 'lowercase':
+                case 'uppercase':
+                case 'capitalize':
+                case 'has-fonts':
+                case 'has-latin':
+                case 'is-cjk':
+
+                    functionValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue, depth + 1);
+
+                    if (typeof functionValue !== 'string') {
+                        if (typeof functionValue === 'number') {
+                            return functionValue;
+                        } else {
+                            functionError = true;
+                        }
+                    } else {
+                        switch (functionName) {
+                            case 'strlen':     return functionValue.length;
+                            case 'trim':       return functionValue.trim();
+                            case 'str2num':    return parseFloat(functionValue);
+                            case 'lowercase':  return functionValue.toLowerCase();
+                            case 'uppercase':  return functionValue.toUpperCase();
+                            case 'capitalize': return functionValue.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+                            case 'has-fonts':  return areTextCharactersAvailable(functionValue);
+                            case 'has-latin':  return hasLatin(functionValue);
+                            case 'is-cjk':     return isCJK(functionValue);
+                        }
+                    }
+
+                    break;
+
+                case 'find':
+                case 'replace':
+                case 'substr':
+
+                    if (Array.isArray(functionValue) && functionValue.length >= 2) {
+
+                        v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
+                        v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
+
+                        if (functionName == 'find' && typeof v1 === 'string' && typeof v2 === 'string') {
+                            return v1.indexOf(v2);
+                        }
+
+                        if (functionName == 'replace' && functionValue.length == 3) {
+
+                            v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
+
+                            if (typeof v1 === 'string' && typeof v2 === 'string' && typeof v3 === 'string') {
+                                return v1.replace(v2,v3);
+                            }
+                        }
+
+                        if (functionName == 'substr') {
+
+                            if (functionValue.length == 2) {
+                                if (typeof v1 === 'string' && typeof v2 === 'number') {
+                                    return v1.substr(v2);
+                                }
+                            } else {
+                                v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
+
+                                if (typeof v1 === 'string' && typeof v2 === 'number' && typeof v3 === 'number') {
+                                    return v1.substr(v2,v3);
+                                }
+                            }
+                        }
+
+                    }
+
+                    functionError = true;
+                    break;
+
+                case 'min':
+                case 'max':
+
+                    if (!Array.isArray(functionValue)) {
+                        functionError = true;
+                    } else {
+
+                        finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
+
+                        for (i = index, li = functionValue.length; i < li; i++) {
+                            tmpValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[i], depth + 1);
+
+                            if (typeof tmpValue !== 'number') {
+                                functionError = true;
+                                break;
+                            }
+
+                            if (functionName == 'max') {
+                                finalValue = Math.max(finalValue, tmpValue);
+                            } else {
+                                finalValue = Math.min(finalValue, tmpValue);
+                            }
+                        }
+
+                        return finalValue;
+                    }
+
+                    break;
+
+                case 'map':
+
+                    if (!Array.isArray(functionValue)) {
+                        functionError = true;
+                    } else {
+
+                        finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
+
+                        const mapItems = functionValue[1];
+
+                        if (!Array.isArray(mapItems)) {
+                            functionError = true;
+                        } else {
+
+                            for (i = index, li = mapItems.length; i < li; i++) {
+                                const item = mapItems[i];
+
+                                if (!Array.isArray(item)) {
+                                    functionError = true;
+                                    break;
+                                } else {
+
+                                    const itemValue = getLayerPropertyValueInner(layer, key, feature, lod, item[0], depth + 1);
+
+                                    if (finalValue == itemValue) {
+                                        return getLayerPropertyValueInner(layer, key, feature, lod, item[1], depth + 1);
+                                    }
+                                }
+                            }
+                        }
+
+                        return getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
+                    }
+
+                    break;
+
+                case 'linear':
+                case 'linear2':
+                case 'discrete':
+                case 'discrete2':
+                case 'lod-scaled':
+                    {
+
+                        //LOD based functions
+                        let stops = null;
+                        let lodScaledArray = null;
+                        let functionValue = lod;
+
+                        if (value['lod-scaled'] != null) {
+                            const array = value['lod-scaled'];
+
+                            if ((typeof array[1]) == 'number') {
+                                return array[1] * Math.pow(2*array[2], array[0] - lod);
+                            }
+
+                            stops = array[1];
+                            lodScaledArray = array;
+
+                        } if (value['discrete2'] != null || value['linear2'] != null) {
+                            const array = value['discrete2'] || value['linear2'];
+                            stops = array[1];
+                            functionValue = getLayerPropertyValueInner(layer, key, feature, lod, array[0], depth + 1);
+                        } else {
+                            stops = value['discrete'] || value['linear'];
+                        }
+
+                        let lastLod = stops[0][0];
+                        let lastValue = stops[0][1];
+                        let valueType = (typeof lastValue);
+                        let newValue = lastValue;
+
+                        let currentLod, currentValue;
+
+                        for (let i = 0, li = stops.length; i <= li; i++) {
+
+                            if (i == li) {
+                                newValue = lastValue;
+                                break;
+                            }
+
+                            if (stops[i][0] > functionValue) {
+
+                                if (value['discrete'] != null || value['discrete2'] != null || lodScaledArray != null) { //no interpolation
+                                    newValue = lastValue;
+                                    break;
+                                } else { //interpolate
+
+                                    currentLod = stops[i][0];
+                                    currentValue = stops[i][1];
+
+                                    if (currentLod == lastLod) { //end of array no interpolation needed
+                                        break;
+                                    }
+
+                                    switch(valueType) {
+
+                                    case 'boolean':
+                                        lastValue = lastValue ? 1 : 0;
+                                        currentValue = lastValue ? 1 : 0;
+                                        newValue = lastValue + (currentValue - lastValue) * ((functionValue - lastLod) / (currentLod - lastLod));
+
+                                        newValue = newValue > 0.5 ? true : false;
+                                        break;
+
+                                    case 'number':
+                                        newValue = lastValue + (currentValue - lastValue) * ((functionValue - lastLod) / (currentLod - lastLod));
+                                        break;
+
+                                    case 'object':
+                                        newValue = [];
+
+                                        for (let j = 0, lj= lastValue.length; j < lj; j++) {
+                                            newValue[j] = lastValue[j] + (currentValue[j] - lastValue[j]) * ((functionValue - lastLod) / (currentLod - lastLod));
+                                        }
+
+                                        break;
+                                    }
+
+                                    break;
+                                }
+                            }
+
+                            lastLod = stops[i][0];
+                            lastValue = stops[i][1];
+                        }
+
+                        if (lodScaledArray != null) {
+                            newValue *= Math.pow(2*lodScaledArray[2], lodScaledArray[0] - functionValue);
+                        }
+
+                        return newValue;
+                    }
+
+                default:
+                    functionError = true;
+                    break;
+            }
+
+            if (functionError) {
+                if (root) {
+                    return getDefaultLayerPropertyValue(key);
+                } else {
+                    return void(0);
+                }
             }
 
             return value;
         }
-
-        var functionName, functionValue, functionError, finalValue;
-
-        for (functionName in value) {
-            break;
-        }
-
-        if (!functionName) {
-            if (root) {
-                return getDefaultLayerPropertyValue(key);
-            } else {
-                return void(0);
-            }
-        }
-
-        functionValue = value[functionName];
-
-        switch (functionName) {
-            case 'if':
-
-                if (!Array.isArray(functionValue) || functionValue.length != 3) {
-                    functionError = true;
-                } else {
-                    if (getFilterResult(functionValue[0], feature, globals.featureType, globals.groupId, layer, key, lod, 0)) {
-                        finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
-                    } else {
-                        finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
-                    }
-
-                    if (typeof finalValue === 'undefined') {
-                        functionError = true;
-                    } else {
-                        return finalValue;
-                    }
-                }
-
-                break;
-
-            case 'add':
-            case 'sub':
-            case 'mul':
-            case 'div':
-            case 'mod':
-            case 'pow':
-            case 'tofixed':
-            case 'atan2':
-            case 'random':
-
-                if (!Array.isArray(functionValue) || functionValue.length != 2) {
-                    functionError = true;
-                } else {
-
-                    v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
-                    v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
-
-                    if (typeof v1 !== 'number' || typeof v2 !== 'number') {
-                        functionError = true;
-                    } else {
-                        switch (functionName) {
-                            case 'add':    return v1 + v2;
-                            case 'sub':    return v1 - v2;
-                            case 'mul':    return v1 * v2;
-                            case 'div':    return v1 / v2;
-                            case 'mod':    return v1 % v2;
-                            case 'pow':    return Math.pow(v1, v2);
-                            case 'atan2':  return Math.atan2(v1, v2);
-                            case 'tofixed': return v1.tofixed(v2);
-                            case 'random': return v1 + Math.random() * (v2-v1);
-                        }
-                    }
-                }
-
-                break;
-
-            case 'clamp':
-
-                if (!Array.isArray(functionValue) || functionValue.length != 3) {
-                    functionError = true;
-                } else {
-
-                    v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
-                    v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
-                    v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
-
-                    if (typeof v1 !== 'number' || typeof v2 !== 'number' || typeof v3 !== 'number') {
-                        functionError = true;
-                    } else {
-                        return clamp(v1, v2, v3);
-                    }
-                }
-
-                break;
-
-            case 'logScale':
-            case 'log-scale':
-
-                if (!Array.isArray(functionValue) || functionValue.length < 2) {
-                    functionError = true;
-                } else {
-
-                    v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
-                    v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
-                    v3 = 0, v4 = 100;
-
-                    if (functionValue.length > 2) {
-                        v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);                        
-
-                        if (typeof v3 !== 'number') {
-                            functionError = true;
-                        }
-                    }
-
-                    if (functionValue.length > 3) {
-                        v4 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[3], depth + 1);                        
-
-                        if (typeof v4 !== 'number') {
-                            functionError = true;
-                        }
-                    }
-
-                    if (functionError || typeof v1 !== 'number' || typeof v2 !== 'number') {
-                        functionError = true;
-                    } else {
-                        var imax = v4, imin = v3, smax = v2, s = v1, p, i;
-
-                        if (s > smax) s = smax; 
-
-                        p = (imax - imin) / Math.log(smax + 1);
-                        i = p * Math.log(s + 1) + imin;
-
-                        return i;
-                    }
-                }
-
-                break;
-
-
-            case 'sgn':
-            case 'sin':
-            case 'cos':
-            case 'tan':
-            case 'asin':
-            case 'acos':
-            case 'atan':
-            case 'sqrt':
-            case 'abs':
-            case 'log':
-            case 'round':
-            case 'floor':
-            case 'ceil':
-            case 'deg2rad':
-            case 'rad2deg':
-
-                functionValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue, depth + 1);
-
-                if (typeof functionValue !== 'number') {
-                    functionError = true;
-                } else {
-                    switch (functionName) {
-                        case 'sgn':  return functionValue < 0 ? -1 : 1;
-                        case 'sin':  return Math.sin(functionValue);
-                        case 'cos':  return Math.cos(functionValue);
-                        case 'tan':  return Math.tan(functionValue);
-                        case 'asin': return Math.asin(functionValue);
-                        case 'acos': return Math.acos(functionValue);
-                        case 'atan': return Math.atan(functionValue);
-                        case 'sqrt': return Math.sqrt(functionValue);
-                        case 'abs':  return Math.abs(functionValue);
-                        case 'log':  return Math.log(functionValue);
-                        case 'round': return Math.round(functionValue);
-                        case 'floor': return Math.floor(functionValue);
-                        case 'ceil':  return Math.ceil(functionValue);
-                        case 'deg2rad':  return (functionValue / 180) * Math.PI;
-                        case 'rad2deg':  return (functionValue / Math.PI) * 180;
-                    }
-                }
-
-                break;
-
-            case 'strlen':
-            case 'trim':
-            case 'str2num':
-            case 'lowercase':
-            case 'uppercase':
-            case 'capitalize':
-            case 'has-fonts':
-            case 'has-latin':
-            case 'is-cjk':
-                functionValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue, depth + 1);
-
-                if (typeof functionValue !== 'string') {
-                    if (typeof functionValue === 'number') {
-                        return functionValue;
-                    } else {
-                        functionError = true;
-                    }
-                } else {
-                    switch (functionName) {
-                        case 'strlen':     return functionValue.length;
-                        case 'trim':       return functionValue.trim();
-                        case 'str2num':    return parseFloat(functionValue);
-                        case 'lowercase':  return functionValue.toLowerCase();
-                        case 'uppercase':  return functionValue.toUpperCase();
-                        case 'capitalize': return functionValue.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
-                        case 'has-fonts':  return areTextCharactersAvailable(functionValue);
-                        case 'has-latin':  return hasLatin(functionValue);
-                        case 'is-cjk':     return isCJK(functionValue); 
-                    }
-                }
-
-                break;
-
-            case 'find':
-            case 'replace':
-            case 'substr':
-
-                if (Array.isArray(functionValue) && functionValue.length >= 2) {
-
-                    v1 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
-                    v2 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[1], depth + 1);
-
-                    if (functionName == 'find' && typeof v1 === 'string' && typeof v2 === 'string') {
-                        return v1.indexOf(v2);
-                    }
-
-                    if (functionName == 'replace' && functionValue.length == 3) {
-
-                        v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
-
-                        if (typeof v1 === 'string' && typeof v2 === 'string' && typeof v3 === 'string') {
-                            return v1.replace(v2,v3);
-                        }
-                    }
-
-                    if (functionName == 'substr') {
-
-                        if (functionValue.length == 2) {
-                            if (typeof v1 === 'string' && typeof v2 === 'number') {
-                                return v1.substr(v2);
-                            }
-                        } else {
-                            v3 = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
-
-                            if (typeof v1 === 'string' && typeof v2 === 'number' && typeof v3 === 'number') {
-                                return v1.substr(v2,v3);
-                            }
-                        }
-                    }
-
-                }
-
-                functionError = true;
-                break;
-
-            case 'min':
-            case 'max':
-
-                if (!Array.isArray(functionValue)) {
-                    functionError = true;
-                } else {
-
-                    finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
-
-                    for (i = index, li = functionValue.length; i < li; i++) {
-                        tmpValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[i], depth + 1);
-
-                        if (typeof tmpValue !== 'number') {
-                            functionError = true;
-                            break;
-                        }
-
-                        if (functionName == 'max') {
-                            finalValue = Math.max(finalValue, tmpValue);
-                        } else {
-                            finalValue = Math.min(finalValue, tmpValue);
-                        }
-                    }
-
-                    return finalValue;
-                }
-
-                break;
-
-            case 'map':
-
-                if (!Array.isArray(functionValue)) {
-                    functionError = true;
-                } else {
-
-                    finalValue = getLayerPropertyValueInner(layer, key, feature, lod, functionValue[0], depth + 1);
-
-                    var mapItems = functionValue[1];
-
-                    if (!Array.isArray(mapItems)) {
-                        functionError = true;
-                    } else {
-
-                        for (i = index, li = mapItems.length; i < li; i++) {
-                            var item = mapItems[i];
-
-                            if (!Array.isArray(item)) {
-                                functionError = true;
-                                break;
-                            } else {
-
-                                var itemValue = getLayerPropertyValueInner(layer, key, feature, lod, item[0], depth + 1);
-
-                                if (finalValue == itemValue) {
-                                    return getLayerPropertyValueInner(layer, key, feature, lod, item[1], depth + 1);
-                                }
-                            }
-                        }
-                    }
-
-                    return getLayerPropertyValueInner(layer, key, feature, lod, functionValue[2], depth + 1);
-                }
-
-                break;
-
-            case 'linear':
-            case 'linear2':
-            case 'discrete':
-            case 'discrete2':
-            case 'lod-scaled':
-
-                //LOD based functions
-                var stops = null;
-                var lodScaledArray = null;
-                var functionValue = lod;
-
-                if (value['lod-scaled'] != null) {
-                    var array = value['lod-scaled'];
-
-                    if ((typeof array[1]) == 'number') {
-                        return array[1] * Math.pow(2*array[2], array[0] - lod);
-                    }
-
-                    stops = array[1];
-                    lodScaledArray = array;
-
-                } if (value['discrete2'] != null || value['linear2'] != null) {
-                    var array = value['discrete2'] || value['linear2'];
-                    stops = array[1];
-                    functionValue = getLayerPropertyValueInner(layer, key, feature, lod, array[0], depth + 1);
-                } else {
-                    stops = value['discrete'] || value['linear'];
-                }
-
-                var lastLod = stops[0][0];
-                var lastValue = stops[0][1];
-                var valueType = (typeof lastValue);
-                var newValue = lastValue;
-
-                var currentLod, currentValue;
-
-                for (var i = 0, li = stops.length; i <= li; i++) {
-
-                    if (i == li) {
-                        newValue = lastValue;
-                        break;
-                    }
-
-                    if (stops[i][0] > functionValue) {
-
-                        if (value['discrete'] != null || value['discrete2'] != null || lodScaledArray != null) { //no interpolation
-                            newValue = lastValue;
-                            break;
-                        } else { //interpolate
-
-                            currentLod = stops[i][0];
-                            currentValue = stops[i][1];
-
-                            if (currentLod == lastLod) { //end of array no interpolation needed
-                                break;
-                            }
-
-                            switch(valueType) {
-
-                            case 'boolean':
-                                lastValue = lastValue ? 1 : 0;
-                                currentValue = lastValue ? 1 : 0;
-                                newValue = lastValue + (currentValue - lastValue) * ((functionValue - lastLod) / (currentLod - lastLod));
-
-                                newValue = newValue > 0.5 ? true : false;
-                                break;
-
-                            case 'number':
-                                newValue = lastValue + (currentValue - lastValue) * ((functionValue - lastLod) / (currentLod - lastLod));
-                                break;
-
-                            case 'object':
-                                newValue = [];
-
-                                for (var j = 0, lj= lastValue.length; j < lj; j++) {
-                                    newValue[j] = lastValue[j] + (currentValue[j] - lastValue[j]) * ((functionValue - lastLod) / (currentLod - lastLod));
-                                }
-
-                                break;
-                            }
-
-                            break;
-                        }
-                    }
-
-                    lastLod = stops[i][0];
-                    lastValue = stops[i][1];
-                }
-
-                if (lodScaledArray != null) {
-                    newValue *= Math.pow(2*lodScaledArray[2], lodScaledArray[0] - functionValue);
-                }
-
-                return newValue;
-
-            default: 
-                functionError = true;
-                break;
-        }
-
-        if (functionError) {
-            if (root) {
-                return getDefaultLayerPropertyValue(key);
-            } else {
-                return void(0);
-            }
-        }
-
 
     case 'number':
     case 'boolean':
@@ -697,10 +702,10 @@ var getLayerPropertyValueInner = function(layer, key, feature, lod, value, depth
     } else {
         return void(0);
     }
-};
+}
 
 
-var inheritLayer = function(layerId, layer, layerData, stylesheetLayersData, depth) {
+const inheritLayer = function(layerId, layer, layerData, stylesheetLayersData, depth) {
     if (depth > 100) {
         logError('custom', 'infinite inherit loop in Layer: ' + layerId);
         return;
@@ -709,7 +714,7 @@ var inheritLayer = function(layerId, layer, layerData, stylesheetLayersData, dep
     //do we need inherite Layer?
     if (layerData['inherit'] != null) {
         //get inherited Layer
-        var LayerToInherit = stylesheetLayersData['layers'][layerData['inherit']];
+        const LayerToInherit = stylesheetLayersData['layers'][layerData['inherit']];
 
         if (LayerToInherit != null) {
 
@@ -718,18 +723,18 @@ var inheritLayer = function(layerId, layer, layerData, stylesheetLayersData, dep
             }
 
             //copy inherited Layer properties
-            for (var key in LayerToInherit) {
+            for (let key in LayerToInherit) {
                 layer[key] = LayerToInherit[key];
             }
         } else {
             logError('wrong-object', layerId, 'inherit', LayerToInherit, 'Layer');
-            return getDefaultLayerPropertyValue(key);
+            return getDefaultLayerPropertyValue(null /*key*/);
         }
     }
-};
+}
 
 
-var copyLayer = function(layerId, layer, layerData, stylesheetLayersData) {
+function copyLayer(layerId, layer, layerData, stylesheetLayersData) {
     //do we need inherite Layer?
     if (layerData['inherit'] != null) {
         inheritLayer(layerId, layer, layerData, stylesheetLayersData, 0);
@@ -737,16 +742,16 @@ var copyLayer = function(layerId, layer, layerData, stylesheetLayersData) {
 
     //copy Layer properties
     //if inherited properties are present then they will be overwriten
-    for (var key in layerData) {
+    for (let key in layerData) {
         layer[key] = layerData[key];
     }
 
     //store layer id
     layer['$$layer-id'] = layerId;
-};
+}
 
 
-var logError = function(errorType, layerId, key, value, index, subkey) {
+function logError(errorType, layerId, key, value, index, subkey) {
     if (globals.disableLog) {
         return;
     }
@@ -754,8 +759,8 @@ var logError = function(errorType, layerId, key, value, index, subkey) {
     if ((typeof value) == 'object') {
         value = JSON.stringify(value);
     }
-    
-    var str = null;
+
+    let str = null;
 
     switch(errorType) {
     case 'wrong-property-value':
@@ -786,16 +791,17 @@ var logError = function(errorType, layerId, key, value, index, subkey) {
         str = 'Error: ' + layerId;
         break;
     }
-    
+
     if (str && globals.log) {
-         // eslint-disable-next-line 
+         // eslint-disable-next-line
         console.log(str);
         //throw str;
     }
-};
+}
 
 
-var getUnitsNormalizedValue = function(value, screen, fallbackUnits) {
+// eslint-disable-next-line
+function getUnitsNormalizedValue(value, screen, fallbackUnits) {
     if (typeof value === 'string') {
         if (value == '0' || value.length == 0) return 0;
 
@@ -803,7 +809,8 @@ var getUnitsNormalizedValue = function(value, screen, fallbackUnits) {
 
         if (value.length >= 2) {
 
-            var factor = 1, pf = globals.pixelsPerMM, ipf = globals.invPixelsPerMM;
+            const pf = globals.pixelsPerMM, ipf = globals.invPixelsPerMM;
+            let factor = 1;
 
             switch(value.substr(-2, 2)) {
                 case 'km': factor = screen ? pf * 1000 * 1000 : 1000; break;
@@ -839,8 +846,9 @@ var getUnitsNormalizedValue = function(value, screen, fallbackUnits) {
 }
 
 
-var validateValue = function(layerId, key, value, type, arrayLength, min, max, hasUnits) {
-    var i, li;
+// eslint-disable-next-line
+function validateValue(layerId, key, value, type, arrayLength, min, max, hasUnits) {
+    let i, li;
 
     //check for object
     if (value != null && (typeof value) == 'object' && !Array.isArray(value)) {
@@ -878,7 +886,7 @@ var validateValue = function(layerId, key, value, type, arrayLength, min, max, h
                           value[0] == 'start' || value[0] == 'end' || value[0] == 'middle' || value[0] == 'midpoint')) {
                         logError('wrong-property-value', layerId, key, value);
                         return getDefaultLayerPropertyValue(key);
-                    } 
+                    }
 
                 } else if (key == 'dynamic-reduce') {
                     if (value[0] == 'by-extenal-param') {
@@ -913,11 +921,11 @@ var validateValue = function(layerId, key, value, type, arrayLength, min, max, h
 
         //check multipasss
         if (key == 'next-pass' || key == 'visibility-switch') {
-            var vswitch = (key == 'visibility-switch');
+            const vswitch = (key == 'visibility-switch');
             if (Array.isArray(value) && value.length > 0) {
 
                 for (i = 0; i < li; i++) {
-                    var valueItem = value[i];
+                    const valueItem = value[i];
 
                     if (!(typeof valueItem == 'object' &&
                             Array.isArray(valueItem) &&
@@ -928,7 +936,7 @@ var validateValue = function(layerId, key, value, type, arrayLength, min, max, h
                         logError('wrong-property-value[]', layerId, key, value, i);
                         return getDefaultLayerPropertyValue(key);
                     } else {
-                        //fast constant 
+                        //fast constant
                         if (typeof valueItem[1] == 'string' && valueItem[1].charAt(0) == '@') {
                             if (typeof globals.stylesheetConstants[valueItem[1]] == 'undefined') {
                                 logError('wrong-property-value[]', layerId, key, value, i);
@@ -1104,10 +1112,10 @@ var validateValue = function(layerId, key, value, type, arrayLength, min, max, h
     case 'boolean':
         return value;
     }
-};
+}
 
 
-var validateLayerPropertyValue = function(layerId, key, value) {
+function validateLayerPropertyValue(layerId, key, value) {
 
     switch(key) {
 
@@ -1213,10 +1221,10 @@ var validateLayerPropertyValue = function(layerId, key, value) {
     }
 
     return value; //custom property
-};
+}
 
 
-var getDefaultLayerPropertyValue = function(key) {
+function getDefaultLayerPropertyValue(key) {
     switch(key) {
     case 'inherit':          return '';
     case 'filter':           return null;
@@ -1285,7 +1293,7 @@ var getDefaultLayerPropertyValue = function(key) {
     case 'label-no-overlap':  return true;
     case 'label-no-overlap-factor': return null;
     case 'label-no-overlap-margin': return [5,5];
-       
+
     case 'polygon':             return false;
     case 'polygon-style':       return 'solid';
     case 'polygon-use-stencil': return true;
@@ -1321,11 +1329,11 @@ var getDefaultLayerPropertyValue = function(key) {
     case 'importance-source':  return null; //''
     case 'importance-weight':  return 1;
     }
-};
+}
 
 
 function getFilterResult(filter, feature, featureType, group, layer, key, lod, depth, fast) {
-    var result, i, li;
+    let result, i, li;
 
     if (!filter || !Array.isArray(filter)) {
         return false;
@@ -1336,7 +1344,7 @@ function getFilterResult(filter, feature, featureType, group, layer, key, lod, d
     }
 
     switch(filter[0]) {
-        case 'all': 
+        case 'all':
             for (i = 1, li = filter.length; i < li; i++) {
                 result = getFilterResult(filter[i], feature, featureType, group, layer, key, lod, depth + 1, fast);
 
@@ -1344,8 +1352,8 @@ function getFilterResult(filter, feature, featureType, group, layer, key, lod, d
                     return false;
                 }
             }
-               
-            return true;                         
+
+            return true;
 
         case 'any':
             for (i = 1, li = filter.length; i < li; i++) {
@@ -1355,8 +1363,8 @@ function getFilterResult(filter, feature, featureType, group, layer, key, lod, d
                     return true;
                 }
             }
-               
-            return false;                         
+
+            return false;
 
         case 'none':
             for (i = 1, li = filter.length; i < li; i++) {
@@ -1366,13 +1374,13 @@ function getFilterResult(filter, feature, featureType, group, layer, key, lod, d
                     return false;
                 }
             }
-               
+
             return true;
-                              
-        case 'skip': return false; 
+
+        case 'skip': return false;
     }
 
-    var value, value2;
+    let value, value2;
 
     if (fast && filter[2]) {
         value = filter[1];
@@ -1409,45 +1417,45 @@ function getFilterResult(filter, feature, featureType, group, layer, key, lod, d
     case '<=': return (value <= value2);
     case '>': return (value > value2);
     case '<': return (value < value2);
-        
+
     case 'has': return (typeof value != 'undefined');
     case '!has': return (typeof value == 'undefined');
-        
+
     case 'in':
         for (i = fast ? 3 : 2, li = filter.length; i < li; i++) {
             if (filter[i] == value) {
                 return true;
             }
-        } 
+        }
         return false;
-        
+
     case '!in':
         for (i = fast ? 3 : 2, li = filter.length; i < li; i++) {
             if (filter[i] == value) {
                 return false;
             }
-        } 
+        }
         return true;
-    }            
+    }
 
-    return false;    
+    return false;
 }
 
 
 function isSimpleValue(value) {
     switch(typeof value) {
         case 'number':  return true;
-        case 'string': 
-            
+        case 'string':
+
             if (value.length > 0) {
                 switch(value.charAt(0)) {
-                    case '#': 
+                    case '#':
                     case '$':
                     case '@':
                     case '&':
                         break;
-                    
-                    default: 
+
+                    default:
 
                         if (value.indexOf('{') == -1) {
                             return true;
@@ -1471,10 +1479,10 @@ function makeFasterFilter(filter) {
         return filter;
     }
 
-    var i, li, value, simple, result = [filter[0]];
+    let i, li, result = [filter[0]];
 
     switch(filter[0]) {
-    case 'all': 
+    case 'all':
     case 'any':
     case 'none':
     case 'skip':
@@ -1504,15 +1512,15 @@ function makeFasterFilter(filter) {
 
         for (i = 2, li = filter.length; i < li; i++) {
             result[i+1] = filter[i];
-        } 
+        }
 
     }
 
     return result;
 }
 
-var processLayer = function(layerId, layerData, stylesheetLayersData) {
-    var layer = {}, key, value;
+function processLayer(layerId, layerData, stylesheetLayersData) {
+    let layer = {}, key, value;
 
     //copy Layer and inherit Layer if needed
     copyLayer(layerId, layer, layerData, stylesheetLayersData);
@@ -1565,9 +1573,9 @@ var processLayer = function(layerId, layerData, stylesheetLayersData) {
         //copy constats to vswitch
         if (key == 'visibility-switch') {
             if (Array.isArray(value) && value.length > 0) {
-                for (var i = 0, li = value.length; i < li; i++) {
-                    var valueItem = value[i];
-                    var wrong = false;
+                for (let i = 0, li = value.length; i < li; i++) {
+                    const valueItem = value[i];
+                    let wrong = false;
 
                     if (!(typeof valueItem == 'object' && Array.isArray(valueItem) && valueItem.length == 2)) {
                         wrong = true;
@@ -1599,11 +1607,10 @@ var processLayer = function(layerId, layerData, stylesheetLayersData) {
     }
 
     return layer;
-};
+}
 
 
-var processStylesheet = function(stylesheetLayersData) {
-    var key;
+function processStylesheet(stylesheetLayersData) {
     globals.stylesheetBitmaps = {};
     globals.stylesheetFonts = {};
     globals.stylesheetConstants = stylesheetLayersData['constants'] || {};
@@ -1611,12 +1618,11 @@ var processStylesheet = function(stylesheetLayersData) {
     globals.stylesheetLocals = {};
 
     //get bitmaps
-    var bitmaps = stylesheetLayersData['bitmaps'] || {};
+    let bitmaps = stylesheetLayersData['bitmaps'] || {}, bitmap;
 
     //build map
-    for (key in bitmaps) {
-        var bitmap = bitmaps[key];
-        //var skip = false;
+    for (let key in bitmaps) {
+        bitmap = bitmaps[key];
 
         if ((typeof bitmap) == 'string') {
             bitmap = {'url':bitmap, 'hash': getHash(bitmap) };
@@ -1640,17 +1646,17 @@ var processStylesheet = function(stylesheetLayersData) {
     //remove urls
     bitmaps = globals.stylesheetBitmaps;
 
-    for (key in bitmaps) {
+    for (let key in bitmaps) {
         bitmap = bitmaps[key];
         bitmap['url'] = null;
     }
 
     //get fonts
-    var fonts = stylesheetLayersData['fonts'] || {};
+    const fonts = stylesheetLayersData['fonts'] || {};
 
     //build map
-    for (key in fonts) {
-        var font = fonts[key];
+    for (let key in fonts) {
+        let font = fonts[key];
 
         if ((typeof font) == 'string') {
             font = {'url':font};
@@ -1674,15 +1680,15 @@ var processStylesheet = function(stylesheetLayersData) {
         layers : {}
     };
 
-    var layers = stylesheetLayersData['layers'] || {};
+    const layers = stylesheetLayersData['layers'] || {};
 
     globals.stylesheetLayers = globals.stylesheetData.layers;
 
     //process layers
-    for (key in layers) {
+    for (let key in layers) {
         globals.stylesheetData.layers[key] = processLayer(key, layers[key], stylesheetLayersData);
     }
-};
+}
 
 
 export {getFilterResult, processStylesheet, getLayer, getLayerPropertyValue, getLayerExpresionValue, getLayerPropertyValueInner, makeFasterFilter, hasLayerProperty};

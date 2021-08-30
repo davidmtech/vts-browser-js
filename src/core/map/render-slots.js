@@ -1,6 +1,6 @@
 
 
-var MapRenderSlots = function(map) {
+const MapRenderSlots = function(map) {
     this.map = map;
     this.draw = map.draw;
     this.renderer = map.renderer;
@@ -23,13 +23,13 @@ MapRenderSlots.prototype.addRenderSlot = function(id, callback, enabled) {
 
 
 MapRenderSlots.prototype.getRenderSlotIndex = function(id) {
-    return this.map.searchArrayIndexById(this.renderSlots, id); 
+    return this.map.searchArrayIndexById(this.renderSlots, id);
 };
 
 
 MapRenderSlots.prototype.checkRenderSlotId = function(id) {
     if (id == 'after-map-render') {
-        return 'map'; 
+        return 'map';
     } else {
         return id;
     }
@@ -37,26 +37,26 @@ MapRenderSlots.prototype.checkRenderSlotId = function(id) {
 
 
 MapRenderSlots.prototype.moveRenderSlotBefore = function(whichId, whereId) {
-    var from = this.getRenderSlotIndex(this.checkRenderSlotId(whichId));
-    var to = this.getRenderSlotIndex(whereId);
-    if (from != -1 && to != -1 && to != from-1) { 
+    const from = this.getRenderSlotIndex(this.checkRenderSlotId(whichId));
+    const to = this.getRenderSlotIndex(whereId);
+    if (from != -1 && to != -1 && to != from-1) {
         this.renderSlots.splice(to, 0, this.renderSlots.splice(from, 1)[0]);
     }
 };
 
 
 MapRenderSlots.prototype.moveRenderSlotAfter = function(whichId, whereId) {
-    var from = this.getRenderSlotIndex(this.checkRenderSlotId(whichId));
-    var to = this.getRenderSlotIndex(whereId);
+    const from = this.getRenderSlotIndex(this.checkRenderSlotId(whichId));
+    let to = this.getRenderSlotIndex(whereId);
     if (from != -1 && to != -1 && to != from+1) {
-        to++; 
+        to++;
         this.renderSlots.splice(to, 0, this.renderSlots.splice(from, 1)[0]);
     }
 };
 
 
 MapRenderSlots.prototype.removeRenderSlot = function(id) {
-    var index = this.getRenderSlotIndex(id);
+    const index = this.getRenderSlotIndex(id);
     if (index != -1) {
         this.renderSlots.splice(index, 1);
     }
@@ -64,7 +64,7 @@ MapRenderSlots.prototype.removeRenderSlot = function(id) {
 
 
 MapRenderSlots.prototype.setRenderSlotEnabled = function(id, state) {
-    var index = this.getRenderSlotIndex(id);
+    const index = this.getRenderSlotIndex(id);
     if (index != -1) {
         this.renderSlots[index].enabled = state;
     }
@@ -72,11 +72,11 @@ MapRenderSlots.prototype.setRenderSlotEnabled = function(id, state) {
 
 
 MapRenderSlots.prototype.getRenderSlotEnabled = function(id) {
-    var index = this.getRenderSlotIndex(id);
+    const index = this.getRenderSlotIndex(id);
     if (index != -1) {
         return this.renderSlots[index].enabled;
     }
-    
+
     return false;
 };
 
@@ -86,8 +86,8 @@ MapRenderSlots.prototype.processRenderSlots = function() {
         this.renderer.gpu.setViewport(); //just in case
     }
 
-    for (var i = 0, li = this.renderSlots.length; i < li; i++) {
-        var slot = this.renderSlots[i];
+    for (let i = 0, li = this.renderSlots.length; i < li; i++) {
+        const slot = this.renderSlots[i];
 
         if (slot.enabled && slot.callback) {
             this.renderer.gpu.setState(this.draw.drawTileState);
@@ -98,4 +98,3 @@ MapRenderSlots.prototype.processRenderSlots = function() {
 
 
 export default MapRenderSlots;
-

@@ -1,13 +1,13 @@
 
-import {utils as utils_} from '../utils/utils';
+//import {utils as utils_} from '../utils/utils';
 import MapMetanode_ from './metanode';
 
 //get rid of compiler mess
-var utils = utils_;
-var MapMetanode = MapMetanode_;
+//const utils = utils_;
+const MapMetanode = MapMetanode_;
 
 
-var MapMetatile = function(metaresources, surface, tile) {
+const MapMetatile = function(metaresources, surface, tile) {
     this.metaresources= metaresources; //this is metastorage tile
     this.map = metaresources.map;
     this.surface = surface;
@@ -43,7 +43,7 @@ MapMetatile.prototype.kill = function(killedByCache) {
 
 
 MapMetatile.prototype.clone = function(surface) {
-    var metatile = new MapMetatile(this.metaresources, surface);
+    const metatile = new MapMetatile(this.metaresources, surface);
     metatile.nodes = this.nodes;
     metatile.loadState = this.loadState;
     metatile.nodes = this.nodes;
@@ -83,7 +83,7 @@ MapMetatile.prototype.isReady = function (/*doNotLoad,*/ priority) {
         return true;
     } else {
 
-        if (this.loadState == 0) { 
+        if (this.loadState == 0) {
             //if (doNotLoad) {
                 //remove from queue
                 //if (this.mapLoaderUrl) {
@@ -96,14 +96,14 @@ MapMetatile.prototype.isReady = function (/*doNotLoad,*/ priority) {
                 if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount &&
                         performance.now() > this.loadErrorTime + this.map.config.mapLoadErrorRetryTime) {
 
-                    this.scheduleLoad(priority);                    
+                    this.scheduleLoad(priority);
                 }
             } else {
                 this.scheduleLoad(priority);
             }
             //}
         } //else load in progress
-        
+
         return false;
     }
 };
@@ -117,31 +117,31 @@ MapMetatile.prototype.used = function() {
 
 
 MapMetatile.prototype.getNode = function(id) {
-    var x = id[1] - this.id[1] - this.offsetx;
-    var y = id[2] - this.id[2] - this.offsety;
-    
+    const x = id[1] - this.id[1] - this.offsetx;
+    const y = id[2] - this.id[2] - this.offsety;
+
     if (x < 0 || y < 0 || x >= this.sizex || y >= this.sizey) {
         return null;
     }
-    
-    var node = this.nodes[this.sizex * y + x];
+
+    let node = this.nodes[this.sizex * y + x];
 
     if (!node) {
-        var index = this.sizex * y + x;
-        var stream = {data:this.data, index:this.metanodesIndex + (index * this.metanodeSize)};
-        node = (new MapMetanode(this, [this.lod, this.metatileIdx + this.offsetx + x, this.metatileIdy + this.offsety + y], stream, this.divisionNode)); 
+        const index = this.sizex * y + x;
+        const stream = {data:this.data, index:this.metanodesIndex + (index * this.metanodeSize)};
+        node = (new MapMetanode(this, [this.lod, this.metatileIdx + this.offsetx + x, this.metatileIdy + this.offsety + y], stream, this.divisionNode));
         this.nodes[index] = node;
         this.applyMetanodeCredits(x, y);
-        this.applyMetatanodeBitplanes(x, y); 
+        this.applyMetatanodeBitplanes(x, y);
     }
 
-/*    
+/*
     if (!node.ready) {
         node.generateCullingHelpers();
         node.ready = true;
     }
 */
-    
+
     return node;
 };
 
@@ -175,9 +175,9 @@ MapMetatile.prototype.onLoadError = function() {
     this.loadErrorCounter ++;
 
     //make sure we try to load it again
-    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) { 
+    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) {
         setTimeout((function(){ if (!this.map.killed) { this.map.markDirty(); } }).bind(this), this.map.config.mapLoadErrorRetryTime);
-    }    
+    }
 
     this.mapLoaderCallError();
 };
@@ -198,12 +198,12 @@ MapMetatile.prototype.onLoaded = function(data, task) {
     data = new DataView(data);
 
     this.size += data.byteLength * 4;
-    
+
     this.data = data;
 
-    var t = performance.now();
+    const t = performance.now();
     this.parseMetatatile({data:data, index: 0});
-    this.map.stats.renderBuild += performance.now() - t; 
+    this.map.stats.renderBuild += performance.now() - t;
 
     this.cacheItem= this.map.metatileCache.insert(this.kill.bind(this, true), this.size);
 
@@ -232,8 +232,8 @@ MapMetatile.prototype.parseMetatatile = function(stream) {
     };
 */
 
-    var streamData = stream.data;
-    var magic = '';
+    const streamData = stream.data;
+    let magic = '';
 
     magic += String.fromCharCode(streamData.getUint8(stream.index, true)); stream.index += 1;
     magic += String.fromCharCode(streamData.getUint8(stream.index, true)); stream.index += 1;
@@ -258,7 +258,7 @@ MapMetatile.prototype.parseMetatatile = function(stream) {
 
     this.sizex = streamData.getUint16(stream.index, true); stream.index += 2;
     this.sizey = streamData.getUint16(stream.index, true); stream.index += 2;
-    
+
     this.flagPlanes = new Array(8);
 
     if (this.version < 2) {
@@ -271,27 +271,27 @@ MapMetatile.prototype.parseMetatatile = function(stream) {
 
     this.parseMetatatileCredits(stream);
     this.parseMetatatileNodes(stream);
-    
-    this.useVersion = (this.map.config.mapForceMetatileV3 && this.version < 5) ? 3 : this.version; 
+
+    this.useVersion = (this.map.config.mapForceMetatileV3 && this.version < 5) ? 3 : this.version;
 };
 
 
 MapMetatile.prototype.parseFlagPlanes = function(stream) {
-    var streamData = stream.data;
+    const streamData = stream.data;
 
     //rounded to bytes
-    var bitplaneSize = ((this.sizex * this.sizey + 7) >> 3);
+    const bitplaneSize = ((this.sizex * this.sizey + 7) >> 3);
 
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         if ((this.flags & (1 << i)) != 0) {
 
-            var bitplane = new Uint8Array(bitplaneSize);
-    
-            for (var j = 0; j < bitplaneSize; j++) {
+            const bitplane = new Uint8Array(bitplaneSize);
+
+            for (let j = 0; j < bitplaneSize; j++) {
                 bitplane[j] = streamData.getUint8(stream.index, true); stream.index += 1;
             }
-    
-            this.flagPlanes[i] = bitplane; 
+
+            this.flagPlanes[i] = bitplane;
         }
     }
 };
@@ -306,33 +306,33 @@ MapMetatile.prototype.parseMetatatileCredits = function(stream) {
     };
 */
 
-    var streamData = stream.data;
-    
+    const streamData = stream.data;
+
     if (this.version < 2) {
         this.creditCount = streamData.getUint8(stream.index, true); stream.index += 1;
         this.creditSize = streamData.getUint16(stream.index, true); stream.index += 2;
     }
-    
+
     if (this.creditCount == 0) {
         this.credits = [];
         return;
     }
 
     //rounded to bytes
-    var bitfieldSize = ((this.sizex * this.sizey + 7) >> 3);
+    const bitfieldSize = ((this.sizex * this.sizey + 7) >> 3);
 
     this.credits = new Array(this.creditCount);
 
-    for (var i = 0, li = this.credits.length; i < li; i++) {
-        var creditId = streamData.getUint16(stream.index, true); stream.index += 2;
-        var bitfield = new Uint8Array(bitfieldSize);
+    for (let i = 0, li = this.credits.length; i < li; i++) {
+        const creditId = streamData.getUint16(stream.index, true); stream.index += 2;
+        const bitfield = new Uint8Array(bitfieldSize);
 
-        for (var j = 0; j < bitfieldSize; j++) {
+        for (let j = 0; j < bitfieldSize; j++) {
             bitfield[j] = streamData.getUint8(stream.index, true); stream.index += 1;
         }
-    
-        var credit = this.map.getCreditByNumber(creditId);
-        var stringId = credit ? credit.key : null;
+
+        const credit = this.map.getCreditByNumber(creditId);
+        const stringId = credit ? credit.key : null;
 
         this.credits[i] = { creditId : stringId, creditMask: bitfield};
     }
@@ -340,23 +340,23 @@ MapMetatile.prototype.parseMetatatileCredits = function(stream) {
 
 
 MapMetatile.prototype.applyMetatatileBitplanes = function() {
-    for (var i = 0; i < 1; i++) {
+    for (let i = 0; i < 1; i++) {
         if (this.flagPlanes[i]) {
-            
-            var bitplane = this.flagPlanes[i]; 
-    
-            for (var y = 0; y < this.sizey; y++) {
-                for (var x = 0; x < this.sizex; x++) {
-                    var byteIndex = this.sizex * y + x;
-                    var bitIndex = byteIndex & 7;
-                    var bitMask = 1 << bitIndex;
+
+            const bitplane = this.flagPlanes[i];
+
+            for (let y = 0; y < this.sizey; y++) {
+                for (let x = 0; x < this.sizex; x++) {
+                    let byteIndex = this.sizex * y + x;
+                    const bitIndex = byteIndex & 7;
+                    const bitMask = 1 << bitIndex;
                     byteIndex >>= 3;
-                    
+
                     if (bitplane[byteIndex] & bitMask) {
                         switch(i) {
                         case 0:
                             this.nodes[y*this.sizex+x].alien = true;
-                            break;       
+                            break;
                         }
                     }
                 }
@@ -367,19 +367,19 @@ MapMetatile.prototype.applyMetatatileBitplanes = function() {
 
 
 MapMetatile.prototype.applyMetatanodeBitplanes = function(x, y) {
-    for (var i = 0; i < 1; i++) {
+    for (let i = 0; i < 1; i++) {
         if (this.flagPlanes[i]) {
-            var bitplane = this.flagPlanes[i]; 
-            var byteIndex = this.sizex * y + x;
-            var bitIndex = byteIndex & 7;
-            var bitMask = 1 << bitIndex;
+            let byteIndex = this.sizex * y + x;
+            let bitIndex = byteIndex & 7;
+            const bitplane = this.flagPlanes[i];
+            const bitMask = 1 << bitIndex;
             byteIndex >>= 3;
-            
+
             if (bitplane[byteIndex] & bitMask) {
                 switch(i) {
                 case 0:
                     this.nodes[y*this.sizex+x].alien = true;
-                    break;       
+                    break;
                 }
             }
         }
@@ -388,16 +388,16 @@ MapMetatile.prototype.applyMetatanodeBitplanes = function(x, y) {
 
 
 MapMetatile.prototype.applyMetatatileCredits = function() {
-    for (var y = 0; y < this.sizey; y++) {
-        for (var x = 0; x < this.sizex; x++) {
-            var byteIndex = this.sizex * y + x;
-            var bitIndex = byteIndex & 7;
-            var bitMask = 1 << bitIndex;
+    for (let y = 0; y < this.sizey; y++) {
+        for (let x = 0; x < this.sizex; x++) {
+            let byteIndex = this.sizex * y + x;
+            const bitIndex = byteIndex & 7;
+            const bitMask = 1 << bitIndex;
             byteIndex >>= 3;
 
-            for (var i = 0, li = this.credits.length; i < li; i++) {
+            for (let i = 0, li = this.credits.length; i < li; i++) {
                 if (this.credits[i].creditMask[byteIndex] & bitMask) {
-                    var id = this.credits[i].creditId;
+                    const id = this.credits[i].creditId;
                     if (id) {
                         this.nodes[y*this.sizex+x].credits.push(id);
                     }
@@ -409,14 +409,14 @@ MapMetatile.prototype.applyMetatatileCredits = function() {
 
 
 MapMetatile.prototype.applyMetanodeCredits = function(x, y) {
-    var byteIndex = this.sizex * y + x;
-    var bitIndex = byteIndex & 7;
-    var bitMask = 1 << bitIndex;
+    let byteIndex = this.sizex * y + x;
+    const bitIndex = byteIndex & 7;
+    const bitMask = 1 << bitIndex;
     byteIndex >>= 3;
 
-    for (var i = 0, li = this.credits.length; i < li; i++) {
+    for (let i = 0, li = this.credits.length; i < li; i++) {
         if (this.credits[i].creditMask[byteIndex] & bitMask) {
-            var id = this.credits[i].creditId;
+            const id = this.credits[i].creditId;
             if (id) {
                 this.nodes[y*this.sizex+x].credits.push(id);
             }
@@ -428,7 +428,7 @@ MapMetatile.prototype.applyMetanodeCredits = function(x, y) {
 MapMetatile.prototype.parseMetatatileNodes = function(stream) {
     this.metanodesIndex = stream.index;
     this.metanodeSize = 1 + 1 + 2 + 2 + 2 + 2;
-    
+
     if (this.version >= 5) {
         this.metanodeSize += (3 + 4) * 4;
     } else {
@@ -455,19 +455,19 @@ MapMetatile.prototype.parseMetatatileNodes = function(stream) {
     } else {
         this.divisionNode = null;
     }
-    
-    this.nodes = new Array(this.sizex*this.sizey);
-    
-    /*
-    var index = 0;
 
-    for (var y = 0; y < this.sizey; y++) {
-        for (var x = 0; x < this.sizex; x++) {
+    this.nodes = new Array(this.sizex*this.sizey);
+
+    /*
+    const index = 0;
+
+    for (let y = 0; y < this.sizey; y++) {
+        for (let x = 0; x < this.sizex; x++) {
             this.nodes[index] = (new MapMetanode(this, [this.lod, this.metatileIdx + this.offsetx + x, this.metatileIdy + this.offsety + y], stream, divisionNode));
             index++;
         }
     }
-    
+
     this.applyMetatatileCredits();
     this.applyMetatatileBitplanes();
     */

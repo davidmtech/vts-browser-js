@@ -1,5 +1,5 @@
 
-var MapGeodataImportGeoJSON = function(builder, heightMode, srs, options) {
+const MapGeodataImportGeoJSON = function(builder, heightMode, srs, options) {
     this.builder = builder;
     this.map = builder.map;
     this.heightMode = heightMode || 'float';
@@ -13,7 +13,7 @@ var MapGeodataImportGeoJSON = function(builder, heightMode, srs, options) {
 };
 
 MapGeodataImportGeoJSON.prototype.processGeometry = function(geometry, feature) {
-    var coords = geometry['coordinates'];
+    const coords = geometry['coordinates'];
     if (!coords) {
         return;
     }
@@ -42,8 +42,8 @@ MapGeodataImportGeoJSON.prototype.processGeometry = function(geometry, feature) 
             break;
 
         case 'MultiPolygon':
-            for (var i = 0, li = coords.length; i < li; i++) {
-                var coords2 = coords[i];
+            for (let i = 0, li = coords.length; i < li; i++) {
+                const coords2 = coords[i];
                 if (coords2.length > 0) {
                     this.builder.addPolygon(coords2[0], (coords2.length > 1) ? coords2.slice(1) : [], null, this.heightMode, feature['properties'], feature['properties'] ? feature['properties']['id'] : null, this.srs, this.tesselation);
                 }
@@ -51,19 +51,21 @@ MapGeodataImportGeoJSON.prototype.processGeometry = function(geometry, feature) 
             break;
 
         case 'GeometryCollection':
+            {
+                const geometries = geometry['gemetries'];
 
-            var geometries = geometry['gemetries'];
-
-            if (geometries) {
-                for (var i = 0, li = geometries.length; i < li; i++) {
-                    this.processGeometry(geometries[i], feature);
+                if (geometries) {
+                    for (let i = 0, li = geometries.length; i < li; i++) {
+                        this.processGeometry(geometries[i], feature);
+                    }
                 }
             }
+            break;
     }
 };
 
 MapGeodataImportGeoJSON.prototype.processFeature = function(json) {
-    var geometry = json['geometry'];
+    const geometry = json['geometry'];
 
     if (geometry) {
         this.processGeometry(geometry, json);
@@ -71,13 +73,13 @@ MapGeodataImportGeoJSON.prototype.processFeature = function(json) {
 };
 
 MapGeodataImportGeoJSON.prototype.processCollection = function(json) {
-    var features = json['features'];
+    const features = json['features'];
 
     if (!features) {
         return;
     }
 
-    for (var i = 0, li = features.length; i < li; i++) {
+    for (let i = 0, li = features.length; i < li; i++) {
         this.processFeature(features[i]);
     }
 };
@@ -110,8 +112,8 @@ MapGeodataImportGeoJSON.prototype.processJSON = function(json) {
 
     } else {
 
-        for (var key in json) {
-            var item = json[key];
+        for (let key in json) {
+            const item = json[key];
 
             if (!this.dontCreateGroups) {
                 this.builder.addGroup(this.groupIdPrefix + key);
@@ -131,4 +133,3 @@ MapGeodataImportGeoJSON.prototype.processJSON = function(json) {
 };
 
 export default MapGeodataImportGeoJSON;
-

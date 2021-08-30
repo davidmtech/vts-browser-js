@@ -1,6 +1,6 @@
 
 
-var MapCache = function(map, maxCost) {
+const MapCache = function(map, maxCost) {
     this.map = map;
     this.maxCost = (maxCost != null) ? maxCost : Number.MAX_VALUE;
     this.skipCostCheck = false;
@@ -34,7 +34,7 @@ MapCache.prototype.updateItem = function(item) {
         this.last = item.prev;
     }
 
-    var first = this.first;
+    const first = this.first;
 
     //add item as first
     this.first = item;
@@ -57,7 +57,7 @@ MapCache.prototype.setMaxCost = function(cost) {
 
 
 MapCache.prototype.clear = function() {
-    var item = this.first;
+    let item = this.first;
 
     while (item != null) {
         if (item.destructor != null) {
@@ -79,7 +79,7 @@ MapCache.prototype.insert = function(destructor, cost) {
 
     //console.log("insert: " + hash + " items: " + this.totalItems);
 
-    var item = { destructor:destructor, cost:cost, prev: null, next:this.first };
+    const item = { destructor:destructor, cost:cost, prev: null, next:this.first };
 
     if (this.first != null) {
         this.first.prev = item;
@@ -104,7 +104,7 @@ MapCache.prototype.insert = function(destructor, cost) {
 
 MapCache.prototype.remove = function(item) {
     this.totalItems++;
-    var hit = false;
+    let hit = false;
 
     if (item == this.first) {
         this.first = item.next;
@@ -132,13 +132,13 @@ MapCache.prototype.remove = function(item) {
         } else {
             item.prev.next = item.next;
         }
-        
+
         if (!item.next) {
             //debugger;
         } else {
             item.next.prev = item.prev;
         }
-        
+
     }
 
     this.totalCost -= item.cost;
@@ -163,7 +163,7 @@ MapCache.prototype.checkCost = function() {
 
         //console.log("remove: " + this.last.hash + " prev: " + this.last.prev + " items: " + this.totalItems);
 
-        var last = this.last;
+        const last = this.last;
 
         if (last != null) {
             //set new last

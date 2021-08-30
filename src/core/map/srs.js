@@ -4,12 +4,12 @@ import {math as math_} from '../utils/math';
 import GeographicLib_ from 'geographiclib';
 
 //get rid of compiler mess
-var MapTexture = MapTexture_;
-var math = math_;
-var GeographicLib = GeographicLib_;
+const MapTexture = MapTexture_;
+const math = math_;
+const GeographicLib = GeographicLib_;
 
 
-var MapSrs = function(map, id, json) {
+const MapSrs = function(map, id, json) {
     this.map = map;
     this.id = id;
     this.proj4 = map.proj4;
@@ -24,12 +24,12 @@ var MapSrs = function(map, id, json) {
     this.srsInfo = this.proj4(this.srsDef).info();
     this.geoidGrid = null;
     this.geoidGridMap = null;
-    this.srsProj4 = this.proj4(this.srsDef, null, null, true); 
-    this.latlonProj4 = null; 
+    this.srsProj4 = this.proj4(this.srsDef, null, null, true);
+    this.latlonProj4 = null;
     this.proj4Cache = {};
 
     if (json['geoidGrid']) {
-        var geoidGridData = json['geoidGrid'];
+        const geoidGridData = json['geoidGrid'];
 
         this.geoidGrid = {
             definition : geoidGridData['definition'] || null,
@@ -50,12 +50,12 @@ var MapSrs = function(map, id, json) {
         }
 
         if (this.geoidGrid.definition) {
-            var url = this.map.url.makeUrl(this.geoidGrid.definition, {}, null);
+            const url = this.map.url.makeUrl(this.geoidGrid.definition, {}, null);
             this.geoidGridMap = new MapTexture(this.map, url, true);
         }
-        
+
         if (this.geoidGrid.srsDefEllps) {
-            this.geoidGrid.srsProj4 = this.proj4(this.geoidGrid.srsDefEllps, null, null, true);        
+            this.geoidGrid.srsProj4 = this.proj4(this.geoidGrid.srsDefEllps, null, null, true);
         }
     }
 
@@ -74,7 +74,7 @@ MapSrs.prototype.parsePeriodicity = function(periodicityData) {
         return null;
     }
 
-    var periodicity = {
+    const periodicity = {
         'type' : periodicityData['type'] || '',
         'period' : periodicityData['period'] || 0
     };
@@ -119,7 +119,7 @@ MapSrs.prototype.isProjected = function() {
 
 
 MapSrs.prototype.getOriginalHeight = function(coords) {
-    var height = coords[2] || 0;
+    let height = coords[2] || 0;
     height /= this.getVerticalAdjustmentFactor(coords);
     height += this.getGeoidGridDelta(coords);
     return height;
@@ -127,7 +127,7 @@ MapSrs.prototype.getOriginalHeight = function(coords) {
 
 
 MapSrs.prototype.getFinalHeight = function(coords) {
-    var height = coords[2] || 0;
+    let height = coords[2] || 0;
     height -= this.getGeoidGridDelta(coords);
     height *= this.getVerticalAdjustmentFactor(coords);
     return height;
@@ -137,13 +137,13 @@ MapSrs.prototype.getFinalHeight = function(coords) {
 MapSrs.prototype.getGeoidGridDelta = function(coords) {
     if (this.geoidGridMap != null && this.isGeoidGridReady()) {
         //get cooords in geoidGrid space
-        var mapCoords = this.proj4(this.srsProj4, this.geoidGrid.srsProj4, [coords[0], coords[1]]);
+        const mapCoords = this.proj4(this.srsProj4, this.geoidGrid.srsProj4, [coords[0], coords[1]]);
 
         //get image coords
-        var px = mapCoords[0] - this.geoidGrid.extents.ll[0];
-        var py = this.geoidGrid.extents.ur[1] - mapCoords[1];
+        let px = mapCoords[0] - this.geoidGrid.extents.ll[0];
+        let py = this.geoidGrid.extents.ur[1] - mapCoords[1];
 
-        var imageExtens = this.geoidGridMap.getImageExtents();
+        const imageExtens = this.geoidGridMap.getImageExtents();
 
         px *= imageExtens[0] / (this.geoidGrid.extents.ur[0] - this.geoidGrid.extents.ll[0]);
         py *= imageExtens[1] / (this.geoidGrid.extents.ur[1] - this.geoidGrid.extents.ll[1]);
@@ -152,21 +152,21 @@ MapSrs.prototype.getGeoidGridDelta = function(coords) {
         py = math.clamp(py, 0, imageExtens[1] - 2);
 
         //get bilineary interpolated value from image
-        var ix = Math.floor(px);
-        var iy = Math.floor(py);
-        var fx = px - ix;
-        var fy = py - iy;
+        const ix = Math.floor(px);
+        const iy = Math.floor(py);
+        const fx = px - ix;
+        const fy = py - iy;
 
-        var data = this.geoidGridMap.getImageData();
-        var index = iy * imageExtens[0];
-        var index2 = index + imageExtens[0];
-        var h00 = data[(index + ix)*4];
-        var h01 = data[(index + ix + 1)*4];
-        var h10 = data[(index2 + ix)*4];
-        var h11 = data[(index2 + ix + 1)*4];
-        var w0 = (h00 + (h01 - h00)*fx);
-        var w1 = (h10 + (h11 - h10)*fx);
-        var delta = (w0 + (w1 - w0)*fy);
+        const data = this.geoidGridMap.getImageData();
+        const index = iy * imageExtens[0];
+        const index2 = index + imageExtens[0];
+        const h00 = data[(index + ix)*4];
+        const h01 = data[(index + ix + 1)*4];
+        const h10 = data[(index2 + ix)*4];
+        const h11 = data[(index2 + ix + 1)*4];
+        const w0 = (h00 + (h01 - h00)*fx);
+        const w1 = (h10 + (h11 - h10)*fx);
+        let delta = (w0 + (w1 - w0)*fy);
 
         //strech deta into value range
         delta = this.geoidGrid.valueRange[0] + (delta * ((this.geoidGrid.valueRange[1] - this.geoidGrid.valueRange[0]) / 255));
@@ -180,40 +180,40 @@ MapSrs.prototype.getGeoidGridDelta = function(coords) {
 
 MapSrs.prototype.getVerticalAdjustmentFactor = function(coords) {
     if (this.srsModifiers.indexOf('adjustVertical') != -1) {
-        var info = this.getSrsInfo();
+        const info = this.getSrsInfo();
 
         //convert coords to latlon
-        var latlonProj = '+proj=longlat ' +
+        const latlonProj = '+proj=longlat ' +
                           ' +alpha=0' +
                           ' +gamma=0 +a=' + info['a'] +
                           ' +b=' + info['b'] +
                           ' +x0=0 +y0=0';
 
         if (!this.latlonProj4) {
-            this.latlonProj4 = this.proj4(latlonProj, null, null, true); 
+            this.latlonProj4 = this.proj4(latlonProj, null, null, true);
         }
 
-        var coords2 = this.proj4(this.srsProj4, this.latlonProj4, [coords[0], coords[1]]);
+        let coords2 = this.proj4(this.srsProj4, this.latlonProj4, [coords[0], coords[1]]);
 
         //move coors 1000m
-        var geod = new GeographicLib.Geodesic.Geodesic(info['a'],
+        const geod = new GeographicLib.Geodesic.Geodesic(info['a'],
                                                        (info['a'] / info['b']) - 1.0);
 
 
-        var r = geod.Direct(coords2[1], coords2[0], 90, 1000);
+        const r = geod.Direct(coords2[1], coords2[0], 90, 1000);
         coords2 = [r.lon2, r.lat2];
 
         //convet coords from latlon back to projected
         coords2 = this.proj4(this.latlonProj4, this.srsProj4, coords2);
 
         //get distance between coords
-        var dx = coords2[0] - coords[0];
-        var dy = coords2[1] - coords[1];
+        const dx = coords2[0] - coords[0];
+        const dy = coords2[1] - coords[1];
 
-        var distance = Math.sqrt(dx * dx + dy* dy);
+        const distance = Math.sqrt(dx * dx + dy* dy);
 
         //get factor
-        var factor = distance / 1000;
+        const factor = distance / 1000;
 
         return factor;
     }
@@ -234,34 +234,34 @@ MapSrs.prototype.convertCoordsTo = function(coords, srs, skipVerticalAdjust) {
 
     coords = coords.slice();
 
-    var stringSrs = (typeof srs === 'string');
+    const stringSrs = (typeof srs === 'string');
 
     //if (!skipVerticalAdjust && stringSrs) {
     coords[2] = this.getOriginalHeight(coords);
     //}
 
-    var srsDef = (stringSrs) ? srs : srs.srsProj4;
+    const srsDef = (stringSrs) ? srs : srs.srsProj4;
 
     /*
     if (srsDef.isGeocent && this.srsProj4.projName == "merc") {
-        var coords3 = coords.slice();
+        const coords3 = coords.slice();
         this.convertMercToWGS(coords3);
         this.convertWGSToGeocent(coords3, srsDef);
         return coords3;
     }*/
 
 
-    var srsDef2 = (stringSrs) ? srs : srs.srsDef;
-    //var coords2 = this.proj4(this.srsProj4, srsDef, coords);
+    const srsDef2 = (stringSrs) ? srs : srs.srsDef;
+    //const coords2 = this.proj4(this.srsProj4, srsDef, coords);
 
-    var proj = this.proj4Cache[srsDef2];
-    
+    let proj = this.proj4Cache[srsDef2];
+
     if (!proj) {
         proj = this.proj4(this.srsProj4, srsDef);
         this.proj4Cache[srsDef2] = proj;
     }
 
-    var coords2 = proj.forward(coords);
+    const coords2 = proj.forward(coords);
 
     if (!skipVerticalAdjust && !stringSrs) {
         coords2[2] = srs.getFinalHeight(coords2);
@@ -277,8 +277,8 @@ MapSrs.prototype.convertCoordsToFast = function(coords, srs, skipVerticalAdjust,
         //coords[2] = this.getOriginalHeight(coords);
     //}
 
-    var srsDef = srs.srsProj4;
-    
+    const srsDef = srs.srsProj4;
+
     /*
     if (srsDef.isGeocent && this.srsProj4.projName == "merc") {
         this.convertMercToWGS(coords, coords2, index, index2);
@@ -286,26 +286,26 @@ MapSrs.prototype.convertCoordsToFast = function(coords, srs, skipVerticalAdjust,
         return;
     }*/
 
-    var srsDef2 = srs.srsDef;
+    const srsDef2 = srs.srsDef;
 
-    var proj = this.proj4Cache[srsDef2];
-    
+    let proj = this.proj4Cache[srsDef2];
+
     if (!proj) {
         proj = this.proj4(this.srsProj4, srsDef);
         this.proj4Cache[srsDef2] = proj;
     }
 
-    var coords3 = proj.forward(coords);
-    
+    const coords3 = proj.forward(coords);
+
     coords2[index2] = coords3[0];
     coords2[index2+1] = coords3[1];
     coords2[index2+2] = coords3[2];
-    
+
 
     //if (!skipVerticalAdjust && stringSrs) {
         //coords2[2] = srs.getFinalHeight(coords2);
     //}
-    
+
     if (srs.geoidGrid) {
         coords2[index2+2] -= srs.getGeoidGridDelta(coords);
     }
@@ -328,19 +328,19 @@ MapSrs.prototype.convertCoordsFrom = function(coords, srs) {
         coords[2] = srs.getOriginalHeight(coords);
     }
 
-    var srsDef = (typeof srs === 'string') ? srs : srs.srsProj4;
-    var srsDef2 = (typeof srs === 'string') ? srs : srs.srsDef;
+    const srsDef = (typeof srs === 'string') ? srs : srs.srsProj4;
+    const srsDef2 = (typeof srs === 'string') ? srs : srs.srsDef;
 
-    //var coords2 = this.proj4(srsDef, this.srsProj4, coords);
+    //const coords2 = this.proj4(srsDef, this.srsProj4, coords);
 
-    var proj = this.proj4Cache[srsDef2];
-    
+    let proj = this.proj4Cache[srsDef2];
+
     if (!proj) {
         proj = this.proj4(this.srsProj4, srsDef);
         this.proj4Cache[srsDef2] = proj;
     }
 
-    var coords2 = proj.inverse(coords);
+    const coords2 = proj.inverse(coords);
 
     coords2[2] = this.getFinalHeight(coords2);
 
@@ -349,11 +349,11 @@ MapSrs.prototype.convertCoordsFrom = function(coords, srs) {
 
 
 MapSrs.prototype.phi2z = function(eccent, ts) {
-    var HALFPI = Math.PI*0.5;
-    var eccnth = 0.5 * eccent;
-    var con, dphi;
-    var phi = HALFPI - 2 * Math.atan(ts);
-    for (var i = 0; i <= 15; i++) {
+    const HALFPI = Math.PI*0.5;
+    const eccnth = 0.5 * eccent;
+    let phi = HALFPI - 2 * Math.atan(ts);
+    let con, dphi;
+    for (let i = 0; i <= 15; i++) {
         con = eccent * Math.sin(phi);
         dphi = HALFPI - 2 * Math.atan(ts * (Math.pow(((1 - con) / (1 + con)), eccnth))) - phi;
         phi += dphi;
@@ -367,43 +367,43 @@ MapSrs.prototype.phi2z = function(eccent, ts) {
 
 
 MapSrs.prototype.convertMercToWGS = function(coords, coords2, index, index2) {
-    var TWOPI = Math.PI * 2;
-    var HALFPI = Math.PI*0.5;
-    var proj = this.srsProj4;
-    var x = coords[index] - proj.x0;
-    var y = coords[index+1] - proj.y0;
+    const TWOPI = Math.PI * 2;
+    const HALFPI = Math.PI*0.5;
+    const proj = this.srsProj4;
+    let x = coords[index] - proj.x0;
+    let y = coords[index+1] - proj.y0;
 
     if (proj.sphere) {
         coords2[index2+1] = HALFPI - 2 * Math.atan(Math.exp(-y / (proj.a * proj.k0)));
     } else {
-        var ts = Math.exp(-y / (proj.a * proj.k0));
-        var yy = this.phi2z(proj.e, ts);
+        const ts = Math.exp(-y / (proj.a * proj.k0));
+        const yy = this.phi2z(proj.e, ts);
         coords2[index2+1] = yy;
         if (yy === -9999) {
             return;
         }
     }
-    
+
     //coords[0] = adjustlon(proj.long0 + x / (proj.a * proj.k0));
     x = proj.long0 + x / (proj.a * proj.k0);
-    var SPI = 3.14159265359;
+    const SPI = 3.14159265359;
     coords2[index2] = (Math.abs(x) <= SPI) ? x : (x - ((x < 0) ? -1 : 1) * TWOPI);
     coords2[index2+2] = coords[index+2];
 };
 
 
 MapSrs.prototype.convertWGSToGeocent = function(coords, srs, coords2, index, index2) {
-    var datum = srs.datum;
+    const datum = srs.datum;
 
-    var HALFPI = Math.PI*0.5;
-    var Longitude = coords[index];
-    var Latitude = coords[index+1];
-    var Height = coords[index+2]; //Z value not always supplied
+    const HALFPI = Math.PI*0.5;
+    let Longitude = coords[index];
+    let Latitude = coords[index+1];
+    const Height = coords[index+2]; //Z value not always supplied
 
-    var Rn; /*  Earth radius at location  */
-    var SinLat; /*  Math.sin(Latitude)  */
-    var Sin2Lat; /*  Square of Math.sin(Latitude)  */
-    var CosLat; /*  Math.cos(Latitude)  */
+    let Rn; /*  Earth radius at location  */
+    let SinLat; /*  Math.sin(Latitude)  */
+    let Sin2Lat; /*  Square of Math.sin(Latitude)  */
+    let CosLat; /*  Math.cos(Latitude)  */
 
     /*
      ** Don't blow up if Latitude is just a little out of the value
@@ -437,4 +437,3 @@ MapSrs.prototype.convertWGSToGeocent = function(coords, srs, coords2, index, ind
 
 
 export default MapSrs;
-

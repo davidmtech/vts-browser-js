@@ -2,9 +2,9 @@
 import Dom_ from '../../utility/dom';
 
 //get rid of compiler mess
-var dom = Dom_;
+const dom = Dom_;
 
-var UIControlCompass = function(ui, visible, visibleLock) {
+const UIControlCompass = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('compass',
@@ -24,7 +24,7 @@ var UIControlCompass = function(ui, visible, visibleLock) {
 
       + ' </div>', visible, visibleLock);
 
-    var compass = this.control.getElement('vts-compass');
+    const compass = this.control.getElement('vts-compass');
     compass.setDraggableState(true);
     compass.on('drag', this.onDrag.bind(this));
     compass.on('dblclick', this.onDoubleClick.bind(this));
@@ -32,20 +32,20 @@ var UIControlCompass = function(ui, visible, visibleLock) {
     this.image = this.control.getElement('vts-compass-compass');
     this.image2 = this.control.getElement('vts-compass-compass2');
     this.image3 = this.control.getElement('vts-compass-compass3');
-    
+
     this.lastStyle = '';
 };
 
 
 UIControlCompass.prototype.update = function() {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var pos = map.getPosition();
-    var orientation = pos.getOrientation();
-    var value = 'rotateX('+(Math.round(orientation[1]+90)*0.7)+'deg) ' + 'rotateZ('+Math.round(-orientation[0]-45)+'deg)';
+    const pos = map.getPosition();
+    const orientation = pos.getOrientation();
+    const value = 'rotateX('+(Math.round(orientation[1]+90)*0.7)+'deg) ' + 'rotateZ('+Math.round(-orientation[0]-45)+'deg)';
 
     if (value != this.lastStyle) {
         this.lastStyle = value;
@@ -57,7 +57,7 @@ UIControlCompass.prototype.update = function() {
 
 
 UIControlCompass.prototype.onDrag = function(event) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
@@ -67,11 +67,11 @@ UIControlCompass.prototype.onDrag = function(event) {
         this.browser.autopilot.setAutopan(0,0);
     }
 
-    var delta = event.getDragDelta();
-    var sensitivity = 0.4;
-    
-    var controller = this.browser.controlMode.getCurrentController();
-    
+    const delta = event.getDragDelta();
+    const sensitivity = 0.4;
+
+    const controller = this.browser.controlMode.getCurrentController();
+
     if (controller.orientationDeltas) {
         controller.orientationDeltas.push([delta[0] * sensitivity,
             -delta[1] * sensitivity, 0]);
@@ -80,7 +80,7 @@ UIControlCompass.prototype.onDrag = function(event) {
 
 
 UIControlCompass.prototype.onDoubleClick = function(event) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
@@ -90,8 +90,8 @@ UIControlCompass.prototype.onDoubleClick = function(event) {
         this.browser.autopilot.setAutopan(0,0);
     }
 
-    var pos = map.getPosition();
-    var orientation = pos.getOrientation();
+    const pos = map.getPosition();
+    const orientation = pos.getOrientation();
     orientation[0] = 0;
     orientation[1] = -90;
     pos.setOrientation(orientation);
@@ -101,8 +101,8 @@ UIControlCompass.prototype.onDoubleClick = function(event) {
     if (this.browser.config.navigationMode == 'azimuthal2')  {
         this.browser.config.navigationMode = 'azimuthal';
     }
-    
-    dom.stopPropagation(event);    
+
+    dom.stopPropagation(event);
 };
 
 

@@ -1,12 +1,12 @@
 
-var InspectorLayers = function(inspector) {
+const InspectorLayers = function(inspector) {
     this.inspector = inspector;
     this.core = inspector.core;
 };
 
 
 InspectorLayers.prototype.init = function() {
-    var inspector = this.inspector;
+    const inspector = this.inspector;
     inspector.addStyle(
         '#vts-layers-panel {'
             + 'font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;'
@@ -46,12 +46,12 @@ InspectorLayers.prototype.init = function() {
             + 'height: 200px;'
             + 'border: 1px solid #ddd;'
         + '}'
-        
+
         + '#vts-layers-surfaces-panel {'
             + 'margin-top: 5px;'
             + 'float: left;'
-        + '}'        
-        
+        + '}'
+
         + '#vts-layers-surfaces-items {'
             + 'width: 150px;'
             + 'overflow-y: scroll;'
@@ -60,7 +60,7 @@ InspectorLayers.prototype.init = function() {
             + 'border-top: 1px solid #ddd;'
             + 'border-bottom: 1px solid #ddd;'
         + '}'
-         
+
         + '#vts-layers-boundlayers-panel {'
             + 'margin-top: 5px;'
             + 'float: left;'
@@ -121,7 +121,7 @@ InspectorLayers.prototype.init = function() {
             + 'height: 21px;'
             + 'border: 1px solid #ddd;'
         + '}'
-        
+
         + '.vts-layers-panel-title {'
             + 'margin: 0px;'
             + 'margin-bottom: 5px;'
@@ -129,28 +129,28 @@ InspectorLayers.prototype.init = function() {
 
         + '.vts-layers-item {'
             + 'width: 100%;'
-        + '}'        
-        
+        + '}'
+
         + '.vts-layers-item input[type=number]{'
             + 'width: 43px;'
         + '}'
-        
+
         + '.vts-layers-name {'
             + 'width: 120px;'
             + 'display: inline-block;'
             + 'overflow: hidden;'
             + 'text-overflow: ellipsis;'
-            + 'white-space: nowrap;'       
-        + '}'          
+            + 'white-space: nowrap;'
+        + '}'
 
         + '.vts-layers-name2 {'
             + 'width: 126px;'
             + 'display: inline-block;'
             + 'overflow: hidden;'
             + 'text-overflow: ellipsis;'
-            + 'white-space: nowrap;'       
+            + 'white-space: nowrap;'
         + '}'
-         
+
         + '#vts-layers-fl-properties-style {'
             + 'width: 175px;'
             + 'height: 21px;'
@@ -160,9 +160,9 @@ InspectorLayers.prototype.init = function() {
             + 'width: 100%;'
             + 'overflow: hidden;'
             + 'text-overflow: ellipsis;'
-            + 'white-space: nowrap;'    
-        + '}' 
-        
+            + 'white-space: nowrap;'
+        + '}'
+
     );
 
     this.element = document.createElement('div');
@@ -197,7 +197,7 @@ InspectorLayers.prototype.init = function() {
     this.element.addEventListener('dblclick', inspector.doNothing.bind(this), false);
 
     this.views = [];
-    
+
     this.panelVisible = false;
     this.panelInitialized = false;
     this.currentView = '';
@@ -207,14 +207,14 @@ InspectorLayers.prototype.init = function() {
 
 
 InspectorLayers.prototype.initViews = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var views = map.getNamedViews(), freeLayer;
-    var id = '--initial--';
-    var i, li, j, lj, layers, states, index, view, surfaces, skey;
+    let views = map.getNamedViews(), freeLayer;
+    let id = '--initial--';
+    let i, li, j, lj, layers, states, index, view, surfaces, skey, surface;
 
 
     this.views[id] = {
@@ -233,23 +233,23 @@ InspectorLayers.prototype.initViews = function() {
             original : JSON.parse(JSON.stringify(map.getNamedView(view).getInfo()))
         };
     }
-    
+
     this.currentView = id;
     views = this.views;
-    
-    for (var key in views) {
+
+    for (let key in views) {
         view = views[key];
-        surfaces = map.getSurfaces();   
-        
+        surfaces = map.getSurfaces();
+
         for (i = 0, li = surfaces.length; i < li; i++) {
             id = surfaces[i];
             surface = map.getSurface(id);
             layers = map.getBoundLayers();
-            states = []; 
-    
+            states = [];
+
             for (j = 0, lj = layers.length; j < lj; j++) {
                 //layer = map.getBoundLayerById(layers[j]);
-                
+
                 states.push({
                     id : layers[j],
                     alpha : 100,
@@ -257,23 +257,23 @@ InspectorLayers.prototype.initViews = function() {
                     enabled : false
                 });
             }
-            
+
             view.surfaces[id] = {
                 enabled : false,
-                layers : states 
+                layers : states
             };
-        }         
+        }
 
-        var freeLayers = map.getFreeLayers();   
-        
+        const freeLayers = map.getFreeLayers();
+
         for (i = 0, li = freeLayers.length; i < li; i++) {
             id = freeLayers[i];
             layers = map.getBoundLayers();
-            states = []; 
-    
+            states = [];
+
             for (j = 0, lj = layers.length; j < lj; j++) {
                 //layer = map.getBoundLayerById(layers[j]);
-                
+
                 states.push({
                     id : layers[j],
                     alpha : 100,
@@ -281,10 +281,10 @@ InspectorLayers.prototype.initViews = function() {
                     enabled : false
                 });
             }
-            
+
             freeLayer = map.getFreeLayer(id);
-            var freeLayerInfo = freeLayer.getInfo(); 
-            
+            const freeLayerInfo = freeLayer.getInfo();
+
             view.freeLayers[id] = {
                 enabled : false,
                 style : null,
@@ -292,17 +292,17 @@ InspectorLayers.prototype.initViews = function() {
                 depthShift : 0,
                 depthShift2 : 0,
                 depthShift3 : 0,
-                layers : states 
+                layers : states
             };
         }
-        
-        var viewSurfaces = view.original['surfaces'];
-        
+
+        let viewSurfaces = view.original['surfaces'];
+
         for (skey in viewSurfaces) {
             layers = viewSurfaces[skey];
-            
+
             if (view.surfaces[skey]) {
-                var surface = view.surfaces[skey]; 
+                const surface = view.surfaces[skey];
                 surface.enabled = true;
 
                 for (i = 0, li = layers.length; i < li; i++) {
@@ -311,7 +311,7 @@ InspectorLayers.prototype.initViews = function() {
                         if (index != -1 && surface.layers[index]) {
                             surface.layers[index].enabled = true;
                             surface.layers.splice(i, 0, surface.layers.splice(index, 1)[0]);
-                        }    
+                        }
                     } else {
                         id = layers[i]['id'];
                         index = this.findIdInArray(surface.layers, id);
@@ -320,37 +320,37 @@ InspectorLayers.prototype.initViews = function() {
                             surface.layers[index].alpha = layers[i]['alpha'] ? (parseFloat(layers[i]['alpha'])*100) : 100;
                             surface.layers[index].options = layers[i]['options'] ? JSON.stringify(layers[i]['options']) : "{}";
                             surface.layers.splice(i, 0, surface.layers.splice(index, 1)[0]);
-                        }    
+                        }
                     }
                 }
             }
         }
 
-        var viewfreeLayers = view.original['freeLayers'];
-        
+        let viewfreeLayers = view.original['freeLayers'];
+
         for (skey in viewfreeLayers) {
-            var freeLayerProperties = viewfreeLayers[skey];
-            
+            const freeLayerProperties = viewfreeLayers[skey];
+
             if (view.freeLayers[skey]) {
-                freeLayer = view.freeLayers[skey]; 
+                freeLayer = view.freeLayers[skey];
                 freeLayer.enabled = true;
-                var depthShift = freeLayerProperties['depthOffset'] || [0,0,0];
+                const depthShift = freeLayerProperties['depthOffset'] || [0,0,0];
                 freeLayer.depthShift = depthShift[0];
                 freeLayer.depthShift2 = depthShift[1];
                 freeLayer.depthShift3 = depthShift[2];
                 freeLayer.style = freeLayerProperties['style'];
                 //freeLayer.originalStyle = freeLayer.style;
-                
+
                 layers = freeLayerProperties['boundLayers'] || [];
                 //freeLayer.layers = layers;
-                
+
                 for (i = 0, li = layers.length; i < li; i++) {
                     if (typeof layers[i] === 'string') {
                         index = this.findIdInArray(freeLayer.layers, layers[i]);
                         if (index != -1 && freeLayer.layers[index]) {
                             freeLayer.layers[index].enabled = true;
                             freeLayer.layers.splice(i, 0, freeLayer.layers.splice(index, 1)[0]);
-                        }    
+                        }
                     } else {
                         id = layers[i]['id'];
                         index = this.findIdInArray(freeLayer.layers, id);
@@ -359,66 +359,66 @@ InspectorLayers.prototype.initViews = function() {
                             freeLayer.layers[index].alpha = layers[i]['alpha'] ? (parseFloat(layers[i]['alpha'])*100) : 100;
                             freeLayer.layers[index].options = layers[i]['options'] ? JSON.stringify(layers[i]['options']) : "{}";
                             freeLayer.layers.splice(i, 0, surface.layers.splice(index, 1)[0]);
-                        }    
+                        }
                     }
                 }
             }
-        }        
+        }
     }
 };
 
 
 InspectorLayers.prototype.findIdInArray = function(array, id) {
-    for (var i = 0, li = array.length; i < li; i++) {
+    for (let i = 0, li = array.length; i < li; i++) {
         if (array[i].id == id) {
             return i;
-        } 
+        }
     }
-    
+
     return -1;
 };
 
 
 InspectorLayers.prototype.buildViews = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
 
-    var views = this.views;
-    var html = '';
+    const views = this.views;
+    let html = '';
 
-    for (var key in views) {
+    for (let key in views) {
         html += '<div class="vts-views-item" id="vts-views-item-' + key + '">'
                  + '<div class="vts-layers-name2">' + key + '</div>'
-                 + '<button id="vts-views-cbutton-' + key + '" type="button" title="Clone">C</button>' 
-                 + '<button id="vts-views-xbutton-' + key + '" type="button" title="Remove">X</button>' 
+                 + '<button id="vts-views-cbutton-' + key + '" type="button" title="Clone">C</button>'
+                 + '<button id="vts-views-xbutton-' + key + '" type="button" title="Remove">X</button>'
                  + '</div>';
     }
 
     this.viewItems.innerHTML = html;
 
-    for (key in views) {
-        htmlId = 'vts-views-cbutton-' + key;
+    for (let key in views) {
+        let htmlId = 'vts-views-cbutton-' + key;
         document.getElementById(htmlId).onclick = this.switchView.bind(this, key, htmlId, 'clone');
         htmlId = 'vts-views-xbutton-' + key;
         document.getElementById(htmlId).onclick = this.switchView.bind(this, key, htmlId, 'remove');
-        var htmlId = 'vts-views-item-' + key;
+        htmlId = 'vts-views-item-' + key;
         document.getElementById(htmlId).onclick = this.selectView.bind(this, key);
     }
 };
 
 
 InspectorLayers.prototype.buildSurfaces = function() {
-    var view = this.views[this.currentView];
-    var surfaces = view.surfaces;
-    var html = '', htmlId;
-    var firstKey = null, key;
-    
+    const view = this.views[this.currentView];
+    const surfaces = view.surfaces;
+    let html = '', htmlId;
+    let firstKey = null, key;
+
     for (key in surfaces) {
         html += '<div id="vts-surface-item-' + key + '" class="vts-surface-item"><input id="vts-surface-checkbox-'
                  + key + '" type="checkbox"/><span title=' + key + '>' + key + '</span></div>';
-                 
+
         if (firstKey === null) {
             firstKey = key;
         }
@@ -444,21 +444,21 @@ InspectorLayers.prototype.buildSurfaces = function() {
 
 
 InspectorLayers.prototype.buildBoundLayers = function(id) {
-    var view = this.views[this.currentView];
-    var html = '';
+    const view = this.views[this.currentView];
+    let html = '', layers;
 
     if (view.surfaces[id]) {
-        var layers = view.surfaces[id].layers;
+        layers = view.surfaces[id].layers;
 
-        for (var i = 0, li = layers.length; i < li; i++) {
-            var layer = layers[i];
+        for (let i = 0, li = layers.length; i < li; i++) {
+            const layer = layers[i];
 
             html += '<div class="vts-layers-item"><input id="vts-boundlayer-checkbox-' + layer.id + '" type="checkbox" ' + (layer.enabled ? 'checked' : '')   + '/>'
                      + '<div class="vts-layers-name">' + layer.id + '</div>'
                      + '<input id="vts-boundlayer-spinner-' + layer.id + '" type="number" title="Alpha" min="0" max="100" step="10" value="' + layer.alpha + '">'
-                     + '<button id="vts-boundlayer-obutton-' + layer.id + '" type="button" title="Options">O</button>' 
-                     + '<button id="vts-boundlayer-ubutton-' + layer.id + '" type="button" title="Move Above">&uarr;</button>' 
-                     + '<button id="vts-boundlayer-dbutton-' + layer.id + '" type="button" title="Move Bellow">&darr;</button>' 
+                     + '<button id="vts-boundlayer-obutton-' + layer.id + '" type="button" title="Options">O</button>'
+                     + '<button id="vts-boundlayer-ubutton-' + layer.id + '" type="button" title="Move Above">&uarr;</button>'
+                     + '<button id="vts-boundlayer-dbutton-' + layer.id + '" type="button" title="Move Bellow">&darr;</button>'
                      + '</div>';
         }
     }
@@ -466,8 +466,8 @@ InspectorLayers.prototype.buildBoundLayers = function(id) {
     this.boundLayersItems.innerHTML = html;
 
     if (view.surfaces[id]) {
-        for (i = 0, li = layers.length; i < li; i++) {
-            var htmlId = 'vts-boundlayer-checkbox-' + layers[i].id;
+        for (let i = 0, li = layers.length; i < li; i++) {
+            let htmlId = 'vts-boundlayer-checkbox-' + layers[i].id;
             document.getElementById(htmlId).onchange = this.switchBoundLayer.bind(this, layers[i].id, htmlId, 'enable');
             htmlId = 'vts-boundlayer-spinner-' + layers[i].id;
             document.getElementById(htmlId).onchange = this.switchBoundLayer.bind(this, layers[i].id, htmlId, 'alpha');
@@ -483,12 +483,11 @@ InspectorLayers.prototype.buildBoundLayers = function(id) {
 
 
 InspectorLayers.prototype.buildFreeLayers = function() {
-    var view = this.views[this.currentView];
-    var layers = view.freeLayers;
-    var html = '';
+    const view = this.views[this.currentView];
+    const layers = view.freeLayers;
+    let html = '';
 
-    for (var key in layers) {
-        //var layer = layers[key];
+    for (let key in layers) {
         html += '<div class="vts-surface-item" id="vts-freelayer-item-' + key
                   + '"><input id="vts-freelayer-checkbox-' + key + '" type="checkbox" '
                   + (layers[key].enabled ? 'checked' : '') + '/><span title=' + key + '>' + key + '</span></div>';
@@ -496,8 +495,8 @@ InspectorLayers.prototype.buildFreeLayers = function() {
 
     this.freeLayersItems.innerHTML = html;
 
-    for (key in layers) {
-        var htmlId = 'vts-freelayer-checkbox-' + key;
+    for (let key in layers) {
+        let htmlId = 'vts-freelayer-checkbox-' + key;
         document.getElementById(htmlId).onchange = this.switchFreeLayer.bind(this, key, htmlId);
         htmlId = 'vts-freelayer-item-' + key;
         document.getElementById(htmlId).onclick = this.selectFreeLayer.bind(this, key);
@@ -506,17 +505,17 @@ InspectorLayers.prototype.buildFreeLayers = function() {
 
 
 InspectorLayers.prototype.buildFreeLayerProperties = function(id) {
-    var map = this.core.getMap();
-    var view = this.views[this.currentView];
-    var layers = view.freeLayers[id].layers;
-    var html = '', i, li, htmlId;
-    
+    const map = this.core.getMap();
+    const view = this.views[this.currentView];
+    const layers = view.freeLayers[id].layers;
+    let html = '', i, li, htmlId;
+
     if (!map || !map.getFreeLayer(id)) {
         return;
     }
 
-    var layerInfo = map.getFreeLayer(id).getInfo();
-    var layerType = layerInfo['type']; 
+    const layerInfo = map.getFreeLayer(id).getInfo();
+    const layerType = layerInfo['type'];
 
     switch(layerType) {
     case 'mesh':
@@ -527,29 +526,29 @@ InspectorLayers.prototype.buildFreeLayerProperties = function(id) {
                      + '<input id="vts-fl-properties-depth-shift2" type="number" min="-100" max="100" step="1" value="' + view.freeLayers[id].depthShift2 + '">'
                      + '<input id="vts-fl-properties-depth-shift3" type="number" min="-100" max="100" step="1" value="' + view.freeLayers[id].depthShift3 + '">'
                      + '</div>';
-    
+
         html += '<div class="vts-layers-item"><div class="vts-layers-name">' + 'BoundLayers:' + '</div></div>';
-        
+
         for (i = 0, li = layers.length; i < li; i++) {
-            var layer = layers[i];
-        
+            const layer = layers[i];
+
             html += '<div class="vts-layers-item"><input id="vts-fl-properties-checkbox-' + layer.id + '" type="checkbox" ' + (layer.enabled ? 'checked' : '')   + '/>'
                          + '<div class="vts-layers-name">' + layer.id + '</div>'
                          + '<input id="vts-fl-properties-spinner-' + layer.id + '" type="number" title="Alpha" min="0" max="100" step="10" value="' + layer.alpha + '">'
-                         + '<button id="vts-fl-properties-ubutton-' + layer.id + '" type="button" title="Move Above">&uarr;</button>' 
-                         + '<button id="vts-fl-properties-dbutton-' + layer.id + '" type="button" title="Move Bellow">&darr;</button>' 
+                         + '<button id="vts-fl-properties-ubutton-' + layer.id + '" type="button" title="Move Above">&uarr;</button>'
+                         + '<button id="vts-fl-properties-dbutton-' + layer.id + '" type="button" title="Move Bellow">&darr;</button>'
                          + '</div>';
         }
-        
+
         this.freeLayersPropertiesItems.innerHTML = html;
-    
+
         htmlId = 'vts-fl-properties-depth-shift';
         document.getElementById(htmlId).onchange = this.switchFreeLayerProperty.bind(this, htmlId, 'depthShift');
         htmlId = 'vts-fl-properties-depth-shift2';
         document.getElementById(htmlId).onchange = this.switchFreeLayerProperty.bind(this, htmlId, 'depthShift2');
         htmlId = 'vts-fl-properties-depth-shift3';
         document.getElementById(htmlId).onchange = this.switchFreeLayerProperty.bind(this, htmlId, 'depthShift3');
-        
+
         for (i = 0, li = layers.length; i < li; i++) {
             htmlId = 'vts-fl-properties-checkbox-' + layers[i].id;
             document.getElementById(htmlId).onchange = this.switchFreeLayerBoundLayer.bind(this, layers[i].id, htmlId, 'enable');
@@ -560,29 +559,29 @@ InspectorLayers.prototype.buildFreeLayerProperties = function(id) {
             htmlId = 'vts-fl-properties-dbutton-' + layers[i].id;
             document.getElementById(htmlId).onclick = this.switchFreeLayerBoundLayer.bind(this, layers[i].id, htmlId, 'down');
         }
-            
+
         break;
 
     case 'geodata':
     case 'geodata-tiles':
+        {
+            html += '<div class="vts-layers-item"><div class="vts-layers-name" style="width:50px">' + 'Style:' + '</div>'
+                        + '<select id="vts-layers-fl-properties-style">';
 
-        html += '<div class="vts-layers-item"><div class="vts-layers-name" style="width:50px">' + 'Style:' + '</div>'
-                    + '<select id="vts-layers-fl-properties-style">';
-                    
-        var styles = map.getStylesheets();
-        var index = styles.indexOf(view.freeLayers[id].style || view.freeLayers[id].originalStyle); // || layerInfo["style"]); 
-            
-        for (i = 0, li = styles.length; i < li; i++) {
-            html += '<option value="' + styles[i] + '" ' + ((i == index) ? 'selected' : '') + '>' + styles[i] + '</option>';
+            const styles = map.getStylesheets();
+            const index = styles.indexOf(view.freeLayers[id].style || view.freeLayers[id].originalStyle); // || layerInfo["style"]);
+
+            for (i = 0, li = styles.length; i < li; i++) {
+                html += '<option value="' + styles[i] + '" ' + ((i == index) ? 'selected' : '') + '>' + styles[i] + '</option>';
+            }
+
+            html += '</select>' + '</div>';
+
+            this.freeLayersPropertiesItems.innerHTML = html;
+
+            htmlId = 'vts-layers-fl-properties-style';
+            document.getElementById(htmlId).onchange = this.switchFreeLayerProperty.bind(this, htmlId, 'style');
         }
-                    
-        html += '</select>' + '</div>';
-
-        this.freeLayersPropertiesItems.innerHTML = html;
-
-        htmlId = 'vts-layers-fl-properties-style';
-        document.getElementById(htmlId).onchange = this.switchFreeLayerProperty.bind(this, htmlId, 'style');
-       
         break;
     }
 };
@@ -593,7 +592,7 @@ InspectorLayers.prototype.selectView = function(id) {
         return;
     }
 
-    var element;
+    let element;
 
     //deselect previous
     if (this.currentView) {
@@ -617,53 +616,53 @@ InspectorLayers.prototype.selectView = function(id) {
 
 
 InspectorLayers.prototype.switchView = function(id, htmlId, action) {
-    //var element = document.getElementById(htmlId);
-    var views = this.views;
-    
-    for (var key in this.views) {
+    const views = this.views;
+
+    for (let key in this.views) {
         if (key == id) {
             switch(action) {
             case 'clone':
-                    //layers[i].enabled = element.checked;
-                var i = 2;
-                    
-                // eslint-disable-next-line
-                while(true) {
-                    if (!views[id + ' #' + i]) {
-                        views[id + ' #' + i] = JSON.parse(JSON.stringify(views[id]));
-                        break;
-                    } 
-                    i++;
-                }
-                
-                this.buildViews();
-                    
-                break;
-            case 'remove':
-                
-                var count = 0;
-                
-                for (key in views) {
-                    count++;
-                }
-                
-                if (count > 1) {
-                    delete views[id];
-                    this.buildViews();
+                {
+                        //layers[i].enabled = element.checked;
+                    let i = 2;
 
-                    if (this.currentView == id) {
-                        for (key in views) {
-                            this.selectView(key);
+                    // eslint-disable-next-line
+                    while(true) {
+                        if (!views[id + ' #' + i]) {
+                            views[id + ' #' + i] = JSON.parse(JSON.stringify(views[id]));
                             break;
                         }
-                    } else {
-                        this.selectView(this.currentView);
+                        i++;
+                    }
+
+                    this.buildViews();
+                }
+                break;
+            case 'remove':
+                {
+                    let count = 0;
+
+                    for (key in views) {
+                        count++;
+                    }
+
+                    if (count > 1) {
+                        delete views[id];
+                        this.buildViews();
+
+                        if (this.currentView == id) {
+                            for (key in views) {
+                                this.selectView(key);
+                                break;
+                            }
+                        } else {
+                            this.selectView(this.currentView);
+                        }
                     }
                 }
-                    
                 break;
             }
-            
+
             break;
         }
     }
@@ -671,15 +670,15 @@ InspectorLayers.prototype.switchView = function(id, htmlId, action) {
 
 
 InspectorLayers.prototype.switchSurface = function(id, htmlId) {
-    var element = document.getElementById(htmlId);
-    var view = this.views[this.currentView];
+    const element = document.getElementById(htmlId);
+    const view = this.views[this.currentView];
     view.surfaces[id].enabled = element.checked;
     this.applyMapView();
 };
 
 
 InspectorLayers.prototype.selectSurface = function(id) {
-    var element;
+    let element;
     //deselect previous
     if (this.currentSurface) {
         element = document.getElementById('vts-surface-item-' + this.currentSurface);
@@ -697,11 +696,11 @@ InspectorLayers.prototype.selectSurface = function(id) {
 
 
 InspectorLayers.prototype.switchBoundLayer = function(id, htmlId, action) {
-    var element = document.getElementById(htmlId);
-    var view = this.views[this.currentView];
-    var layers = view.surfaces[this.currentSurface].layers;
-    
-    for (var i = 0, li = layers.length; i < li; i++) {
+    const element = document.getElementById(htmlId);
+    const view = this.views[this.currentView];
+    const layers = view.surfaces[this.currentSurface].layers;
+
+    for (let i = 0, li = layers.length; i < li; i++) {
         if (layers[i].id == id) {
             switch(action) {
             case 'enable':
@@ -711,7 +710,7 @@ InspectorLayers.prototype.switchBoundLayer = function(id, htmlId, action) {
                 layers[i].alpha = parseInt(element.value, 10);
                 break;
             case 'options':
-                //display popup               
+                //display popup
                 break;
             case 'up':
                 layers.splice(Math.max(0,i-1), 0, layers.splice(i, 1)[0]);
@@ -722,25 +721,25 @@ InspectorLayers.prototype.switchBoundLayer = function(id, htmlId, action) {
                 this.selectSurface(this.currentSurface);
                 break;
             }
-            
+
             break;
         }
     }
-    
+
     this.applyMapView();
 };
 
 
 InspectorLayers.prototype.switchFreeLayer = function(id, htmlId) {
-    var element = document.getElementById(htmlId);
-    var view = this.views[this.currentView];
+    const element = document.getElementById(htmlId);
+    const view = this.views[this.currentView];
     view.freeLayers[id].enabled = element.checked;
     this.applyMapView();
 };
 
 
 InspectorLayers.prototype.selectFreeLayer = function(id) {
-    var element;
+    let element;
     //deselect previous
     if (this.currentFreeLayer) {
         element = document.getElementById('vts-freelayer-item-' + this.currentFreeLayer);
@@ -756,11 +755,11 @@ InspectorLayers.prototype.selectFreeLayer = function(id) {
 
 
 InspectorLayers.prototype.switchFreeLayerBoundLayer = function(id, htmlId, action) {
-    var element = document.getElementById(htmlId);
-    var view = this.views[this.currentView];
-    var layers = view.freeLayers[this.currentFreeLayer].layers;
-    
-    for (var i = 0, li = layers.length; i < li; i++) {
+    const element = document.getElementById(htmlId);
+    const view = this.views[this.currentView];
+    const layers = view.freeLayers[this.currentFreeLayer].layers;
+
+    for (let i = 0, li = layers.length; i < li; i++) {
         if (layers[i].id == id) {
             switch(action) {
             case 'enable':
@@ -778,19 +777,19 @@ InspectorLayers.prototype.switchFreeLayerBoundLayer = function(id, htmlId, actio
                 this.selectFreeLayer(this.currentFreeLayer);
                 break;
             }
-            
+
             break;
         }
     }
-    
+
     this.applyMapView();
 };
 
 
 InspectorLayers.prototype.switchFreeLayerProperty = function(htmlId, action) {
-    var element = document.getElementById(htmlId);
-    var view = this.views[this.currentView];
-    var layer = view.freeLayers[this.currentFreeLayer];
+    const element = document.getElementById(htmlId);
+    const view = this.views[this.currentView];
+    const layer = view.freeLayers[this.currentFreeLayer];
 
     switch(action) {
     case 'depthShift':  layer.depthShift = parseInt(element.value, 10); break;
@@ -798,36 +797,36 @@ InspectorLayers.prototype.switchFreeLayerProperty = function(htmlId, action) {
     case 'depthShift3': layer.depthShift3 = parseInt(element.value, 10); break;
     case 'style':       layer.style = element.value; break;
     }
-    
+
     this.applyMapView();
 };
 
 
 InspectorLayers.prototype.applyMapView = function(jsonOnly) {
-    var view = {
+    const view = {
         'surfaces' : {},
         'freeLayers' : {},
         'options' : {}
     };
 
-    var sourceView = this.views[this.currentView];
-    var surfaces = sourceView.surfaces, i, li, layers;
+    const sourceView = this.views[this.currentView];
+    let surfaces = sourceView.surfaces, i, li, layers;
 
     view['options'] = JSON.parse(JSON.stringify(sourceView.options));
-    
-    for (var key in surfaces) {
+
+    for (let key in surfaces) {
         if (surfaces[key].enabled) {
-            var surfaceBoundLayers = [];
+            const surfaceBoundLayers = [];
             layers = surfaces[key].layers; //bound layers
-            
+
             for (i = 0, li = layers.length; i < li; i++) {
                 if (layers[i].enabled) {
 
-                    var options = JSON.parse(JSON.stringify(layers[i].options));
-                    var options2 = JSON.stringify(options);
+                    const options = JSON.parse(JSON.stringify(layers[i].options));
+                    const options2 = JSON.stringify(options);
 
                     if (layers[i].alpha < 100) {
-                        var item = {'id':layers[i].id, 'alpha':(layers[i].alpha*0.01).toFixed(2)};
+                        const item = {'id':layers[i].id, 'alpha':(layers[i].alpha*0.01).toFixed(2)};
                         if (options2 != '{}') {
                             item.options = options;
                         }
@@ -837,35 +836,35 @@ InspectorLayers.prototype.applyMapView = function(jsonOnly) {
                     }
                 }
             }
-            
+
             view['surfaces'][key] = surfaceBoundLayers;
         }
     }
 
-    var freeLayers = sourceView.freeLayers;
-    
-    for (key in freeLayers) {
+    const freeLayers = sourceView.freeLayers;
+
+    for (let key in freeLayers) {
         if (freeLayers[key].enabled) {
-            var freeLayerBoundLayers = [];
+            const freeLayerBoundLayers = [];
             layers = freeLayers[key].layers; //bound layers
-            
+
             for (i = 0, li = layers.length; i < li; i++) {
                 if (layers[i].enabled) {
-                    
+
                     if (layers[i].alpha < 100) {
-                        var item = {'id':layers[i].id, 'alpha':(layers[i].alpha*0.01).toFixed(2)};
-                        if (options2 != '{}') {
+                        const item = {'id':layers[i].id, 'alpha':(layers[i].alpha*0.01).toFixed(2)};
+                        /*if (options2 != '{}') {    //???????
                             item.options = options;
-                        }
+                        }*/
                         freeLayerBoundLayers.push(item);
                     } else {
                         freeLayerBoundLayers.push(layers[i].id);
                     }
                 }
             }
-            
+
             view['freeLayers'][key] = {};
-            
+
             if (freeLayerBoundLayers.length > 0) {
                 view['freeLayers'][key]['boundLayers'] = freeLayerBoundLayers;
             }
@@ -873,14 +872,14 @@ InspectorLayers.prototype.applyMapView = function(jsonOnly) {
             if (freeLayers[key].style && freeLayers[key].style != freeLayers[key].originalStyle) {
                 view['freeLayers'][key]['style'] = freeLayers[key].style;
             }
-            
+
             if (!(freeLayers[key].depthShift == 0 && freeLayers[key].depthShift2 == 0 && freeLayers[key].depthShift3 == 0)) {
                 view['freeLayers'][key]['depthOffset'] = [
                     parseFloat((freeLayers[key].depthShift).toFixed(2)),
                     parseFloat((freeLayers[key].depthShift2).toFixed(2)),
                     parseFloat((freeLayers[key].depthShift3).toFixed(2)) ];
-            } 
-            
+            }
+
         }
     }
 
@@ -888,11 +887,11 @@ InspectorLayers.prototype.applyMapView = function(jsonOnly) {
     this.jsonText2.value = encodeURIComponent(JSON.stringify(view));
 
     if (!jsonOnly) {
-        var map = this.core.getMap();
+        const map = this.core.getMap();
         if (!map) {
             return;
         }
-        
+
         map.setView(view, null, true);
     }
 };

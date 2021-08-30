@@ -1,5 +1,5 @@
 
-var UIControlCredits = function(ui, visible, visibleLock) {
+const UIControlCredits = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('credits',
@@ -15,24 +15,23 @@ var UIControlCredits = function(ui, visible, visibleLock) {
 
 
 UIControlCredits.prototype.getCreditsString = function(array, separator, full) {
-    var map = this.browser.getMap();
-    var html = '';
-    //var copyright = '&copy;' + (new Date().getFullYear());
-    
-    var li = array.length;
-    var plain = ''; 
-    var more = false;
-    var creditInfo;
+    const map = this.browser.getMap();
+    let html = '';
 
-    for (var i = 0; i < li; i++) {
+    let li = array.length;
+    let plain = '';
+    let more = false;
+    let creditInfo;
+
+    for (let i = 0; i < li; i++) {
         creditInfo = map.getCreditInfo(array[i]);
         if (creditInfo['plain']) {
             plain += creditInfo['plain'];
         }
-    }        
-    
+    }
+
     if (plain && plain.length > 30 && li > 1 && !full) {
-        for (i = 0; i < li; i++) {
+        for (let i = 0; i < li; i++) {
             creditInfo = map.getCreditInfo(array[i]);
             if (creditInfo['html'].trim() != '') {
                 li = i + 1;
@@ -41,37 +40,37 @@ UIControlCredits.prototype.getCreditsString = function(array, separator, full) {
         }
 
         if (li < array.length) {
-            more = true; 
+            more = true;
         } else {
             li = array.length;
         }
     }
 
-    for (i = 0; i < li; i++) {
+    for (let i = 0; i < li; i++) {
         creditInfo = map.getCreditInfo(array[i]);
-       
+
         if (creditInfo['html'] && creditInfo['html'].trim() != '') {
             html += creditInfo['html'];
 
             if (i + 1 < li) {
-                html += separator;        
+                html += separator;
             }
         }
     }
-    
+
     return [html, more];
 };
 
 
 UIControlCredits.prototype.update = function() {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var html = '', html2 = '', html3 = '', res;
-    var credits = map.getCurrentCredits();
-    
+    let html = '', html2 = '', html3 = '', res;
+    const credits = map.getCurrentCredits();
+
     if (credits['imagery'].length > 0) {
         res = this.getCreditsString(credits['imagery'], ', ');
         if (res[0] != '') {
@@ -84,7 +83,7 @@ UIControlCredits.prototype.update = function() {
             html2 += this.getCreditsString(credits['imagery'], '<br/>', true)[0] + '</div>';
         }
     }
-    
+
     if (credits['mapdata'].length > 0) {
         res = this.getCreditsString(credits['mapdata'], ', ');
         if (res[0] != '') {
@@ -107,11 +106,11 @@ UIControlCredits.prototype.update = function() {
         this.lastHTML = html;
         this.credits.setHtml(html);
 
-        var butt = this.control.getElement('vts-credits-imagery-more');
+        let butt = this.control.getElement('vts-credits-imagery-more');
         if (butt) {
             butt.on('click', this.onMoreButton.bind(this, butt, '2'));
         }
-        
+
         butt = this.control.getElement('vts-credits-mapdata-more');
         if (butt) {
             butt.on('click', this.onMoreButton.bind(this, butt, '3'));
@@ -120,37 +119,21 @@ UIControlCredits.prototype.update = function() {
 
     this.lastHTML2 = html2;
     this.lastHTML3 = html3;
-
-    /*
-    if (this.lastHTML2 != html2) {
-        var butt = this.control.getElement("vts-credits-imagery-more");
-        if (butt) {
-            butt.on("click", this.onMoreButton.bind(this, butt, "2"));
-        }
-    }
-        
-    if (this.lastHTML3 != html3) {
-        var butt = this.control.getElement("vts-credits-mapdata-more");
-        if (butt) {
-            butt.on("click", this.onMoreButton.bind(this, butt, "3"));
-        }
-    }*/
 };
 
 
 UIControlCredits.prototype.onMoreButton = function(butt, html) {
-    var rect = butt.getRect();
-    
+    const rect = butt.getRect();
+
     if (html == '2') {
         html = this.lastHTML2;
     } else {
         html = this.lastHTML3;
     }
-    
+
     this.ui.popup.show({'right' : Math.max(0,(rect['fromRight']-rect['width'])) + 'px',
         'bottom' : (rect['fromBottom']+7) + 'px'}, html);
 };
 
 
 export default UIControlCredits;
-

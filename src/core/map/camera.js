@@ -3,11 +3,11 @@ import {vec3 as vec3_} from '../utils/matrix';
 import {math as math_} from '../utils/math';
 
 //get rid of compiler mess
-var vec3 = vec3_;
-var math = math_;
+const vec3 = vec3_;
+const math = math_;
 
 
-var MapCamera = function(map) {
+const MapCamera = function(map) {
     this.map = map;
     this.camera = map.renderer.camera;
     this.distance = 10;
@@ -24,18 +24,18 @@ var MapCamera = function(map) {
 
 
 MapCamera.prototype.update = function() {
-    var map = this.map;
+    const map = this.map;
 
     //check position orientaion ...
     map.position.check();
 
-    //var height = 227;
-    var height = map.position.getHeight();
+    //const height = 227;
+    let height = map.position.getHeight();
 
-    var lod =  map.measure.getOptimalHeightLod(map.position.getCoords(), map.position.getViewExtent(), map.config.mapNavSamplesPerViewExtent);
-    //var surfaceHeight = [226,true,true]; //map.getSurfaceHeight(map.position.getCoords(), lod, true);
-    var surfaceHeight = map.measure.getSurfaceHeight(map.position.getCoords(), lod, true);
-    
+    const lod =  map.measure.getOptimalHeightLod(map.position.getCoords(), map.position.getViewExtent(), map.config.mapNavSamplesPerViewExtent);
+    //const surfaceHeight = [226,true,true]; //map.getSurfaceHeight(map.position.getCoords(), lod, true);
+    const surfaceHeight = map.measure.getSurfaceHeight(map.position.getCoords(), lod, true);
+
     map.stats.heightTerrain = surfaceHeight[0];
     map.stats.heightDelta = height;
 
@@ -49,7 +49,7 @@ MapCamera.prototype.update = function() {
         height = map.renderer.getSuperElevatedHeight(height);
     }
 
-    var camInfo = map.measure.getPositionCameraInfo(map.position, map.getNavigationSrs().isProjected());
+    const camInfo = map.measure.getPositionCameraInfo(map.position, map.getNavigationSrs().isProjected());
 
     this.camera.setPosition(camInfo.orbitCoords);
     this.camera.setRotationMatrix(camInfo.rotMatrix);
@@ -66,10 +66,10 @@ MapCamera.prototype.update = function() {
     this.distance = Math.max(this.terrainHeight, this.distance2);
     this.distance = math.clamp(this.distance, 0.1, this.camera.getFar());
 
-    this.distanceFactor = Math.tan(math.radians(map.position.getFov()*0.5)); 
+    this.distanceFactor = Math.tan(math.radians(map.position.getFov()*0.5));
 
     this.perceivedDistance = Math.max(this.terrainHeight, this.distance2 * this.distanceFactor);
-    
+
     //this.renderer.cameraDistance = camInfo.distance; //needed for fog
     map.renderer.cameraDistance = this.distance; //needed for fog
     map.renderer.viewExtent = map.position.getViewExtent();
@@ -78,8 +78,8 @@ MapCamera.prototype.update = function() {
     //this.camera.setOrtho(true);
 
     //convert nav coords to physical
-    var coords = map.position.getCoords();
-    var worldPos = map.convert.convertCoords([coords[0], coords[1], height], 'navigation', 'physical');
+    const coords = map.position.getCoords();
+    const worldPos = map.convert.convertCoords([coords[0], coords[1], height], 'navigation', 'physical');
     this.center = [worldPos[0], worldPos[1], worldPos[2]];
     worldPos[0] += camInfo.orbitCoords[0];
     worldPos[1] += camInfo.orbitCoords[1];
@@ -95,33 +95,33 @@ MapCamera.prototype.update = function() {
     if (!this.mapIsProjected) { //HACK!!!!!!!!
         this.geocentDistance = vec3.length(this.position);
 
-        var n = [0,0,0];
+        const n = [0,0,0];
         vec3.normalize(this.position, n);
         this.geocentNormal = n;
     } else {
         this.vector2[3] = 0;
     }
-    
+
     //console.log("word-pos: " + JSON.stringify(worldPos));
 
     //set near and far of camera by distance of orbit
-    var factor = Math.max(this.height, this.distance) / 600000;
+    let factor = Math.max(this.height, this.distance) / 600000;
 
-    var near = Math.max(this.near, this.near * (factor * 20));
+    const near = Math.max(this.near, this.near * (factor * 20));
     factor = Math.max(1.0, factor);
-    var far = 600000 * (factor * 10);
+    const far = 600000 * (factor * 10);
 
     //console.log("near: " + near + "  far: " + far);
 
     this.camera.setParams(map.position.getFov()*0.5, near, far * 2.0);
-    
+
     return camInfo;
 };
 
 
 MapCamera.prototype.getCameraHeight = function() {
     //TODO: get camera height
-    //var cameraPos = this.camera.position;
+    //const cameraPos = this.camera.position;
     //return (this.camera.getPosition()[2] - this.planet.surfaceHeight([this.position[0] + cameraPos[0], this.position[1] + cameraPos[1]])[0]);
 
     //hack - distance intead of height
@@ -161,5 +161,3 @@ MapCamera.prototype.getAspect = function() {
 
 
 export default MapCamera;
-
-

@@ -1,4 +1,4 @@
 
-var globals = {};
+const globals = {};
 
 export {globals};

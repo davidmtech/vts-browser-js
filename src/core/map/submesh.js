@@ -6,13 +6,13 @@ import {math as math_} from '../utils/math';
 import BBox_ from '../renderer/bbox';
 
 //get rid of compiler mess
-var mat4 = mat4_;
-var math = math_;
-//var GpuMesh = GpuMesh_;
-var BBox = BBox_;
+const mat4 = mat4_;
+const math = math_;
+//const GpuMesh = GpuMesh_;
+const BBox = BBox_;
 
 
-var MapSubmesh = function(mesh, stream) {
+const MapSubmesh = function(mesh, stream) {
     this.generateLines = true;
     this.map = mesh.map;
     this.vertices = null;
@@ -92,7 +92,7 @@ struct MapSubmeshHeader {
 };
 */
 
-    var streamData = stream.data;
+    const streamData = stream.data;
 
     this.flags = streamData.getUint8(stream.index, true); stream.index += 1;
 
@@ -105,8 +105,8 @@ struct MapSubmeshHeader {
     this.textureLayer = streamData.getUint16(stream.index, true); stream.index += 2;
     this.textureLayer2 = this.textureLayer; //hack for presentation
 
-    var bboxMin = this.bbox.min;
-    var bboxMax = this.bbox.max;
+    const bboxMin = this.bbox.min;
+    const bboxMax = this.bbox.max;
 
     bboxMin[0] = streamData.getFloat64(stream.index, true); stream.index += 8;
     bboxMin[1] = streamData.getFloat64(stream.index, true); stream.index += 8;
@@ -142,21 +142,21 @@ struct VerticesBlock {
 };
 */
 
-    var data = stream.data;
-    var index = stream.index;
-    var uint8Data = stream.uint8Data;
+    const data = stream.data;
+    const uint8Data = stream.uint8Data;
+    let index = stream.index;
 
-    var numVertices = data.getUint16(index, true); index += 2;
+    const numVertices = data.getUint16(index, true); index += 2;
 
     if (!numVertices) {
         this.valid = false;
     }
 
-    var internalUVs = null;
-    var externalUVs = null;
-    var onlyOneUVs = this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords);
+    let internalUVs = null;
+    let externalUVs = null;
+    const onlyOneUVs = this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords);
 
-    var vertices = this.use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
+    let vertices = this.use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
 
     if (this.flags & this.flagsExternalTexcoords) {
         if (onlyOneUVs) {
@@ -166,10 +166,10 @@ struct VerticesBlock {
         }
     }
 
-    var uvfactor = this.use16bit ? 1.0 : (1.0 / 65535);
-    var vindex = 0;
-    var uvindex = 0;
-    var i, li;
+    const uvfactor = this.use16bit ? 1.0 : (1.0 / 65535);
+    let vindex = 0;
+    let uvindex = 0;
+    let i, li;
 
     for (i = 0; i < numVertices; i++) {
         vertices[vindex] = (uint8Data[index] + (uint8Data[index + 1]<<8)) * uvfactor;
@@ -208,10 +208,9 @@ struct TexcoorsBlock {
 */
 
     if (this.flags & this.flagsInternalTexcoords) {
-        var numUVs = data.getUint16(index, true); index += 2;
+        const numUVs = data.getUint16(index, true); index += 2;
 
         internalUVs = this.use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
-        //var uvfactor = 1.0 / 65535;
 
         for (i = 0, li = numUVs * 2; i < li; i+=2) {
             internalUVs[i] = (uint8Data[index] + (uint8Data[index + 1]<<8)) * uvfactor;
@@ -235,15 +234,15 @@ struct FacesBlock {
 };
 */
 
-    var numFaces = data.getUint16(index, true); index += 2;
-    var indices = null;
+    const numFaces = data.getUint16(index, true); index += 2;
+    let indices = null;
 
     internalUVs = null;
     externalUVs = null;
 
-    var onlyExternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && !(this.flags & this.flagsInternalTexcoords));
-    var onlyInternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords));
-    var onlyIndices = onlyExternalIndices || onlyInternalIndices;
+    const onlyExternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && !(this.flags & this.flagsInternalTexcoords));
+    const onlyInternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords));
+    const onlyIndices = onlyExternalIndices || onlyInternalIndices;
 
     if (onlyIndices) {
         indices = new Uint16Array(numFaces * 3);
@@ -259,10 +258,10 @@ struct FacesBlock {
         }
     }
 
-    var vtmp = this.tmpVertices;
-    var eUVs = this.tmpExternalUVs;
-    var iUVs = this.tmpInternalUVs;
-    var v1, v2, v3, vv1, vv2, vv3, sindex;
+    let vtmp = this.tmpVertices;
+    let eUVs = this.tmpExternalUVs;
+    let iUVs = this.tmpInternalUVs;
+    let v1, v2, v3, vv1, vv2, vv3, sindex;
 
     if (onlyExternalIndices) {
         vertices = this.tmpVertices;
@@ -379,7 +378,7 @@ struct FacesBlock {
 
 
 MapSubmesh.prototype.parseWord = function (data, res) {
-    var value = data[res[1]];
+    const value = data[res[1]];
 
     if (value & 0x80) {
         res[0] = (value & 0x7f) | (data[res[1]+1] << 7);
@@ -392,7 +391,7 @@ MapSubmesh.prototype.parseWord = function (data, res) {
 
 
 MapSubmesh.prototype.parseDelta = function (data, res) {
-    var value = data[res[1]];
+    let value = data[res[1]];
 
     if (value & 0x80) {
         value = (value & 0x7f) | (data[res[1]+1] << 7);
@@ -431,38 +430,38 @@ struct VerticesBlock {
 };
 */
 
-    var data = stream.data;
-    var index = stream.index;
-    var uint8Data = stream.uint8Data;
-    var onlyOneUVs = this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords);
+    const data = stream.data;
+    const uint8Data = stream.uint8Data;
+    const onlyOneUVs = this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords);
+    let index = stream.index;
 
-    var numVertices = data.getUint16(index, true); index += 2;
-    var quant = data.getUint16(index, true); index += 2;
+    const numVertices = data.getUint16(index, true); index += 2;
+    let quant = data.getUint16(index, true); index += 2;
 
     if (!numVertices) {
         this.valid = false;
     }
 
-    var center = this.bbox.center();
-    var scale = this.bbox.maxSize;
+    const center = this.bbox.center();
+    const scale = this.bbox.maxSize;
 
-    var multiplier = 1.0 / quant;
-    var externalUVs = null;
+    let multiplier = 1.0 / quant;
+    let externalUVs = null, internalUVs = null;
 
-    var vertices = this.use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
-    var vindex;
+    let vertices = this.use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
+    let vindex;
 
-    var x = 0, y = 0,z = 0;
-    var cx = center[0], cy = center[1], cz = center[2];
-    var mx = this.bbox.min[0];
-    var my = this.bbox.min[1];
-    var mz = this.bbox.min[2];
-    var sx = 1.0 / (this.bbox.max[0] - this.bbox.min[0]);
-    var sy = 1.0 / (this.bbox.max[1] - this.bbox.min[1]);
-    var sz = 1.0 / (this.bbox.max[2] - this.bbox.min[2]);
+    let x = 0, y = 0,z = 0;
+    let cx = center[0], cy = center[1], cz = center[2];
+    const mx = this.bbox.min[0];
+    const my = this.bbox.min[1];
+    const mz = this.bbox.min[2];
+    const sx = 1.0 / (this.bbox.max[0] - this.bbox.min[0]);
+    const sy = 1.0 / (this.bbox.max[1] - this.bbox.min[1]);
+    const sz = 1.0 / (this.bbox.max[2] - this.bbox.min[2]);
 
-    var res = [0, index];
-    var i, li, t;
+    let res = [0, index];
+    let i, li, t;
 
     if (this.use16bit) {
         for (i = 0; i < numVertices; i++) {
@@ -525,7 +524,7 @@ struct VerticesBlock {
                     this.parseDelta(uint8Data, res);
                     y += res[0];
 
-                    var uvindex = i * 2;
+                    const uvindex = i * 2;
                     t = x * multiplier;
                     if (t < 0) t = 0; if (t > 65535) t = 65535;
                     externalUVs[uvindex] = t;
@@ -540,7 +539,7 @@ struct VerticesBlock {
                     this.parseDelta(uint8Data, res);
                     y += res[0];
 
-                    var uvindex = i * 2;
+                    const uvindex = i * 2;
                     externalUVs[uvindex] = x * multiplier;
                     externalUVs[uvindex+1] = 1 - (y * multiplier);
                 }
@@ -568,14 +567,14 @@ struct TexcoorsBlock {
 */
 
     if (this.flags & this.flagsInternalTexcoords) {
-        var numUVs = data.getUint16(index, true); index += 2;
-        var quantU = data.getUint16(index, true); index += 2;
-        var quantV = data.getUint16(index, true); index += 2;
-        var multiplierU = (this.use16bit) ? (65536.0 / quantU) : (1.0 / quantU);
-        var multiplierV = (this.use16bit) ? (65536.0 / quantV) : (1.0 / quantV);
+        const numUVs = data.getUint16(index, true); index += 2;
+        const quantU = data.getUint16(index, true); index += 2;
+        const quantV = data.getUint16(index, true); index += 2;
+        const multiplierU = (this.use16bit) ? (65536.0 / quantU) : (1.0 / quantU);
+        const multiplierV = (this.use16bit) ? (65536.0 / quantV) : (1.0 / quantV);
         x = 0, y = 0;
 
-        var internalUVs = this.use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
+        internalUVs = this.use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
         res[1] = index;7
 
         if (this.use16bit) {
@@ -622,15 +621,15 @@ struct FacesBlock {
 };
 */
 
-    var numFaces = data.getUint16(index, true); index += 2;
-    var indices = null;
+    const numFaces = data.getUint16(index, true); index += 2;
+    let indices = null;
 
     internalUVs = null;
     externalUVs = null;
 
-    var onlyExternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && !(this.flags & this.flagsInternalTexcoords));
-    var onlyInternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords));
-    var onlyIndices = onlyExternalIndices || onlyInternalIndices;
+    const onlyExternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && !(this.flags & this.flagsInternalTexcoords));
+    const onlyInternalIndices = (this.map.config.mapIndexBuffers && this.map.config.mapOnlyOneUVs && (this.flags & this.flagsInternalTexcoords));
+    const onlyIndices = onlyExternalIndices || onlyInternalIndices;
 
     if (onlyIndices) {
         indices = new Uint16Array(numFaces * 3);
@@ -646,11 +645,11 @@ struct FacesBlock {
         }
     }
 
-    var vtmp = this.tmpVertices;
-    var eUVs = this.tmpExternalUVs;
-    var iUVs = this.tmpInternalUVs;
-    var high = 0;
-    var v1, v2, v3, vv1, vv2, vv3;
+    let vtmp = this.tmpVertices;
+    let eUVs = this.tmpExternalUVs;
+    let iUVs = this.tmpInternalUVs;
+    let high = 0;
+    let v1, v2, v3, vv1, vv2, vv3;
     res[1] = index;
 
     for (i = 0; i < numFaces; i++) {
@@ -673,7 +672,7 @@ struct FacesBlock {
             indices[vindex+2] = v3;
         } else {
             vindex = i * (3 * 3);
-            var sindex = v1 * 3;
+            let sindex = v1 * 3;
             vertices[vindex] = vtmp[sindex];
             vertices[vindex+1] = vtmp[sindex+1];
             vertices[vindex+2] = vtmp[sindex+2];
@@ -793,7 +792,8 @@ MapSubmesh.prototype.getFileSize = function () {
 
 
 MapSubmesh.prototype.buildGpuMesh = function () {
-    return this.map.renderer.createMesh(
+
+    return this.map.renderer.gpu.createMesh(
 
         {
             bbox: this.bbox,
@@ -801,49 +801,43 @@ MapSubmesh.prototype.buildGpuMesh = function () {
             uvs: this.internalUVs,
             uvs2: this.externalUVs,
             indices: this.indices,
-            use16bit: this.use16bit
+            use16bit: this.use16bit,
+            direct: true
         }
 
     );
 
-    /*return new GpuMesh(this.map.renderer.gpu, {
-        bbox: this.bbox,
-        vertices: this.vertices,
-        uvs: this.internalUVs,
-        uvs2: this.externalUVs,
-        indices: this.indices
-    }, 1, this.map.core, true, this.use16bit);*/
 };
 
 
 MapSubmesh.prototype.computeUVArea = function (texture) {
-    var uvs = this.internalUVs || this.externalUVs;
-    var area = 0;
-    var fx = texture.width / 65535;
-    var fy = texture.height / 65535;
+    const uvs = this.internalUVs || this.externalUVs;
+    const fx = texture.width / 65535;
+    const fy = texture.height / 65535;
+    let area = 0;
 
-    var faceArea = function(i1, i2, i3) {
-        var dx = (uvs[i2] - uvs[i1])*fx, dy = (uvs[i2+1] - uvs[i1+1])*fy;
-        var l1 = Math.sqrt(dx*dx+dy*dy);
+    const faceArea = function(i1, i2, i3) {
+        let dx = (uvs[i2] - uvs[i1])*fx, dy = (uvs[i2+1] - uvs[i1+1])*fy;
+        const l1 = Math.sqrt(dx*dx+dy*dy);
         dx = (uvs[i3] - uvs[i2])*fx, dy = (uvs[i3+1] - uvs[i2+1])*fy;
-        var l2 = Math.sqrt(dx*dx+dy*dy);
+        const l2 = Math.sqrt(dx*dx+dy*dy);
         dx = (uvs[i1] - uvs[i3])*fy, dy = (uvs[i1+1] - uvs[i3+1])*fy;
-        var l3 = Math.sqrt(dx*dx+dy*dy);
+        const l3 = Math.sqrt(dx*dx+dy*dy);
 
-        var sp = (l1+l2+l3)*0.5; //semi perimeter
+        const sp = (l1+l2+l3)*0.5; //semi perimeter
 
         return Math.sqrt(Math.max(0.0,sp*(sp-l1)*(sp-l2)*(sp-l3)));
     }
 
     if (uvs) {
-        var indices = this.indices;
+        const indices = this.indices;
 
         if (indices) {
-            for (var i = 0, ii = 0, li = this.faces; i < li; i++, ii+=3) {
+            for (let i = 0, ii = 0, li = this.faces; i < li; i++, ii+=3) {
                 area += faceArea(indices[i*3]*2, indices[i*3+1]*2, indices[i*3+2]*2);
             }
         } else {
-            for (var i = 0, ii = 0, li = this.faces; i < li; i++, ii+=3) {
+            for (let i = 0, ii = 0, li = this.faces; i < li; i++, ii+=3) {
                 area += faceArea(i*3*2, i*3*2 + 1, i*3*2 +2);
             }
         }
@@ -861,7 +855,7 @@ MapSubmesh.prototype.getWorldMatrix = function(geoPos, matrix) {
     // camera effectively stays in the position [0,0] and the tiles travel
     // around it. (The Z coordinate is fine and is not handled in this way.)
 
-    var m = matrix;
+    let m = matrix;
 
     if (m) {
         m[0] = this.bbox.side(0); m[1] = 0; m[2] = 0; m[3] = 0;
@@ -880,7 +874,7 @@ MapSubmesh.prototype.getWorldMatrix = function(geoPos, matrix) {
 
 
 MapSubmesh.prototype.getWorldMatrixSE = function(geoPos, matrix) {
-    var m = matrix;
+    let m = matrix;
 
     if (m) {
         m[0] = 1; m[1] = 0; m[2] = 0; m[3] = 0;
@@ -896,24 +890,26 @@ MapSubmesh.prototype.getWorldMatrixSE = function(geoPos, matrix) {
 
 
 MapSubmesh.prototype.drawBBox = function(cameraPos) {
-    var renderer = this.map.renderer;
+    const renderer = this.map.renderer;
 
-    return;
+    if (renderer.device === VTS_DEVICE_THREE) {
+        return;
+    }
 
-    renderer.gpu.useProgram(renderer.progBBox, ['aPosition']);
+    renderer.gpu.useProgram(renderer.gpu.progBBox, ['aPosition']);
 
-    var mvp = mat4.create();
-    var mv = mat4.create();
+    const mvp = mat4.create();
+    const mv = mat4.create();
 
     mat4.multiply(renderer.camera.getModelviewMatrix(), this.getWorldMatrix(cameraPos), mv);
 
-    var proj = renderer.camera.getProjectionMatrix();
+    const proj = renderer.camera.getProjectionMatrix();
     mat4.multiply(proj, mv, mvp);
 
-    renderer.progBBox.setMat4('uMVP', mvp);
+    renderer.gpu.progBBox.setMat4('uMVP', mvp);
 
     //draw bbox
-    renderer.bboxMesh.draw(renderer.progBBox, 'aPosition');
+    renderer.bboxMesh.draw(renderer.gpu.progBBox, 'aPosition');
 };
 
 

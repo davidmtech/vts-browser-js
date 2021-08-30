@@ -2,36 +2,36 @@
 import {math as math_} from '../utils/math';
 
 //get rid of compiler mess
-var math = math_;
+const math = math_;
 
 
-var MapTrajectory = function(map, p1, p2, options) {
+const MapTrajectory = function(map, p1, p2, options) {
     this.map = map;
     this.p1 = p1.clone();
     this.p2 = p2.clone();
     this.op2 = p2.clone();
 
-    var hm1 = this.p1.getHeightMode();
-    var hm2 = this.p2.getHeightMode();
-    
+    const hm1 = this.p1.getHeightMode();
+    const hm2 = this.p2.getHeightMode();
+
     if (hm1 == 'fix' && hm2 == 'float') {
         this.p1 = this.map.convert.convertPositionHeightMode(this.p1, 'float', true);
     } else if (hm1 == 'float' && hm2 == 'fix') {
         this.p1 = this.map.convert.convertPositionHeightMode(this.p1, 'fix', true);
-    } 
-    
-    var vm1 = this.p1.getViewMode();
-    var vm2 = this.p2.getViewMode();
+    }
+
+    const vm1 = this.p1.getViewMode();
+    const vm2 = this.p2.getViewMode();
 
     if (vm1 == 'subj' && vm2 == 'obj') {
         this.p2 = this.map.convert.convertPositionViewMode(this.p2, 'subj');
     } else if (vm1 == 'obj' && vm2 == 'subj') {
         this.p1 = this.map.convert.convertPositionViewMode(this.p1, 'subj');
-    } 
-    
-    this.p1.pos[5] = this.p1.pos[5] < 0 ? (360 + (this.p1.pos[5] % 360)) : (this.p1.pos[5] % 360);  
-    this.p2.pos[5] = this.p2.pos[5] < 0 ? (360 + (this.p2.pos[5] % 360)) : (this.p2.pos[5] % 360);  
-    
+    }
+
+    this.p1.pos[5] = this.p1.pos[5] < 0 ? (360 + (this.p1.pos[5] % 360)) : (this.p1.pos[5] % 360);
+    this.p2.pos[5] = this.p2.pos[5] < 0 ? (360 + (this.p2.pos[5] % 360)) : (this.p2.pos[5] % 360);
+
     this.pp1 = this.p1.clone();
 
     this.mode = options['mode'] || 'auto';
@@ -49,11 +49,11 @@ var MapTrajectory = function(map, p1, p2, options) {
 
     if (!this.map.getNavigationSrs().isProjected()) {
         this.geodesic = this.map.measure.getGeodesic();
-    } 
-    
+    }
+
     if (options['distanceAzimuth']) {
         this.distanceAzimuth = true;
-        
+
         this.pp2 = this.p1.clone();
         if (options['destHeight']) {
             this.pp2.setHeight(options['destHeight']);
@@ -62,37 +62,37 @@ var MapTrajectory = function(map, p1, p2, options) {
         if (options['destOrientation']) {
             this.pp2.setHeight(options['destOrientation']);
         }
-        
+
         if (options['destFov']) {
             this.pp2.setHeight(options['destFov']);
         }
 
-        this.geoAzimuth = options['azimuth'] || 0; 
+        this.geoAzimuth = options['azimuth'] || 0;
         this.geoDistance = options['distance'] || 100;
-        this.distance = this.geoDistance; 
+        this.distance = this.geoDistance;
         this.azimuth = this.geoAzimuth % 360;
         this.azimuth = (this.azimuth < 0) ? (360 + this.azimuth) : this.azimuth;
 
     } else {
         this.distanceAzimuth = false;
-            
+
         this.pp2 = this.p2.clone();
 
         //get distance and azimut
-        var res = this.map.measure.getDistance(this.pp1.getCoords(), this.pp2.getCoords());
+        let res = this.map.measure.getDistance(this.pp1.getCoords(), this.pp2.getCoords());
         this.distance = res[0];
         this.azimuth = (res[1] + 90) % 360;
         this.azimuth = (this.azimuth < 0) ? (360 + this.azimuth) : this.azimuth;
 
         if (!this.map.getNavigationSrs().isProjected()) {
             res = this.geodesic.Inverse(this.pp1.pos[2], this.pp1.pos[1], this.pp2.pos[2], this.pp2.pos[1]);
-            this.geoAzimuth = res.azi1; 
+            this.geoAzimuth = res.azi1;
             this.geoDistance = res.s12;
             this.azimuth = this.geoAzimuth % 360;
             this.azimuth = (this.azimuth < 0) ? (360 + this.azimuth) : this.azimuth;
         }
     }
-    
+
     //console.log("azim: " + Math.round(this.azimuth) + " p1: " + this.p1.pos[5]  + " p2: " + this.p2.pos[5]);
 
     this.detectMode();
@@ -121,7 +121,7 @@ MapTrajectory.prototype.detectMode = function() {
 MapTrajectory.prototype.detectDuration = function() {
     this.duration = 0;
     this.headingDuration = 1000;
-    
+
     if (this.distance < 500) {
         this.duration = 1000;
     } else if (this.distance < 2000) {
@@ -134,7 +134,7 @@ MapTrajectory.prototype.detectDuration = function() {
         } else {
             this.headingDuration = 1500;
         }
-        
+
         if (this.duration < 6000) {
             this.duration = 6000;
         }
@@ -148,35 +148,35 @@ MapTrajectory.prototype.detectDuration = function() {
             this.headingDuration *= 1.8;
         }
     }
-    
+
     if (this.mode != 'direct') {
-        var minDuration = 3 * this.headingDuration; 
+        const minDuration = 3 * this.headingDuration;
         this.duration = Math.max(this.duration, minDuration);
-        
+
         if (this.maxDuration < minDuration) {
             this.duration = this.maxDuration;
             this.headingDuration = this.maxDuration / 3;
-        }   
-    }    
-    
+        }
+    }
+
     this.duration = Math.min(this.duration, this.maxDuration);
     this.duration = Math.max(this.duration, this.minDuration);
 };
 
-    
-MapTrajectory.prototype.generate = function() {
-    var samples = new Array(Math.ceil(this.duration / this.samplePeriod)+(this.distanceAzimuth?0:1));
-    var index = 0;
-    
-    for (var time = 0; time <= this.duration; time += this.samplePeriod) {
-        var factor = time / this.duration;
 
-        var p = this.pp1.clone(), x, coords;
-        
+MapTrajectory.prototype.generate = function() {
+    const samples = new Array(Math.ceil(this.duration / this.samplePeriod)+(this.distanceAzimuth?0:1));
+    let index = 0;
+
+    for (let time = 0; time <= this.duration; time += this.samplePeriod) {
+        let factor = time / this.duration;
+
+        let p = this.pp1.clone(), x, coords;
+
         if (this.mode == 'direct') {
 
             x = factor;
-            
+
             switch(this.fade) {
             case 'in':
                 switch(this.fadePower) {
@@ -212,17 +212,17 @@ MapTrajectory.prototype.generate = function() {
                 }
                 break;
             }
-            
+
             p.setCoords(this.getInterpolatedCoords(factor));
             p.setHeight(this.getInterpolatedHeight(factor));
-            
-            var o1 = this.pp1.getOrientation(); 
-            var o2 = this.pp2.getOrientation(); 
+
+            const o1 = this.pp1.getOrientation();
+            const o2 = this.pp2.getOrientation();
 
             p.setOrientation(this.getInterpolatedOrinetation(o1, o2, factor));
             p.setFov(this.getInterpolatedFov(factor));
             p.setViewExtent(this.getInterpolatedViewExtent(factor));
-            
+
             samples[index] = p.pos;
             index++;
         } else {
@@ -234,35 +234,35 @@ MapTrajectory.prototype.generate = function() {
             factor =  x*x*(3 - 2*x);
 
             //factor2 includes slow start and end of flight
-            var factor2 =  this.getSmoothFactor(time);
-            
+            const factor2 =  this.getSmoothFactor(time);
+
             if (this.submode == 'piha') {
-                
-                var distanceFactor = (this.distance / this.duration * (time - this.duration / (2 * Math.PI) * Math.sin(2 * Math.PI / this.duration * time))) / this.distance;
 
-                //var f = (time / this.duration) * Math.PI * 2;
-                //var distanceFactor = ((f - Math.sin(f)) / (2 * Math.PI));
-                
-                var pv = this.pv;
-                var h1 = this.pp1.getCoords()[2]; 
-                var h2 = this.pp2.getCoords()[2]; 
+                const distanceFactor = (this.distance / this.duration * (time - this.duration / (2 * Math.PI) * Math.sin(2 * Math.PI / this.duration * time))) / this.distance;
 
-                var height = this.distance / ((this.duration*0.001) * pv * Math.tan(math.radians(this.pp1.getFov()) * 0.5))
+                //const f = (time / this.duration) * Math.PI * 2;
+                //const distanceFactor = ((f - Math.sin(f)) / (2 * Math.PI));
+
+                const pv = this.pv;
+                const h1 = this.pp1.getCoords()[2];
+                const h2 = this.pp2.getCoords()[2];
+
+                const height = this.distance / ((this.duration*0.001) * pv * Math.tan(math.radians(this.pp1.getFov()) * 0.5))
                               * (1 - Math.cos(2 * Math.PI * time / this.duration))
                               + h1 + (h2 - h1) * time  / this.duration;
 
                 coords = this.getInterpolatedCoords(distanceFactor);
 
                 p.setCoords(coords);
-                p.setHeight(height);            
+                p.setHeight(height);
             } else {
 
                 coords = this.getInterpolatedCoords(factor2);
-    
+
                 p.setCoords(coords);
-                p.setHeight(this.getSineHeight(factor));            
+                p.setHeight(this.getSineHeight(factor));
             }
-            
+
             if (coords[3] != null) { //used for correction in planet mode
                 this.azimuth = -coords[3];
             }
@@ -270,7 +270,7 @@ MapTrajectory.prototype.generate = function() {
             p.setOrientation(this.getFlightOrienation(time));
             p.setFov(this.getInterpolatedFov(factor));
             p.setViewExtent(this.getInterpolatedViewExtent(factor));
-            
+
             //p.convertViewMode("subj");
             //console.log("pos: " + p.toString());
 
@@ -279,7 +279,7 @@ MapTrajectory.prototype.generate = function() {
             index++;
         }
     }
-    
+
     if (!this.distanceAzimuth) {
         samples[index] = this.op2.clone().pos;
     }
@@ -291,19 +291,15 @@ MapTrajectory.prototype.generate = function() {
 
 
 MapTrajectory.prototype.getInterpolatedCoords = function(factor) {
-    var c1 = this.pp1.getCoords(); 
-    var c2 = this.pp2.getCoords(); 
+    const c1 = this.pp1.getCoords();
+    const c2 = this.pp2.getCoords();
 
     if (!this.map.getNavigationSrs().isProjected()) {
-        var res = this.geodesic.Direct(c1[1], c1[0], this.geoAzimuth, this.geoDistance * factor);
+        const res = this.geodesic.Direct(c1[1], c1[0], this.geoAzimuth, this.geoDistance * factor);
 
-        var azimut = res.azi1 - res.azi2;
+        let azimut = res.azi1 - res.azi2;
 
-        //var azimut = (azimut - 90) % 360;
         azimut = (this.azimuth < 0) ? (360 + azimut) : azimut;
-
-        //azimut = this.azimuth;
-
 
         return [ res.lon2, res.lat2,
             c1[2] + (c2[2] - c1[2]) * factor, azimut];
@@ -317,9 +313,9 @@ MapTrajectory.prototype.getInterpolatedCoords = function(factor) {
 
 
 MapTrajectory.prototype.getInterpolatedOrinetation = function(o1, o2, factor) {
-    var od1 = o2[0] - o1[0];
-    var od2 = o2[1] - o1[1];
-    var od3 = o2[2] - o1[2];
+    let od1 = o2[0] - o1[0];
+    const od2 = o2[1] - o1[1];
+    const od3 = o2[2] - o1[2];
 
     if (this.yawInterpolation == 'shortest' || this.yawInterpolation == 'longest') {
         if (Math.abs(od1) > 180) {
@@ -346,29 +342,29 @@ MapTrajectory.prototype.getInterpolatedOrinetation = function(o1, o2, factor) {
 
 
 MapTrajectory.prototype.getInterpolatedFov = function(factor) {
-    var f1 = this.pp1.getFov(); 
-    var f2 = this.pp2.getFov(); 
+    const f1 = this.pp1.getFov();
+    const f2 = this.pp2.getFov();
     return f1 + (f2 - f1) * factor;
 };
 
 
 MapTrajectory.prototype.getInterpolatedViewExtent = function(factor) {
-    var v1 = this.pp1.getViewExtent(); 
-    var v2 = this.pp2.getViewExtent(); 
+    const v1 = this.pp1.getViewExtent();
+    const v2 = this.pp2.getViewExtent();
     return v1 + (v2 - v1) * factor;
 };
 
 
 MapTrajectory.prototype.getInterpolatedHeight = function(factor) {
-    var h1 = this.pp1.getHeight(); 
-    var h2 = this.pp2.getHeight(); 
+    const h1 = this.pp1.getHeight();
+    const h2 = this.pp2.getHeight();
     return h1 + (h2 - h1) * factor;
 };
 
 
 MapTrajectory.prototype.getSineHeight = function(factor) {
-    var c1 = this.pp1.getCoords(); 
-    var c2 = this.pp2.getCoords(); 
+    const c1 = this.pp1.getCoords();
+    const c2 = this.pp2.getCoords();
 
     return c1[2] + (c2[2] - c1[2]) * factor +
            Math.sin(Math.PI * factor) * this.flightHeight;
@@ -376,7 +372,7 @@ MapTrajectory.prototype.getSineHeight = function(factor) {
 
 
 MapTrajectory.prototype.getSmoothFactor = function(time) {
-    var x = 0;
+    let x = 0;
 
     if (time < this.headingDuration) {
         x = 0;
@@ -392,10 +388,10 @@ MapTrajectory.prototype.getSmoothFactor = function(time) {
 
 
 MapTrajectory.prototype.getFlightOrienation = function(time) {
-    var o1 = null;
-    var o2 = null;
-    var fo = [0, -90, 0]; //flight orientation
-    var factor = 0;
+    let o1 = null;
+    let o2 = null;
+    let fo = [0, -90, 0]; //flight orientation
+    let factor = 0;
 
     //get fly direction angle
     fo[0] = this.azimuth % 360;
@@ -416,13 +412,10 @@ MapTrajectory.prototype.getFlightOrienation = function(time) {
         factor = 0;
         o1 = fo;
         o2 = fo;
-    }    
-    
+    }
+
     return this.getInterpolatedOrinetation(o1, o2, factor);
 };
 
 
 export default MapTrajectory;
-
-
-

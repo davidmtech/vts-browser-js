@@ -7,21 +7,21 @@ import Autopilot_ from './autopilot/autopilot';
 import ControlMode_ from './control-mode/control-mode';
 import Presenter_ from './presenter/presenter';
 import Rois_ from './rois/rois';
-import UIEvent_ from './ui/element/event';
+//import UIEvent_ from './ui/element/event';
 
 
 //get rid of compiler mess
-var CoreInterface = CoreInterface_;
-var utils = utils_;
-var UI = UI_;
-var Autopilot = Autopilot_;
-var ControlMode = ControlMode_;
-var Presenter = Presenter_;
-var Rois = Rois_;
-var checkSupport = checkSupport_;
+const CoreInterface = CoreInterface_;
+const utils = utils_;
+const UI = UI_;
+const Autopilot = Autopilot_;
+const ControlMode = ControlMode_;
+const Presenter = Presenter_;
+const Rois = Rois_;
+const checkSupport = checkSupport_;
 
 
-var Browser = function(element, config) {
+const Browser = function(element, config) {
     this.killed = false;
     this.configStorage = {};
     this.initConfig();
@@ -140,14 +140,14 @@ Browser.prototype.setupWS = function() {
 
     this.ws.onmessage = (e) => {
 
-        var map = this.getMap();
+        const map = this.getMap();
         if (!map) {
             return ;
         }
 
         try {
 
-            var json = JSON.parse(e.data);
+            const json = JSON.parse(e.data);
 
             //console.log(e.data);
 
@@ -167,28 +167,28 @@ Browser.prototype.setupWS = function() {
                     break;
 
                 case 'pos':
+                    {
+                        const pos = json.pos;
+                        const pos2 = map.getPosition().toArray();
 
-                    var pos = json.pos;
-                    var pos2 = map.getPosition().toArray();
+                        this.lastWsPos = pos;
 
-                    this.lastWsPos = pos;
-
-                    if (json.fixedHeight) {
-                        this.config.fixedHeight = json.fixedHeight;
-                    }
-
-                    if (Math.abs(pos[1] - pos2[1]) > 0.00001 ||
-                        Math.abs(pos[2] - pos2[2]) > 0.00001 ||
-                        Math.abs(pos[4] - pos2[4]) > 0.001 ||
-                        Math.abs(pos[5] - pos2[5]) > 0.01 ||
-                        Math.abs(pos[6] - pos2[6]) > 0.01 ||
-                        Math.abs(pos[7] - pos2[7]) > 0.01 ||
-                        Math.abs(pos[8] - pos2[8]) > 0.01 ||
-                        Math.abs(pos[9] - pos2[9]) > 0.01) {
-
-                            map.setPosition(json.pos);
+                        if (json.fixedHeight) {
+                            this.config.fixedHeight = json.fixedHeight;
                         }
 
+                        if (Math.abs(pos[1] - pos2[1]) > 0.00001 ||
+                            Math.abs(pos[2] - pos2[2]) > 0.00001 ||
+                            Math.abs(pos[4] - pos2[4]) > 0.001 ||
+                            Math.abs(pos[5] - pos2[5]) > 0.01 ||
+                            Math.abs(pos[6] - pos2[6]) > 0.01 ||
+                            Math.abs(pos[7] - pos2[7]) > 0.01 ||
+                            Math.abs(pos[8] - pos2[8]) > 0.01 ||
+                            Math.abs(pos[9] - pos2[9]) > 0.01) {
+
+                                map.setPosition(json.pos);
+                            }
+                    }
                     break;
 
                 default:
@@ -216,9 +216,9 @@ Browser.prototype.onMapLoaded = function(event) {
     this.mapLoaded = true;
 
     //overwrite browser options
-    var options = event['browserOptions'] || {};
-    var originalOptions = this.originalConfig;
-    for (var key in originalOptions) {
+    const options = event['browserOptions'] || {};
+    const originalOptions = this.originalConfig;
+    for (let key in originalOptions) {
         if (typeof options[key] !== 'undefined') {
             options[key] = originalOptions[key];
         }
@@ -227,7 +227,7 @@ Browser.prototype.onMapLoaded = function(event) {
     this.setConfigParams(options);
 
     if (this.config.geojson || this.config.geodata) {
-        var data = this.config.geojson || this.config.geodata;
+        let data = this.config.geojson || this.config.geodata;
 
         if (typeof data === 'string') {
             data = data.trim();
@@ -236,6 +236,7 @@ Browser.prototype.onMapLoaded = function(event) {
                 try {
                     data = JSON.parse(data);
                     this.onGeoJsonLoaded(data);
+                // eslint-disable-next-line
                 } catch(e){ }
             } else {
                 utils.loadJSON(data, this.onGeoJsonLoaded.bind(this));
@@ -243,7 +244,7 @@ Browser.prototype.onMapLoaded = function(event) {
         }
     }
 
-    var map = this.getMap();
+    const map = this.getMap();
     map.config.autocenter = this.config.autocenter;
 
     if (this.config.tiles3d && map) {
@@ -252,7 +253,7 @@ Browser.prototype.onMapLoaded = function(event) {
             this.config.autocenter = true;
         }
 
-        var freeLayer = {
+        const freeLayer = {
             credits:[],
             displaySize:1024,
             extents:{"ll":[null,null,null],"ur":[null,null,null]},
@@ -265,7 +266,7 @@ Browser.prototype.onMapLoaded = function(event) {
 
         map.addFreeLayer('geodatatest', freeLayer);
 
-        var view = map.getView();
+        const view = map.getView();
         view.freeLayers.geodatatest = { options: { fastParse: true }};
         map.setView(view);
     }
@@ -278,23 +279,23 @@ Browser.prototype.onMapLoaded = function(event) {
 
 
 Browser.prototype.getLinkWithCurrentPos = function() {
-    var map = this.getMap();
+    const map = this.getMap();
     if (!map) {
         return '';
     }
 
     //get url params
-    var params = utils.getParamsFromUrl(window.location.href);
+    const params = utils.getParamsFromUrl(window.location.href);
 
     //get position string
-    var p = map.getPosition();
+    let p = map.getPosition();
     p = map.convertPositionHeightMode(p, 'fix', true);
 
-    var s = '';
+    let s = '';
     s += p.getViewMode() + ',';
-    var c = p.getCoords();
+    const c = p.getCoords();
     s += c[0].toFixed(6) + ',' + c[1].toFixed(6) + ',' + p.getHeightMode() + ',' + c[2].toFixed(2) + ',';
-    var o = p.getOrientation();
+    const o = p.getOrientation();
     s += o[0].toFixed(2) + ',' + o[1].toFixed(2) + ',' + o[2].toFixed(2) + ',';
     s += p.getViewExtent().toFixed(2) + ',' + p.getFov().toFixed(2);
 
@@ -306,7 +307,7 @@ Browser.prototype.getLinkWithCurrentPos = function() {
             params['rotate'] = '0';
         }
 
-        var pan = this.getConfigParam('pan');
+        const pan = this.getConfigParam('pan');
         if (params['pan'] || (pan && (pan[0] || pan[1]))) {
             params['pan'] = '0,0';
         }
@@ -318,15 +319,15 @@ Browser.prototype.getLinkWithCurrentPos = function() {
 
     //convert prameters to url parameters string
     s = '';
-    for (var key in params) {
+    for (let key in params) {
         s += ((s.length > 0) ? '&' : '') + key + '=' + params[key];
     }
 
     //separete base url and url params
-    var urlParts = window.location.href.split('?');
+    const urlParts = window.location.href.split('?');
 
     if (urlParts.length > 1) {
-        var extraParts = urlParts[1].split('#'); //is there anchor?
+        const extraParts = urlParts[1].split('#'); //is there anchor?
         return urlParts[0] + '?' + s + (extraParts[1] || '');
     } else {
         return urlParts[0] + '?' + s;
@@ -341,8 +342,8 @@ Browser.prototype.onMapPositionChanged = function(event) {
 
     if (this.ws) {
 
-        var pos = this.getPositionString(event.position);
-        var pos2 = this.lastWsPos ? this.getPositionString(this.lastWsPos) : "";
+        const pos = this.getPositionString(event.position);
+        const pos2 = this.lastWsPos ? this.getPositionString(this.lastWsPos) : "";
 
         if (pos != pos2) {
 
@@ -391,13 +392,13 @@ Browser.prototype.onMapUpdate = function() {
 
 
 Browser.prototype.onGeoJsonLoaded = function(data) {
-    var map = this.getMap();
-    var geodata = map.createGeodata();
+    const map = this.getMap();
+    const geodata = map.createGeodata();
 
-    var addFreeLayer = (function(){
-        var freeLayer = geodata.makeFreeLayer(this.config.geojsonStyle);
+    const addFreeLayer = (function(){
+        const freeLayer = geodata.makeFreeLayer(this.config.geojsonStyle);
         map.addFreeLayer('geojson', freeLayer);
-        var view = map.getView();
+        const view = map.getView();
         view.freeLayers.geojson = {};
         map.setView(view);
     }).bind(this)
@@ -413,10 +414,10 @@ Browser.prototype.onGeoJsonLoaded = function(data) {
 
 
 Browser.prototype.on3DTilesLoaded = function() {
-    var map = this.getMap();
-    var freeLayer = this.tiles3d.makeFreeLayer({});
+    const map = this.getMap();
+    const freeLayer = this.tiles3d.makeFreeLayer({});
     map.addFreeLayer('tiles3d', freeLayer);
-    var view = map.getView();
+    const view = map.getView();
     view.freeLayers.tiles3d = { options: { fastParse: true }};
     map.setView(view);
 }
@@ -433,7 +434,7 @@ Browser.prototype.onTick = function() {
 
     if (this.ws) {
         if (this.ws.readyState > 1) {
-            var timer = performance.now();
+            const timer = performance.now();
             if ((timer - this.lastWSConnectTime) > 1000) {
                 this.setupWS();
                 this.lastWSConnectTime = timer;
@@ -442,7 +443,7 @@ Browser.prototype.onTick = function() {
     }
 
     if (this.updatePosInUrl) {
-        var timer = performance.now();
+        const timer = performance.now();
         if ((timer - this.lastUrlUpdateTime) > 1000) {
             if (window.history.replaceState) {
                 window.history.replaceState({}, null, this.getLinkWithCurrentPos());
@@ -508,7 +509,7 @@ Browser.prototype.initConfig = function() {
 
 Browser.prototype.setConfigParams = function(params, ignoreCore) {
     if (typeof params === 'object' && params !== null) {
-        for (var key in params) {
+        for (let key in params) {
             this.setConfigParam(key, params[key], ignoreCore);
 
             /*if (!(key == "pos" || key == "position" || key == "view" ||
@@ -543,7 +544,7 @@ Browser.prototype.updateUI = function(key) {
 
 
 Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
-    var map = this.getMap();
+    const map = this.getMap();
 
     switch (key) {
     case 'pos':
@@ -572,7 +573,6 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'positionUrlHistory':     this.config.positionUrlHistory = utils.validateBool(value, false);  break;
     case 'controlCompass':         this.config.controlCompass = utils.validateBool(value, true); this.updateUI(key);    break;
     case 'controlZoom':            this.config.controlZoom = utils.validateBool(value, true); this.updateUI(key);       break;
-    case 'controlMeasure':         this.config.controlMeasure = utils.validateBool(value, false); this.updateUI(key);   break;
     case 'controlScale':           this.config.controlScale = utils.validateBool(value, true); this.updateUI(key);      break;
     case 'controlLayers':          this.config.controlLayers = utils.validateBool(value, false); this.updateUI(key);    break;
     case 'controlSpace':           this.config.controlSpace = utils.validateBool(value, false); this.updateUI(key);     break;
@@ -647,7 +647,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
 
 
 Browser.prototype.getConfigParam = function(key) {
-    var map = this.getMap();
+    const map = this.getMap();
 
     switch (key) {
     case 'pos':
@@ -684,7 +684,6 @@ Browser.prototype.getConfigParam = function(key) {
     case 'positionUrlHistory':     return this.config.positionUrlHistory;
     case 'controlCompass':         return this.config.controlCompass;
     case 'controlZoom':            return this.config.controlZoom;
-    case 'controlMeasure':         return this.config.controlMeasure;
     case 'controlScale':           return this.config.controlScale;
     case 'controlLayers':          return this.config.controlLayers;
     case 'controlSpace':           return this.config.controlSpace;

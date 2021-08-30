@@ -1,12 +1,12 @@
 
-var InspectorGraphs = function(inspector) {
+const InspectorGraphs = function(inspector) {
     this.inspector = inspector;
     this.core = inspector.core;
 };
 
 
 InspectorGraphs.prototype.init = function() {
-    var inspector = this.inspector;
+    const inspector = this.inspector;
 
     inspector.addStyle( ''
         + '#vts-graphs-panel {'
@@ -118,7 +118,7 @@ InspectorGraphs.prototype.switchPanel = function() {
 
 
 InspectorGraphs.prototype.recordingPressed = function(state) {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
 
     if (!map) {
         return;
@@ -138,7 +138,7 @@ InspectorGraphs.prototype.refreshPressed = function() {
 
 
 InspectorGraphs.prototype.resetPressed = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
 
     if (!map) {
         return;
@@ -198,7 +198,7 @@ InspectorGraphs.prototype.magnifyPressed = function() {
 
 
 InspectorGraphs.prototype.updateGraphsPanel = function() {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
 
     if (!map) {
         return;
@@ -235,7 +235,7 @@ InspectorGraphs.prototype.updateGraphsPanel = function() {
 
 
 InspectorGraphs.prototype.onMouseMove = function(event) {
-    var x = event.clientX - this.canvasRender.getBoundingClientRect().left;
+    let x = event.clientX - this.canvasRender.getBoundingClientRect().left;
     this.showCursor = true;
 
     if (this.magnify) {
@@ -244,7 +244,7 @@ InspectorGraphs.prototype.onMouseMove = function(event) {
 
     this.cursorIndex = x;
 
-    var map = this.core.getMap();
+    const map = this.core.getMap();
     if (!map) {
         return;
     }
@@ -262,7 +262,7 @@ InspectorGraphs.prototype.onMouseOut = function() {
 
 
 InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
-    var map = this.core.getMap();
+    const map = this.core.getMap();
 
     if (!map || (!this.refresh && !ignoreRefresh) || !this.panelVisible) {
         return;
@@ -270,32 +270,32 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
 
     stats = stats || map.stats;
 
-    var width = this.canvasRender.width;
-    var height = this.canvasRender.height;
-    var ctx = this.canvasRenderCtx;
+    let width = this.canvasRender.width;
+    let height = this.canvasRender.height;
+    let ctx = this.canvasRenderCtx;
 
-    var samples = stats.graphsTimeSamples;
-    var samplesIndex = stats.graphsTimeIndex;
+    const samples = stats.graphsTimeSamples;
+    const samplesIndex = stats.graphsTimeIndex;
 
-    var factorX = width / samples;
+    let factorX = width / samples;
 
     ctx.clearRect(0, 0, width, height);
 
-    var maxValue = 0;
-    var totalFrame = 0;
-    var totalRender = 0;
-    var totalTexture = 0;
-    var totalMeshes = 0;
-    var totalGpuMeshes = 0;
-    var realCount = 0, i, j, lj;
-    var index, value, values, str, y, factorY, max, min;
+    let maxValue = 0;
+    let totalFrame = 0;
+    let totalRender = 0;
+    let totalTexture = 0;
+    let totalMeshes = 0;
+    let totalGpuMeshes = 0;
+    let realCount = 0, i, j, lj;
+    let index, value, values, str, y, factorY, max, min;
 
-    var valuesFrame = stats.graphsFrameTimes;
-    var valuesRender = stats.graphsRenderTimes;
-    var valuesTextures = stats.graphsCreateTextureTimes;
-    var valuesMeshes = stats.graphsCreateMeshTimes;
-    var valuesGpuMeshes = stats.graphsCreateGpuMeshTimes;
-    var valuesGeodata;
+    let valuesFrame = stats.graphsFrameTimes;
+    let valuesRender = stats.graphsRenderTimes;
+    let valuesTextures = stats.graphsCreateTextureTimes;
+    let valuesMeshes = stats.graphsCreateMeshTimes;
+    let valuesGpuMeshes = stats.graphsCreateGpuMeshTimes;
+    let valuesGeodata;
 
     for (i = 0; i < samples; i++) {
         totalFrame += valuesFrame[i];
@@ -304,7 +304,7 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
         totalMeshes += valuesMeshes[i];
         totalGpuMeshes += valuesGpuMeshes[i];
 
-        var v = valuesFrame[i];
+        const v = valuesFrame[i];
 
         if (v > maxValue) {
             maxValue = v;
@@ -384,16 +384,16 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
         {
             factorY = height / ((map.gpuCache.maxCost+map.resourcesCache.maxCost+map.metatileCache.maxCost));
 
-            var maxMetatiles = 0;
-            var maxResources = 0;
-            var maxTextures = 0;
-            var maxMeshes = 0;
-            var maxGeodata = 0;
-            var maxGpu = 0;
+            let maxMetatiles = 0;
+            let maxResources = 0;
+            let maxTextures = 0;
+            let maxMeshes = 0;
+            let maxGeodata = 0;
+            let maxGpu = 0;
 
-            var valuesMetatiles = stats.graphsCpuMemoryMetatiles;
-            var valuesResources = stats.graphsCpuMemoryUsed;
-            var valuesGpu = stats.graphsGpuMemoryRender;
+            let valuesMetatiles = stats.graphsCpuMemoryMetatiles;
+            let valuesResources = stats.graphsCpuMemoryUsed;
+            let valuesGpu = stats.graphsGpuMemoryRender;
             valuesGeodata = stats.graphsGpuMemoryGeodata;
             valuesTextures = stats.graphsGpuMemoryTextures;
             valuesMeshes = stats.graphsGpuMemoryMeshes;
@@ -468,7 +468,7 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
             min = 99999999999;
             realCount = 0;
             values = (this.graph == 'Polygons') ? stats.graphsPolygons : stats.graphsBuild;
-            var total = 0;
+            let total = 0;
 
             for (i = 0; i < samples; i++) {
                 max = values[i] > max ? values[i] : max;
@@ -516,7 +516,7 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
             ctx.fillStyle='#000000';
             ctx.fillRect(0, 0, width, height);
 
-            var lods;
+            let lods;
 
             for (i = 0; i < samples; i++) {
                 index = samplesIndex + i;
@@ -526,8 +526,8 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
                 //ctx.fillRect(i*factorX, height, 1, -(values[index][0])*factorY);
 
                 y = height;
-                
-                lods = values[index][1]; 
+
+                lods = values[index][1];
 
                 for (j = 0, lj = lods.length; j < lj; j++) {
                     if (lods[j]) {
@@ -544,7 +544,7 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
                 index = (this.cursorIndex + samplesIndex) % samples;
 
                 str = 'LODs:' + values[index][0];
-                lods = values[index][1]; 
+                lods = values[index][1];
 
                 for (j = 0, lj = lods.length; j < lj; j++) {
                     if (lods[j]) {
@@ -562,30 +562,30 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
 
     case 'Flux':
         {
-            var maxCount = 0;
-            var maxSize = 0;
+            let maxCount = 0;
+            let maxSize = 0;
 
-            var maxTexPlusCount = 0;
-            var maxTexPlusSize = 0;
-            var maxTexMinusCount = 0;
-            var maxTexMinusSize = 0;
+            let maxTexPlusCount = 0;
+            let maxTexPlusSize = 0;
+            let maxTexMinusCount = 0;
+            let maxTexMinusSize = 0;
 
-            var maxMeshPlusCount = 0;
-            var maxMeshPlusSize = 0;
-            var maxMeshMinusCount = 0;
-            var maxMeshMinusSize = 0;
+            let maxMeshPlusCount = 0;
+            let maxMeshPlusSize = 0;
+            let maxMeshMinusCount = 0;
+            let maxMeshMinusSize = 0;
 
-            var maxGeodataPlusCount = 0;
-            var maxGeodataPlusSize = 0;
-            var maxGeodataMinusCount = 0;
-            var maxGeodataMinusSize = 0;
+            let maxGeodataPlusCount = 0;
+            let maxGeodataPlusSize = 0;
+            let maxGeodataMinusCount = 0;
+            let maxGeodataMinusSize = 0;
 
             valuesTextures = stats.graphsFluxTextures;
             valuesMeshes = stats.graphsFluxMeshes;
             valuesGeodata = stats.graphsFluxGeodatas;
 
             for (i = 0; i < samples; i++) {
-                var tmp = valuesTextures[i][0][0] + valuesMeshes[i][0][0];
+                let tmp = valuesTextures[i][0][0] + valuesMeshes[i][0][0];
                 maxCount = tmp > maxCount ? tmp : maxCount;
                 tmp = valuesTextures[i][1][0] + valuesMeshes[i][1][0];
                 maxCount = tmp > maxCount ? tmp : maxCount;
@@ -612,19 +612,19 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
             }
 
             factorY = (height*0.25-2) / maxCount;
-            var factorY2 = (height*0.25-2) / maxSize;
+            let factorY2 = (height*0.25-2) / maxSize;
 
-            var base = Math.floor(height*0.25);
-            var base2 = Math.floor(height*0.75);
+            let base = Math.floor(height*0.25);
+            let base2 = Math.floor(height*0.75);
 
             for (i = 0; i < samples; i++) {
                 index = samplesIndex + i;
                 index %= samples;
-                
-                var y1Up = base;
-                var y1Down = base+1;
-                var y2Up = base2;
-                var y2Down = base2+1;
+
+                let y1Up = base;
+                let y1Down = base+1;
+                let y2Up = base2;
+                let y2Down = base2+1;
 
                 ctx.fillStyle='#0000aa';
                 ctx.fillRect(i*factorX, y1Up, 1, -(valuesTextures[index][0][0])*factorY);
@@ -701,4 +701,3 @@ InspectorGraphs.prototype.updateGraphs = function(stats, ignoreRefresh) {
 
 
 export default InspectorGraphs;
-

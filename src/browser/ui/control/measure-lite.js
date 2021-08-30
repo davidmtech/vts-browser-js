@@ -3,12 +3,12 @@ import Dom_ from '../../utility/dom';
 import {UIControlMeasureIcon as UIControlMeasureIcon_, UIControlMeasureIcon2 as UIControlMeasureIcon2_} from './measure';
 
 //get rid of compiler mess
-var dom = Dom_,
-    UIControlMeasureIcon = UIControlMeasureIcon_,
-    UIControlMeasureIcon2 = UIControlMeasureIcon2_;
+const dom = Dom_,
+      UIControlMeasureIcon = UIControlMeasureIcon_,
+      UIControlMeasureIcon2 = UIControlMeasureIcon2_;
 
 
-var UIControlMeasureLite = function(ui, visible, visibleLock) {
+const UIControlMeasureLite = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('measure2',
@@ -35,9 +35,9 @@ var UIControlMeasureLite = function(ui, visible, visibleLock) {
 
         + '<div id="vts-measure-info" class="vts-measure-info">'
         + '</div>'
-        
+
      + ' </div>', visible, visibleLock);
-     
+
     this.div = this.control.getElement('vts-measure');
 
     this.buttonOff = this.control.getElement('vts-measure-button');
@@ -50,7 +50,7 @@ var UIControlMeasureLite = function(ui, visible, visibleLock) {
 
     this.info = this.control.getElement('vts-measure-info');
 
-    var clearButton = this.control.getElement('vts-measure-clear');
+    const clearButton = this.control.getElement('vts-measure-clear');
     clearButton.on('click', this.onClear.bind(this));
     clearButton.on('dblclick', this.onDoNothing.bind(this));
 
@@ -67,7 +67,7 @@ var UIControlMeasureLite = function(ui, visible, visibleLock) {
     } else {
         this.buttonOn.setStyle('display', 'none');
         this.buttonOff.setStyle('display', 'block');
-    }    
+    }
 
     this.onMouseMoveCall = this.onMouseMove.bind(this);
     this.onMouseLeaveCall = this.onMouseLeave.bind(this);
@@ -78,34 +78,34 @@ var UIControlMeasureLite = function(ui, visible, visibleLock) {
 
 
 UIControlMeasureLite.prototype.onDoNothing = function(event) {
-    dom.stopPropagation(event);    
+    dom.stopPropagation(event);
 };
 
-UIControlMeasureLite.prototype.onMouseLeave = function(event) {
+UIControlMeasureLite.prototype.onMouseLeave = function(/*event*/) {
     this.info.setStyle('display', 'none');
 };
 
 
 UIControlMeasureLite.prototype.onMouseClick = function(event) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var mapElement = this.ui.getMapElement();
-    var state = mapElement.getDraggingState();
+    const mapElement = this.ui.getMapElement();
+    const state = mapElement.getDraggingState();
 
     //if (state['dragging']) { //TODO: why does not work this parameter? Fix it once you have time
       //  return;
     //}
-    var delta = state['absMoved'];
+    const delta = state['absMoved'];
 
     if ((delta[0]+delta[1]) > 0) {
         return;
     }
 
-    var coords = event.getMouseCoords();
-    var clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
+    const coords = event.getMouseCoords();
+    let clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
 
     if (!clickCoords) {
         return;
@@ -113,13 +113,13 @@ UIControlMeasureLite.prototype.onMouseClick = function(event) {
 
     clickCoords = map.convertCoordsFromNavToPublic(clickCoords, 'fix');
 
-    var str = '#' + this.counter + '  ' + clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + clickCoords[2].toFixed(2) + 'm';
+    let str = '#' + this.counter + '  ' + clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + clickCoords[2].toFixed(2) + 'm';
 
     if (this.lastCoords) {
-        var res = map.getDistance(this.lastCoords, clickCoords, false, true);
-        var space = '\n   ';
+        const res = map.getDistance(this.lastCoords, clickCoords, false, true);
+        let space = '\n   ';
 
-        for (var i = 0, li = ('' + this.counter).length; i < li; i++) {
+        for (let i = 0, li = ('' + this.counter).length; i < li; i++) {
             space += ' ';
         }
 
@@ -144,28 +144,28 @@ UIControlMeasureLite.prototype.onMouseClick = function(event) {
     this.counter++;
     this.lastCoords = clickCoords;
 
-    var listElement = this.list.getElement();
+    const listElement = this.list.getElement();
     listElement.value += str + '\n';
     listElement.scrollTop = listElement.scrollHeight;    //scroll list to the last line
 };
 
 UIControlMeasureLite.prototype.onMouseMove = function(event) {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var coords = event.getMouseCoords();
-    var clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
+    const coords = event.getMouseCoords();
+    let clickCoords = map.getHitCoords(coords[0], coords[1], 'fix');
 
     if (!clickCoords) {
         this.info.setStyle('display', 'none');
-        return;    
+        return;
     }
 
     clickCoords = map.convertCoordsFromNavToPublic(clickCoords, 'fix');
 
-    var str = clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + clickCoords[2].toFixed(2) + 'm';
+    const str = clickCoords[0].toFixed(7) + ', ' + clickCoords[1].toFixed(7) + ', ' + clickCoords[2].toFixed(2) + 'm';
 
     coords[0] -= this.divRect.left;
     coords[1] -= this.divRect.top;
@@ -179,7 +179,7 @@ UIControlMeasureLite.prototype.onMouseMove = function(event) {
 UIControlMeasureLite.prototype.onSwitch = function() {
     this.measuring = !this.measuring;
 
-    var mapElement = this.ui.getMapElement();
+    const mapElement = this.ui.getMapElement();
 
     if (this.measuring) {
         this.buttonOn.setStyle('display', 'block');
@@ -208,17 +208,15 @@ UIControlMeasureLite.prototype.onClear = function() {
     this.counter = 1;
     this.lastCoords = null;
 
-    var listElement = this.list.getElement();
+    const listElement = this.list.getElement();
     listElement.value = '';
     listElement.scrollTop = 0;
 };
 
 UIControlMeasureLite.prototype.update = function() {
-    //var button = this.control.getElement('vts-measure-button');
-    
-    var left = 10 + (this.ui.config.controlZoom ? 70 : 0) +
-                (this.ui.config.controlSpace ? 35 : 0);
-    
+    const left = 10 + (this.ui.config.controlZoom ? 70 : 0) +
+                 (this.ui.config.controlSpace ? 35 : 0);
+
     this.div.setStyle('left', left + 'px');
     this.listPanel.setStyle('display', this.measuring ? 'block' : 'none');
 };
@@ -226,7 +224,7 @@ UIControlMeasureLite.prototype.update = function() {
 
 UIControlMeasureLite.prototype.updateLink = function() {
     /*
-    var linkValue =  this.browser.getLinkWithCurrentPos();
+    const linkValue =  this.browser.getLinkWithCurrentPos();
     if (this.list.getElement().value != linkValue) {
         this.list.getElement().value = linkValue;
     }*/

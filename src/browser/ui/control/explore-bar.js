@@ -1,5 +1,5 @@
 
-var ExploreBar = function(browser) {
+const ExploreBar = function(browser) {
     this.browser = browser;
 
     // state properties
@@ -32,7 +32,7 @@ ExploreBar.prototype.init = function() {
 };
 
 
-ExploreBar.prototype.positionChanged = function(event) {
+ExploreBar.prototype.positionChanged = function(/*event*/) {
 
 };
 

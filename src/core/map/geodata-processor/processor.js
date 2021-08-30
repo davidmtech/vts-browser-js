@@ -1,5 +1,5 @@
 
-var MapGeodataProcessor = function(surface, listener) {
+const MapGeodataProcessor = function(surface, listener) {
     this.layer = surface;
     this.map = surface.map;
     this.renderer = this.map.renderer;
@@ -14,12 +14,12 @@ var MapGeodataProcessor = function(surface, listener) {
 
 
     // eslint-disable-next-line
-    var worker = require('worker-loader?inline&fallback=false!./worker-main');
-    //var worker = require('worker-loader?!./worker-main');
+    const worker = require('worker-loader?inline&fallback=false!./worker-main');
+    //const worker = require('worker-loader?!./worker-main');
 
     //debug worker
     this.processWorker = new worker;
-    
+
     this.processWorker.onerror = function(event){
         throw new Error(event.message + ' (' + event.filename + ':' + event.lineno + ')');
     };
@@ -60,8 +60,8 @@ MapGeodataProcessor.prototype.onMessage = function(message, direct) {
     if (!direct) {
         message = message.data;
     }
-    
-    var command = message['command'];
+
+    const command = message['command'];
 
     //console.log('onmessage ' + command);
 
@@ -72,19 +72,19 @@ MapGeodataProcessor.prototype.onMessage = function(message, direct) {
     } else if (command == 'styleDone') {
         this.busy = false;
     } else if (command == 'loadBitmaps') {
-        var bitmaps = message['bitmaps'];
+        const bitmaps = message['bitmaps'];
 
-        for (var key in bitmaps) {
-            var bitmap = bitmaps[key];
+        for (let key in bitmaps) {
+            const bitmap = bitmaps[key];
             this.renderer.getBitmap(bitmap['url'], bitmap['filter'] || 'linear', bitmap['tiled'] || false, bitmap['hash'], true);
         }
     }
 
     if (this.listener != null) {
         if (command == 'packed-events') {
-            var messages = message['messages'];
+            const messages = message['messages'];
 
-            for (var i = 0, li = messages.length; i < li; i++) {
+            for (let i = 0, li = messages.length; i < li; i++) {
                 this.onMessage(messages[i], true);
             }
 
@@ -107,12 +107,12 @@ MapGeodataProcessor.prototype.sendCommand = function(command, data, tile, dpr) {
     }
 
     this.ready = false;
-    
-    var message = {'command': command, 'data':data};
+
+    const message = {'command': command, 'data':data};
 
     //console.log('sendCommand ' + command);
-    
-    if (tile && tile.id) { 
+
+    if (tile && tile.id) {
         message['lod'] = tile.id[0];
         message['ix'] = tile.id[1];
         message['iy'] = tile.id[2];
@@ -130,6 +130,7 @@ MapGeodataProcessor.prototype.sendCommand = function(command, data, tile, dpr) {
     this.processWorker.postMessage(message);
 };
 
+// eslint-disable-next-line
 MapGeodataProcessor.prototype.setStylesheet = function(stylesheet, fontsOnly) {
     this.stylesheet = stylesheet;
 
@@ -140,11 +141,11 @@ MapGeodataProcessor.prototype.setStylesheet = function(stylesheet, fontsOnly) {
 
     this.busy = true;
 
-    var ppi = 96 * (window.devicePixelRatio || 1);
-    var config = this.map.config;
-    var params = config.mapFeaturesReduceParams;
-    var isDef = (function(val){ return (typeof val !== 'undefined') });
-    var rmode = config.mapFeaturesReduceMode;
+    const ppi = 96 * (window.devicePixelRatio || 1);
+    const config = this.map.config;
+    const isDef = (function(val){ return (typeof val !== 'undefined') });
+    const rmode = config.mapFeaturesReduceMode;
+    let params = config.mapFeaturesReduceParams;
 
 
     switch (rmode) {
@@ -213,7 +214,7 @@ MapGeodataProcessor.prototype.setStylesheet = function(stylesheet, fontsOnly) {
             break;
 
     }
-    
+
     config.mapFeaturesReduceParams = params;
     config.mapFeaturesReduceFactor = params[2];
     config.mapFeaturesReduceFactor2 = params[3];
@@ -228,12 +229,12 @@ MapGeodataProcessor.prototype.setStylesheet = function(stylesheet, fontsOnly) {
                                         'reduceParams': config.mapFeaturesReduceParams,
                                         'log': config.mapLogGeodataStyles } );
 
-    var fonts = stylesheet.fonts;
-    var fontMap = {}; //'#default' : '#default' };
+    const fonts = stylesheet.fonts;
+    const fontMap = {}; //'#default' : '#default' };
 
-    for (var key in fonts) {
-        var fontUrl = fonts[key];
-        var font = this.renderer.fonts[fontUrl];
+    for (let key in fonts) {
+        const fontUrl = fonts[key];
+        const font = this.renderer.fonts[fontUrl];
         fontMap[key] = fontUrl;
 
         if (font) {

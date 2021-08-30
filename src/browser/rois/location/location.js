@@ -1,10 +1,17 @@
+
+import {Roi as Roi_} from '../roi';
+
+//get rid of compiler mess
+const  Roi = Roi_;
+
+
 /**
  * Photo class - specific Roi type class for rendering simple photo.
  * @constructor
  * @final
  * @extends {Roi}
  */
-var RoiLocation = function(config, core, options) {
+const RoiLocation = function(config, core, options) {
     this.navExtents = null;
     this.navControl = null;
 
@@ -33,11 +40,11 @@ RoiLocation.prototype.processConfig = function() {
         return;
     }
 
-    var err = null;
+    let err = null;
     if (typeof this.config['location'] !== 'object'
         || this.config['location'] === null) {
         err = new Error('Missing (or type error) location key in config JSON');
-    } else if (!this.config['location']['navControl'] instanceof Array
+    } else if (!(this.config['location']['navControl'] instanceof Array)
         || this.config['location']['navExtents'].length !== 4) {
         err = new Error('Missing (or type error) location.navExtents in config JSON');
     } else if (typeof this.config['location']['navControl'] !== 'string') {

@@ -3,14 +3,14 @@
 import {utils as utils_} from '../utils/utils';
 
 //get rid of compiler mess
-//var GpuTexture = GpuTexture_;
-var utils = utils_;
+//const GpuTexture = GpuTexture_;
+const utils = utils_;
 
 
-var RendererFont = function(gpu, core, font, size, path) {
+const RendererFont = function(renderer, core, font, size, path) {
     this.bbox = null;
-    this.gpu = gpu;
-    this.gl = gpu.gl;
+    this.renderer = renderer;
+    this.gpu = renderer.gpu;
     this.core = core;
 
     this.data = null;
@@ -56,16 +56,17 @@ RendererFont.prototype.onError = function() {
 RendererFont.prototype.onFileLoaded = function(index, data) {
     this.core.markDirty();
     //this.textures[index].createFromData(256, 256, new Uint8Array(data), 'linear');
-    this.textures[index] =  this.map.renderer.createDataTexture({ data: new Uint8Array(data), width: 256, height: 256 });
+    //this.textures[index] =  this.renderer.createDataTexture({ data: new Uint8Array(data), width: 256, height: 256 });
+    this.textures[index] =  this.renderer.gpu.createTexture({ data: new Uint8Array(data), width: 256, height: 256, filter: 'linear' });
 };
 
 RendererFont.prototype.onFileLoadError = function() {
 };
 
 RendererFont.prototype.areTexturesReady = function(files) {
-    var ready = true;
-    for (var i = 0, li = files.length; i < li; i++) {
-        var index = files[i];//Math.round( (planes[i] - (planes[i] % 3)) );
+    let ready = true;
+    for (let i = 0, li = files.length; i < li; i++) {
+        const index = files[i];//Math.round( (planes[i] - (planes[i] % 3)) );
 
         if (!this.textures[index]) {
             utils.loadBinary(this.path + (index+2), this.onFileLoaded.bind(this, index), this.onFileLoadError.bind(this));

@@ -1,12 +1,13 @@
 
 import Dom_ from '../../utility/dom';
-var dom = Dom_;
-
 import {constrainMapPosition as constrainMapPosition_} from '../../control-mode/map-observer';
-var constrainMapPosition = constrainMapPosition_;
+
+//get rid of compiler mess
+const dom = Dom_;
+const constrainMapPosition = constrainMapPosition_;
 
 
-var UIControlSpace = function(ui, visible, visibleLock) {
+const UIControlSpace = function(ui, visible, visibleLock) {
     this.ui = ui;
     this.browser = ui.browser;
     this.control = this.ui.addControl('space',
@@ -22,7 +23,7 @@ var UIControlSpace = function(ui, visible, visibleLock) {
           + ' src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAB8klEQVRIx+1Uv4sTQRT+3mRygyDInYXFabaxsRNOIiG7mEPQxsJCLQVF8AeiaCNWigrWiniCVfA/0Eo4ONnZ4P4FURAL9yyCEMQfRMzs7LOZk2HZxNgIQr7qzbw373t838wAc8zxX4P8RbvdPimEuMLM+4loAcAmM3eTJLkHgAEgiiIu9SgAfAfwBsCa1rpbJqltBWEYXhBCdAE0HEENwBIRrQZBQFmWvQKAIAhuVwyqAOwGcLzRaOzIsuylXyB+VxKdc+FTY8yyMWZbURSn3N7l8nRaa9Ja03A4XCiKosHMtwAwEV0Lw/BQJYnW+oAxZu9oNLqUpulASrmdiPa49GCS3v1+3/R6vc0kSe4AeOIGPu/XSH+Rpul7J906ER0GAGYeADgzi8F5nj+QUl5k5tZEEk+6fV6sfO+mgZk/uDO7KuUqYcUYswTgGYBFAPf/8tbW/kiitR6kafqZma+7CVdmbL7s6j9VyhVF0QtmbuV5fnDLm/F4rJRSICKehaFerx9zcr2uJGHmn0S0U0r5uNlsnlVKWQCPXG5jSm/R6XQWrbUnANx1JGuTjL/JzEeJ6IhS6qNH/kUIcaPc2X/51lo/9TCO441KT5IkeWetXQWwDuAHgG/M/BxAK47jt9MuFYCvAHpFUZzWWl+d/9Zz/Dv8ApJPyD0fWCwOAAAAAElFTkSuQmCC">'
 
      + ' </div>', visible, visibleLock);
-     
+
     this.button2D = this.control.getElement('vts-space-2d');
     this.button2D.on('click', this.onSwitch.bind(this));
     this.button2D.on('dblclick', this.onDoNothing.bind(this));
@@ -45,14 +46,14 @@ var UIControlSpace = function(ui, visible, visibleLock) {
 
 
 UIControlSpace.prototype.onDoNothing = function(event) {
-    dom.stopPropagation(event);    
+    dom.stopPropagation(event);
 };
 
 
 UIControlSpace.prototype.onSwitch = function() {
     this.space3D = !this.space3D;
 
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
@@ -62,8 +63,8 @@ UIControlSpace.prototype.onSwitch = function() {
         this.browser.autopilot.setAutopan(0,0);
     }
 
-    var pos = map.getPosition();
-    var orientation = pos.getOrientation();
+    let pos = map.getPosition();
+    let orientation = pos.getOrientation();
 
     if (this.space3D) {
         orientation[0] = 45;
@@ -79,21 +80,21 @@ UIControlSpace.prototype.onSwitch = function() {
 
     pos = constrainMapPosition(this.browser, pos);
     map.setPosition(pos);
-    
+
     this.update();
 };
 
 
 UIControlSpace.prototype.update = function() {
-    var map = this.browser.getMap();
+    const map = this.browser.getMap();
     if (!map) {
         return;
     }
 
-    var pos = map.getPosition();
-    var orientation = pos.getOrientation();
+    const pos = map.getPosition();
+    const orientation = pos.getOrientation();
 
-    var space3D = (Math.abs(orientation[1]+90) > 0.1);
+    const space3D = (Math.abs(orientation[1]+90) > 0.1);
 
     if (space3D != this.display3D) {
         if (space3D) {

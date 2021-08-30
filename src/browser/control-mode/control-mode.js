@@ -4,12 +4,12 @@ import {ControlModeMapObserver as ControlModeMapObserver_} from './map-observer'
 import ControlModePano_ from './pano';
 
 //get rid of compiler mess
-var ControlModeDisabled = ControlModeDisabled_;
-var ControlModeMapObserver = ControlModeMapObserver_;
-var ControlModePano = ControlModePano_;
+const ControlModeDisabled = ControlModeDisabled_;
+const ControlModeMapObserver = ControlModeMapObserver_;
+const ControlModePano = ControlModePano_;
 
 
-var ControlMode = function(browser) {
+const ControlMode = function(browser) {
     this.browser = browser;
     this.ui = browser.ui;
     this.mapControl = this.ui.getMapControl();
@@ -59,7 +59,7 @@ ControlMode.prototype.removeControlMode = function(id) {
 
 
 ControlMode.prototype.setCurrentControlMode = function(id, options) {
-    var newMode = this.controlModes[id];
+    const newMode = this.controlModes[id];
     if (!newMode) {
         return;
     }
@@ -157,7 +157,7 @@ ControlMode.prototype.onDoubleClick = function(event) {
 
 ControlMode.prototype.onTick = function(event) {
     if (this.currentControlMode['tick']) {
-        event.draggingState = this.mapElement.getDraggingState();    
+        event.draggingState = this.mapElement.getDraggingState();
         this.currentControlMode['tick'](event);
     }
 };

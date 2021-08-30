@@ -1,4 +1,4 @@
-import Proj4 from 'melowntech-proj4';
+//import Proj4 from 'melowntech-proj4';
 import Map_ from './map/map';
 import Inspector_ from './inspector/inspector';
 import Renderer_ from './renderer/renderer';
@@ -10,19 +10,19 @@ import {utilsUrl as utilsUrl_} from './utils/url';
 import {platform as platform_} from './utils/platform';
 
 //get rid of compiler mess
-var Map = Map_;
-var Inspector = Inspector_;
-var Renderer = Renderer_;
-var RendererInterface = RendererInterface_;
-var MapPosition = MapPosition_;
-var MapInterface = MapInterface_;
-var utils = utils_;
-var utilsUrl = utilsUrl_;
-var platform = platform_;
+const Map = Map_;
+const Inspector = Inspector_;
+const Renderer = Renderer_;
+const RendererInterface = RendererInterface_;
+const MapPosition = MapPosition_;
+const MapInterface = MapInterface_;
+const utils = utils_;
+const utilsUrl = utilsUrl_;
+const platform = platform_;
 
 
-var Core = function(element, config, coreInterface) {
-    var lang = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+const Core = function(element, config, coreInterface) {
+    const lang = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
     this.killed = false;
     this.config = {
         map : null,
@@ -114,6 +114,7 @@ var Core = function(element, config, coreInterface) {
         mapLogGeodataStyles: true,
         mapBenevolentMargins: false,
 
+        rendererDevice : 'webgl',
         rendererAnisotropic : 0,
         rendererAntialiasing : true,
         rendererAllowScreenshots : false,
@@ -139,7 +140,7 @@ var Core = function(element, config, coreInterface) {
     this.mapInterface = null;
     this.renderer = new Renderer(this, this.element, null, this.onResize.bind(this), this.config);
     this.rendererInterface = new RendererInterface(this.renderer);
-    this.proj4 = Proj4;
+    this.proj4 = this.coreInterface.proj4 ;//Proj4;
     this.contextLost = false;
 
     //platform detection
@@ -196,13 +197,13 @@ Core.prototype.loadMap = function(path) {
     this.tokenCanBeSkiped = true;
     this.mapRunnig = false;
 
-    var onLoaded = (function() {
+    const onLoaded = (function() {
         if (!(this.tokenCookieLoaded || this.tokenCanBeSkiped) || !this.mapConfigData || this.mapRunnig) {
             return;
         }
 
         this.mapRunnig = true;
-        var data = this.mapConfigData;
+        const data = this.mapConfigData;
 
         this.callListener('map-mapconfig-loaded', data);
 
@@ -223,17 +224,17 @@ Core.prototype.loadMap = function(path) {
 
     }).bind(this);
 
-    var onMapConfigLoaded = (function(data) {
+    const onMapConfigLoaded = (function(data) {
         this.mapConfigData = data;
         onLoaded();
     }).bind(this);
 
-    var onMapConfigError = (function() {
+    const onMapConfigError = (function() {
     }).bind(this);
 
     //this.tokenLoaded = true;
 
-    var onAutorizationLoaded = (function(data) {
+    const onAutorizationLoaded = (function(data) {
         if (!data || (data && data['status'])) {
             if (this.tokenCanBeSkiped) {
                 onLoadMapconfig(path);
@@ -269,7 +270,7 @@ Core.prototype.loadMap = function(path) {
 
     }).bind(this);
 
-    var onAutorizationError = (function() {
+    const onAutorizationError = (function() {
         // eslint-disable-next-line
         console.log('auth token not loaded');
 
@@ -278,29 +279,29 @@ Core.prototype.loadMap = function(path) {
         }
     }).bind(this);
 
-    var onImageCookieLoaded = (function() {
+    const onImageCookieLoaded = (function() {
         document.body.removeChild(this.tokenIFrame);
         this.tokenIFrame = null;
         this.tokenCookieLoaded = true;
         onLoaded();
     }).bind(this);
 
-    /*var onImageCookieError = (function() {
+    /*const onImageCookieError = (function() {
         // eslint-disable-next-line
         console.log('auth cookie not loaded');
     }).bind(this);*/
 
-    //var baseUrl = path.split('?')[0].split('/').slice(0, -1).join('/')+'/';
+    //const baseUrl = path.split('?')[0].split('/').slice(0, -1).join('/')+'/';
 
-    var onLoadMapconfig = (function(path) {
+    const onLoadMapconfig = (function(path) {
         utils.loadJSON(path, onMapConfigLoaded, onMapConfigError, null, utils.useCredentials, this.xhrParams);
     }).bind(this);
 
-    var onLoadImageCookie = (function(url, originUrl) {
+    const onLoadImageCookie = (function(url, originUrl) {
         url = utilsUrl.getProcessUrl(url, originUrl);
         this.tokenCookieHost = utilsUrl.getHost(url);
         //utils.loadImage(url, onImageCookieLoaded, onImageCookieError);
-        var iframe = document.createElement('iframe');
+        const iframe = document.createElement('iframe');
         this.tokenIFrame = iframe;
         iframe.onload = onImageCookieLoaded;
         iframe.src = url;
@@ -403,9 +404,9 @@ Core.prototype.once = function(name, listener, wait) {
 
 // private
 Core.prototype.callListener = function(name, event, log) {
-    for (var i = 0; i < this.listeners.length; i++) {
+    for (let i = 0; i < this.listeners.length; i++) {
         if (this.listeners[i].name == name) {
-            var listener = this.listeners[i];
+            const listener = this.listeners[i];
 
             if (listener.wait > 0) {
                 listener.wait--;
@@ -427,7 +428,7 @@ Core.prototype.callListener = function(name, event, log) {
 
 // private
 Core.prototype.removeListener = function(id) {
-    for (var i = 0; i < this.listeners.length; i++) {
+    for (let i = 0; i < this.listeners.length; i++) {
         if (this.listeners[i].id == id) {
             //this.listeners[i].splice(i, 1);
             this.listeners.splice(i, 1);
@@ -470,7 +471,7 @@ Core.prototype.onUpdate = function() {
 
 Core.prototype.setConfigParams = function(params, solveStorage) {
     if (typeof params === 'object' && params !== null) {
-        for (var key in params) {
+        for (let key in params) {
             this.setConfigParam(key, params[key], solveStorage);
         }
     }
@@ -566,6 +567,7 @@ Core.prototype.getConfigParam = function(key) {
 
 Core.prototype.setRendererConfigParam = function(key, value) {
     switch (key) {
+    case 'rendererDevice':             this.config.rendererDevice = utils.validateString(value, 'webgl'); break;
     case 'rendererAnisotropic':        this.config.rendererAnisotropic = utils.validateNumber(value, -1, 2048, 0); if (this.rederer) this.rederer.gpu.setAniso(this.config.rendererAnisotropic); break;
     case 'rendererAntialiasing':       this.config.rendererAntialiasing = utils.validateBool(value, true); break;
     case 'rendererAllowScreenshots':   this.config.rendererAllowScreenshots = utils.validateBool(value, false); break;
@@ -575,6 +577,7 @@ Core.prototype.setRendererConfigParam = function(key, value) {
 
 Core.prototype.getRendererConfigParam = function(key) {
     switch (key) {
+    case 'rendererDevice':             return this.config.rendererDevice;
     case 'rendererAnisotropic':        return this.config.rendererAnisotropic;
     case 'rendererAntialiasing':       return this.config.rendererAntialiasing;
     case 'rendererAllowScreenshots':   return this.config.rendererAllowScreenshots;
@@ -588,7 +591,7 @@ string getCoreVersion()
 */
 
 function getCoreVersion(full) {
-    return (full ? 'Core: ' : '') + '2.23.12';
+    return (full ? 'Core: ' : '') + '2.30.0';
 }
 
 
@@ -602,7 +605,7 @@ function checkSupport() {
     platform.init();
 
     //is webgl supported
-    var canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
 
     if (canvas == null) {
         return false;
@@ -615,7 +618,7 @@ function checkSupport() {
         return false;
     }
 
-    var gl = null;
+    let gl = null;
 
     try {
         gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');

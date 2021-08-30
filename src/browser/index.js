@@ -10,17 +10,17 @@ import BrowserInterface_ from './interface';
 import Dom_ from './utility/dom';
 
 //get rid of compiler mess
-var getCoreVersion = getCoreVersion_, checkSupport = checkSupport_;
-var vec2 = vec2_, vec3 = vec3_, vec4 = vec4_, mat3 = mat3_, mat4 = mat4_;
-var utils = utils_;
-var dom = Dom_;
-var math = math_;
-var BrowserInterface = BrowserInterface_;
-var proj4 = Proj4;
-var platform = platform_;
+const getCoreVersion = getCoreVersion_, checkSupport = checkSupport_;
+const vec2 = vec2_, vec3 = vec3_, vec4 = vec4_, mat3 = mat3_, mat4 = mat4_;
+const utils = utils_;
+const dom = Dom_;
+const math = math_;
+const BrowserInterface = BrowserInterface_;
+const proj4 = Proj4;
+const platform = platform_;
 
 function browser (element, config) {
-    var browserInterface = new BrowserInterface(element, config);
+    const browserInterface = new BrowserInterface(element, config);
     return browserInterface.core ? browserInterface : null;
 }
 

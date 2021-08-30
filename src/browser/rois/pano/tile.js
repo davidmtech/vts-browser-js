@@ -1,6 +1,6 @@
 
 
-var RoiPanoTile = function(face, position, index, lod, scale, url) {
+const RoiPanoTile = function(face, position, index, lod, scale, url) {
     this.face = face;
     this.position = [position[0], position[1]];
     this.index = [index[0], index[1]];

@@ -1,5 +1,5 @@
 
-var BBox = function(xmin, ymin, zmin, xmax, ymax, zmax) {
+const BBox = function(xmin, ymin, zmin, xmax, ymax, zmax) {
     this.min = [];
     this.max = [];
 
@@ -53,7 +53,7 @@ BBox.prototype.center = function(vec) {
             if (isNaN(this.middle[2])) {
                 this.middle[2] = 0;
             }
-        } 
+        }
 
         return this.middle;
     }
@@ -67,4 +67,3 @@ BBox.prototype.translateXY = function(delta) {
 
 
 export default BBox;
-

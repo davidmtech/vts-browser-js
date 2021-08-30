@@ -10,18 +10,18 @@ import MapVirtualSurface_ from './virtual-surface';
 import MapStylesheet_ from './stylesheet';
 
 //get rid of compiler mess
-var MapCredit = MapCredit_;
-var MapBoundLayer = MapBoundLayer_;
-var MapRefFrame = MapRefFrame_;
-var MapView = MapView_;
-var MapSrs = MapSrs_;
-var MapBody = MapBody_;
-var MapSurface = MapSurface_;
-var MapVirtualSurface = MapVirtualSurface_;
-var MapStylesheet = MapStylesheet_;
+const MapCredit = MapCredit_;
+const MapBoundLayer = MapBoundLayer_;
+const MapRefFrame = MapRefFrame_;
+const MapView = MapView_;
+const MapSrs = MapSrs_;
+const MapBody = MapBody_;
+const MapSurface = MapSurface_;
+const MapVirtualSurface = MapVirtualSurface_;
+const MapStylesheet = MapStylesheet_;
 
 
-var MapConfig = function(map, config) {
+const MapConfig = function(map, config) {
     this.map = map;
     this.mapConfig = config;
     this.parseConfig();
@@ -30,15 +30,15 @@ var MapConfig = function(map, config) {
 
 MapConfig.prototype.parseConfig = function() {
     if (!(this.parseSrses() && this.parseBodies() && this.parseReferenceFrame() &&
-          this.parseCredits() && this.parseStylesheets() && 
-          this.parseSurfaces() && this.parseGlues() && 
+          this.parseCredits() && this.parseStylesheets() &&
+          this.parseSurfaces() && this.parseGlues() &&
           this.parseVirtualSurfaces() && this.parseBoundLayers() &&
           this.parseFreeLayers() && this.parseViews() &&
           this.parseParams() && this.parseBrowserOptions() )) {
         //wrong config file
     }
 
-    var stats = this.map.stats;
+    const stats = this.map.stats;
     stats.loadedCount = 0;
     stats.loadErrorCount = 0;
     stats.loadFirst = performance.now();
@@ -56,14 +56,14 @@ MapConfig.prototype.afterConfigParsed = function() {
 
 
 MapConfig.prototype.parseSrses = function() {
-    var srses = this.mapConfig['srses'];
+    const srses = this.mapConfig['srses'];
     this.map.srses = {};
 
     if (srses == null) {
         return false;
     }
 
-    for (var key in srses) {
+    for (let key in srses) {
         this.map.addSrs(key, new MapSrs(this.map, key, srses[key]));
     }
 
@@ -72,14 +72,14 @@ MapConfig.prototype.parseSrses = function() {
 
 
 MapConfig.prototype.parseBodies = function() {
-    var bodies = this.mapConfig['bodies'];
+    const bodies = this.mapConfig['bodies'];
     this.map.bodies = {};
 
     if (bodies == null) {
         return true;//false;
     }
 
-    for (var key in bodies) {
+    for (let key in bodies) {
         this.map.addBody(key, new MapBody(this.map, bodies[key]));
     }
 
@@ -88,7 +88,7 @@ MapConfig.prototype.parseBodies = function() {
 
 
 MapConfig.prototype.parseReferenceFrame = function() {
-    var rf = this.mapConfig['referenceFrame'];
+    const rf = this.mapConfig['referenceFrame'];
 
     if (rf == null) {
         return false;
@@ -105,14 +105,14 @@ MapConfig.prototype.parseReferenceFrame = function() {
 
 
 MapConfig.prototype.parseCredits = function() {
-    var credits = this.mapConfig['credits'];
+    const credits = this.mapConfig['credits'];
     this.map.credits = {};
 
     if (credits == null) {
         return false;
     }
 
-    for (var key in credits) {
+    for (let key in credits) {
         this.map.addCredit(key, new MapCredit(this.map, credits[key]));
     }
 
@@ -121,15 +121,15 @@ MapConfig.prototype.parseCredits = function() {
 
 
 MapConfig.prototype.parseSurfaces = function() {
-    var surfaces = this.mapConfig['surfaces'];
+    const surfaces = this.mapConfig['surfaces'];
     this.map.surfaces = [];
 
     if (surfaces == null) {
         return false;
     }
 
-    for (var i = 0, li = surfaces.length; i < li; i++) {
-        var surface = new MapSurface(this.map, surfaces[i]);
+    for (let i = 0, li = surfaces.length; i < li; i++) {
+        const surface = new MapSurface(this.map, surfaces[i]);
         this.map.addSurface(surface.id, surface);
     }
 
@@ -138,7 +138,7 @@ MapConfig.prototype.parseSurfaces = function() {
 
 
 MapConfig.prototype.parseVirtualSurfaces = function() {
-    var surfaces = this.mapConfig['virtualSurfaces'];
+    const surfaces = this.mapConfig['virtualSurfaces'];
     this.map.virtualSurfaces = [];
 
     if (!this.map.config.mapVirtualSurfaces) {
@@ -149,8 +149,8 @@ MapConfig.prototype.parseVirtualSurfaces = function() {
         return true;
     }
 
-    for (var i = 0, li = surfaces.length; i < li; i++) {
-        var surface = new MapVirtualSurface(this.map, surfaces[i]);
+    for (let i = 0, li = surfaces.length; i < li; i++) {
+        const surface = new MapVirtualSurface(this.map, surfaces[i]);
         this.map.virtualSurfaces[surface.strId] = surface;
     }
 
@@ -159,16 +159,16 @@ MapConfig.prototype.parseVirtualSurfaces = function() {
 
 
 MapConfig.prototype.parseViews = function() {
-    var views = this.mapConfig['namedViews'];
+    const views = this.mapConfig['namedViews'];
     this.map.namedViews = [];
 
     if (views) {
-        for (var key in views) {
+        for (let key in views) {
             this.map.addNamedView(key, new MapView(this.map, views[key], true));
         }
     }
 
-    var view = this.mapConfig['view'];
+    let view = this.mapConfig['view'];
 
     if (typeof view === 'string') {
         view = this.map.namedViews[view];
@@ -186,15 +186,15 @@ MapConfig.prototype.parseViews = function() {
 
 
 MapConfig.prototype.parseGlues = function() {
-    var glues = this.mapConfig['glue'];
+    const glues = this.mapConfig['glue'];
     this.map.glues = [];
 
     if (glues == null) {
         return true;
     }
 
-    for (var i = 0, li = glues.length; i < li; i++) {
-        var surface = new MapSurface(this.map, glues[i], 'glue');
+    for (let i = 0, li = glues.length; i < li; i++) {
+        const surface = new MapSurface(this.map, glues[i], 'glue');
         this.map.addGlue(surface.id.join(';'), surface);
     }
 
@@ -203,15 +203,15 @@ MapConfig.prototype.parseGlues = function() {
 
 
 MapConfig.prototype.parseBoundLayers = function() {
-    var layers = this.mapConfig['boundLayers'];
+    const layers = this.mapConfig['boundLayers'];
     this.map.boundLayers = [];
 
     if (layers == null) {
         return true;
     }
 
-    for (var key in layers) {
-        var layer = new MapBoundLayer(this.map, layers[key], key);
+    for (let key in layers) {
+        const layer = new MapBoundLayer(this.map, layers[key], key);
         this.map.addBoundLayer(key, layer);
     }
 
@@ -220,15 +220,15 @@ MapConfig.prototype.parseBoundLayers = function() {
 
 
 MapConfig.prototype.parseFreeLayers = function() {
-    var layers = this.mapConfig['freeLayers'];
+    const layers = this.mapConfig['freeLayers'];
     this.map.freeLayers = [];
 
     if (layers == null) {
         return true;
     }
 
-    for (var key in layers) {
-        var layer = new MapSurface(this.map, layers[key], 'free');
+    for (let key in layers) {
+        const layer = new MapSurface(this.map, layers[key], 'free');
         this.map.addFreeLayer(key, layer);
     }
 
@@ -237,15 +237,15 @@ MapConfig.prototype.parseFreeLayers = function() {
 
 
 MapConfig.prototype.parseStylesheets = function() {
-    var styles = this.mapConfig['stylesheets'];
+    const styles = this.mapConfig['stylesheets'];
     this.map.stylesheets = [];
 
     if (styles == null) {
         return true;
     }
 
-    for (var key in styles) {
-        var style = new MapStylesheet(this.map, key, styles[key]);
+    for (let key in styles) {
+        const style = new MapStylesheet(this.map, key, styles[key]);
         this.map.addStylesheet(key, style);
     }
 
@@ -259,20 +259,20 @@ MapConfig.prototype.parseParams = function() {
 
 
 MapConfig.prototype.parseBrowserOptions = function() {
-    var options = this.mapConfig['browserOptions'];
+    const options = this.mapConfig['browserOptions'];
     this.map.browserOptions = {};
-    
+
     if (options == null) {
         return true;
     }
-    
+
     this.map.browserOptions = JSON.parse(JSON.stringify(options));
     return true;
 };
 
 
 MapConfig.prototype.cloneConfig = function() {
-    var json = JSON.parse(JSON.stringify(this.mapConfig));
+    const json = JSON.parse(JSON.stringify(this.mapConfig));
     return json;
 };
 

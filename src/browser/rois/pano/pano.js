@@ -1,12 +1,19 @@
 
 import RoiLoadingQueue_ from '../loader';
+import RoiPanoTile_ from './tile';
 import {math as math_} from '../../../core/utils/math';
 import {mat4 as mat4_} from '../../../core/utils/matrix';
 
 //get rid of compiler mess
-var RoiLoadingQueue = RoiLoadingQueue_;
-var math = math_;
-var mat4 = mat4_;
+const RoiLoadingQueue = RoiLoadingQueue_;
+const RoiPanoTile = RoiPanoTile_;
+const math = math_;
+const mat4 = mat4_;
+
+import {Roi as Roi_} from '../roi';
+
+//get rid of compiler mess
+const  Roi = Roi_;
 
 
 /**
@@ -15,7 +22,7 @@ var mat4 = mat4_;
  * @final
  * @extends {Roi}
  */
-var RoiPano = function(config, core, options) {
+const RoiPano = function(config, core, options) {
     this.cubeTree = [];
 
     // Cube face index constants
@@ -61,7 +68,7 @@ RoiPano.prototype.constructor = RoiPano;
 
 // Translates face constant int to face string
 RoiPano.faceTitle = function(index) {
-    var title = '';
+    let title = '';
     switch (index) {
         default:
         case 0: title = 'front'; break;
@@ -91,20 +98,20 @@ RoiPano.prototype.processConfig = function() {
         return;
     }
 
-    var err = null;
+    let err = null;
     if (typeof this.config['pano'] !== 'object'
         || this.config['pano'] === null) {
         err = new Error('Missing (or type error) pano key in config JSON');
-    } else if (!this.config['pano']['orientation'] instanceof Array
+    } else if (!(this.config['pano']['orientation'] instanceof Array)
         || this.config['pano']['orientation'].length !== 3) {
         err = new Error('Missing (or type error) pano.orientation in config JSON');
-    } else if (!this.config['pano']['navExtents'] instanceof Array
+    } else if (!(this.config['pano']['navExtents'] instanceof Array)
         || this.config['pano']['navExtents'].length !== 4) {
         err = new Error('Missing (or type error) pano.navExtents in config JSON');
-    } else if (!this.config['pano']['imageSize'] instanceof Array
+    } else if (!(this.config['pano']['imageSize'] instanceof Array)
         || this.config['pano']['imageSize'].length !== 2) {
         err = new Error('Missing (or type error) pano.imageSize in config JSON');
-    } else if (!this.config['pano']['tileSize'] instanceof Array
+    } else if (!(this.config['pano']['tileSize'] instanceof Array)
         || this.config['pano']['tileSize'].length !== 2) {
         err = new Error('Missing (or type error) pano.tileSize in config JSON');
     } else if (typeof this.config['pano']['lodCount'] !== 'number'
@@ -136,13 +143,13 @@ RoiPano.prototype.initFinalize = function() {
     this.tilesOnLod0 = Math.ceil(this.imageSize / this.tileSize);
     this.tileRelSize = this.tileSize / this.imageSize;
     this.cubeTree = [[], [], [], [], [], []];  // Cube array
-    var index = [0,0];
-    for (var i = 0; i < 6; i++) {
+    let index = [0,0];
+    for (let i = 0; i < 6; i++) {
         index = [0,0];
-        var position = [0.0, 0.0];
-        var arr = this.cubeTree[i];
-        for (var j = 0; j < this.tilesOnLod0; j++) {
-            for (var k = 0; k < this.tilesOnLod0; k++) {
+        const position = [0.0, 0.0];
+        const arr = this.cubeTree[i];
+        for (let j = 0; j < this.tilesOnLod0; j++) {
+            for (let k = 0; k < this.tilesOnLod0; k++) {
                 arr.push(this.prepareTile(i, position, index, 0));
                 position[1] += this.tileRelSize;
                 index[1]++;
@@ -158,13 +165,13 @@ RoiPano.prototype.initFinalize = function() {
 
     // orient cube
     this.cubeOrientationMatrix = math.rotationMatrix(2, math.radians(-this.cubeOrientation[2]));
-    var rotateY = math.rotationMatrix(1, math.radians(-this.cubeOrientation[1]));
-    var rotateX = math.rotationMatrix(0, math.radians(-this.cubeOrientation[0]));
+    const rotateY = math.rotationMatrix(1, math.radians(-this.cubeOrientation[1]));
+    const rotateX = math.rotationMatrix(0, math.radians(-this.cubeOrientation[0]));
     mat4.multiply(this.cubeOrientationMatrix, rotateY, this.cubeOrientationMatrix);
     mat4.multiply(this.cubeOrientationMatrix, rotateX, this.cubeOrientationMatrix);
 
     // prepare face matrices
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         this.faceMatrices.push(this.faceMatrix(i));
     }
 };
@@ -183,20 +190,20 @@ RoiPano.prototype.update = function() {
     }
 
     // get view projection matric
-    var vpMat = this.map.getCameraInfo().viewProjectionMatrix;
+    const vpMat = this.map.getCameraInfo().viewProjectionMatrix;
     // calc zoom (suitable lod)
-    var useLod = this.suitableLod();
+    const useLod = this.suitableLod();
     // console.log('Using lod: ' + useLod);
     // find visible tiles
-    var newTiles = this.visibleTiles(vpMat, useLod);
+    const newTiles = this.visibleTiles(vpMat, useLod);
 
     // check if active tiles changed
-    var changed = false;
+    let changed = false;
     if (this.activeTiles.length !== newTiles.length) {
         changed = true;
     }
     if (!changed) {
-        for (var i in this.activeTiles) {
+        for (let i in this.activeTiles) {
             if (this.activeTiles[i] !== newTiles[i]) {
                 changed = false;
                 break;
@@ -240,17 +247,17 @@ RoiPano.prototype.drawTile = function(tile) {
     }
 
     //  projection-view matrix from map.getCamera()
-    var cam = this.map.getCameraInfo();
-    var pv = cam.viewProjectionMatrix;
+    const cam = this.map.getCameraInfo();
+    const pv = cam.viewProjectionMatrix;
     //  tile (model) matrix
     if (tile.mat === null) {
         this.perepareTileMatrix(tile);
     }
 
-    var mvp = mat4.create();
+    const mvp = mat4.create();
     mat4.identity(mvp);
 
-    var scl = math.scaleMatrix(100,100,100);
+    const scl = math.scaleMatrix(100,100,100);
     mat4.multiply(tile.mat, mvp, mvp);
     mat4.multiply(scl, mvp, mvp);
 
@@ -258,7 +265,7 @@ RoiPano.prototype.drawTile = function(tile) {
     mat4.multiply(pv, mvp, mvp);
 
     // draw tile
-    opts = {};
+    const opts = {};
     opts["mvp"] = mvp;
     opts["texture"] = tile.texture();
     opts["color"] = [255, 255, 255, this.alpha*255];
@@ -268,7 +275,7 @@ RoiPano.prototype.drawTile = function(tile) {
 
 
 RoiPano.prototype.prepareTile = function(face, position, index, lod) {
-    var url = this.tileTemplate.replace('{lod}', lod.toString());
+    let url = this.tileTemplate.replace('{lod}', lod.toString());
     url = url.replace('{face}', RoiPano.faceTitle(face));
     url = url.replace('{row}', index[0]);
     url = url.replace('{column}', index[1]);
@@ -279,8 +286,8 @@ RoiPano.prototype.prepareTile = function(face, position, index, lod) {
     }
 
     // tile scale (if its not regular tile size (last tile in row/col))
-    var tileSize = this.tileRelSize / Math.pow(2, lod);
-    var scale = [tileSize, tileSize];
+    const tileSize = this.tileRelSize / Math.pow(2, lod);
+    const scale = [tileSize, tileSize];
     if (position[0] + tileSize > 1) {
         scale[0] = (position[0] + tileSize) - 1;
     }
@@ -288,15 +295,15 @@ RoiPano.prototype.prepareTile = function(face, position, index, lod) {
         scale[1] = (position[1] + tileSize) - 1;
     }
 
-    var tile = new RoiPanoTile(face, position, index, lod, scale, url);
+    const tile = new RoiPanoTile(face, position, index, lod, scale, url);
 
-    var newIndex = [index[0] * 2, index[1] * 2];
-    var newPosition = [position[0], position[1]];
+    const newIndex = [index[0] * 2, index[1] * 2];
+    const newPosition = [position[0], position[1]];
     lod++;
-    var childrenTs = this.tileRelSize / Math.pow(2, lod);
+    const childrenTs = this.tileRelSize / Math.pow(2, lod);
     if (lod < this.lodCount) {
-        for (var i = 0; i < 4; i++) {
-            var ct = this.prepareTile(face, newPosition, newIndex, lod);
+        for (let i = 0; i < 4; i++) {
+            const ct = this.prepareTile(face, newPosition, newIndex, lod);
             if (ct !== null) {
                 tile.applendChild(ct);
             }
@@ -316,13 +323,13 @@ RoiPano.prototype.prepareTile = function(face, position, index, lod) {
 
 
 RoiPano.prototype.loadActiveTiles = function() {
-    for (var i in this.activeTiles) {
-        var tile = this.activeTiles[i];
+    for (let i in this.activeTiles) {
+        const tile = this.activeTiles[i];
         if (tile.texture() instanceof GpuTexture) { //TODO: fix instanceof GpuTexture
             continue;
         }
 
-        var processClb = function(tile) {
+        const processClb = function(tile) {
             tile.texture(this.renderer.createTexture({source : tile.image()}));
             tile.image(null);
             this.setNeedsRedraw();
@@ -349,19 +356,19 @@ RoiPano.prototype.loadActiveTiles = function() {
 
 
 RoiPano.prototype.suitableLod = function() {
-    var loc = this.map.getPosition();
-    var fov = loc[9];
-    var angle = fov * 0.5;
-    var screenHeight = 768; // TODO get it from Core API
-    var identityTileHeight = this.tileRelSize * screenHeight;
-    var visibleRaito = 1;
+    const loc = this.map.getPosition();
+    const fov = loc[9];
+    const angle = fov * 0.5;
+    const screenHeight = 768; // TODO get it from Core API
+    const identityTileHeight = this.tileRelSize * screenHeight;
+    let visibleRaito = 1;
     if (angle <= 45) {
         visibleRaito = Math.tan(math.radians(angle));
     } else if (angle <= 90) {
         visibleRaito = 1 + Math.tan(math.radians(45 - (angle - 45)));
     }
-    var tileHeight = identityTileHeight * (1 / visibleRaito);
-    var suitableLod = 0;
+    let tileHeight = identityTileHeight * (1 / visibleRaito);
+    let suitableLod = 0;
     while (suitableLod < this.lodCount) {
         if (tileHeight <= this.tileSize) {
             break;
@@ -374,21 +381,21 @@ RoiPano.prototype.suitableLod = function() {
 
 
 RoiPano.prototype.visibleTiles = function(vpMat, lod) {
-    var tiles = [];
+    const tiles = [];
 
-    var recurs = function(tile) {
+    const recurs = function(tile) {
         if (tile.lod === lod || tile.children.length === 0) {
             tiles.push(tile);
             return;
         }
 
-        for (var i in tile.children) {
+        for (let i in tile.children) {
             recurs(tile.children[i]);
         }
     };
 
-    for (var i in this.cubeTree) {
-        for (var j in this.cubeTree[i]) {
+    for (let i in this.cubeTree) {
+        for (let j in this.cubeTree[i]) {
             recurs(this.cubeTree[i][j]);
         }
     }
@@ -398,8 +405,8 @@ RoiPano.prototype.visibleTiles = function(vpMat, lod) {
 
 
 RoiPano.prototype.faceMatrix = function(face) {
-    var ang = [0, 0, 0];
-    var trn = [0, 0, 0];
+    let ang = [0, 0, 0];
+    let trn = [0, 0, 0];
     if (face === this.cubeFront) {
         ang = [90, 180, 180];
         trn = [0, 0, 0.5];
@@ -420,15 +427,15 @@ RoiPano.prototype.faceMatrix = function(face) {
         trn = [0, 0, 0.5];
     }
 
-    var rotX = math.rotationMatrix(0, math.radians(ang[0]));
-    var rotY = math.rotationMatrix(1, math.radians(ang[1]));
-    var rotZ = math.rotationMatrix(2, math.radians(ang[2]));
-    var rot = mat4.create();
+    const rotX = math.rotationMatrix(0, math.radians(ang[0]));
+    const rotY = math.rotationMatrix(1, math.radians(ang[1]));
+    const rotZ = math.rotationMatrix(2, math.radians(ang[2]));
+    const rot = mat4.create();
     mat4.identity(rot);
     mat4.multiply(rotX, rot, rot);
     mat4.multiply(rotY, rot, rot);
     mat4.multiply(rotZ, rot, rot);
-    var trn = math.translationMatrix(trn[0], trn[1], trn[2]);
+    trn = math.translationMatrix(trn[0], trn[1], trn[2]);
     mat4.multiply(rot, trn, trn);
     mat4.multiply(this.cubeOrientationMatrix, trn, trn);
     return trn;
@@ -440,15 +447,15 @@ RoiPano.prototype.perepareTileMatrix = function(tile) {
     mat4.identity(tile.mat);
 
     // 1. tile scale
-    var tscl = math.scaleMatrix(tile.scale[1], tile.scale[0], 1);
+    const tscl = math.scaleMatrix(tile.scale[1], tile.scale[0], 1);
     mat4.multiply(tscl, tile.mat, tile.mat);
 
     // 2. trnaslate to center
-    var ttc = math.translationMatrix(-0.5, -0.5, 0);
+    const ttc = math.translationMatrix(-0.5, -0.5, 0);
     mat4.multiply(ttc, tile.mat, tile.mat);
 
     // 3. position tile in face
-    var tttf = math.translationMatrix(tile.position[1]
+    const tttf = math.translationMatrix(tile.position[1]
                                          , tile.position[0]
                                          , 0);
     mat4.multiply(tttf, tile.mat, tile.mat);

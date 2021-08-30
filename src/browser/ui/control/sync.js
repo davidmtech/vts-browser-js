@@ -1,12 +1,16 @@
 
-var UIControlSync = function(ui, visible, visibleLock) {
+import Dom_ from '../../utility/dom';
+
+//get rid of compiler mess
+const dom = Dom_;
+
+const UIControlSync = function(ui, visible, visibleLock) {
     this.ui = ui;
 
     this.clinets = [];
 
-    var html = '<div>';
-    //var html = '<div class="vts-sync">';
-    var hues = [0, 32, 96, 192, 224, 64]
+    let html = '<div>';
+    const hues = [0, 32, 96, 192, 224, 64]
 
     if (this.ui.browser.config.syncId == '.enter') {
         html += '<div id="vts-sync-popup" style="position:absolute; left:0px; top:0px; width:100%; height: 100%; background-color: rgba(255,255,255,0.7); z-index: 5;">';
@@ -15,7 +19,7 @@ var UIControlSync = function(ui, visible, visibleLock) {
     }
 
 
-    for (var i = 0, li = hues.length; i < li; i++) {
+    for (let i = 0, li = hues.length; i < li; i++) {
         html += '<div id="vts-sync' + i + '" class="vts-sync" style="background: radial-gradient(circle, hsl(' + hues[i] + ',100%,50%,0) 45%, hsl(' + hues[i] + ',100%,50%,1) 50%, hsl(' + hues[i] + ',100%,50%,-1) 55%);">';
         html += '<div id="vts-sync-id' + i + '" class="vts-sync-label"></div>';
         html += '</div>';
@@ -25,7 +29,7 @@ var UIControlSync = function(ui, visible, visibleLock) {
 
     this.control = this.ui.addControl("sync", html, visible, visibleLock);
 
-    var mapElement = this.ui.getMapElement();
+    const mapElement = this.ui.getMapElement();
 
     if (this.ui.browser.config.syncId == '.enter') {
         this.input = this.control.getElement('vts-sync-input');
@@ -47,14 +51,14 @@ UIControlSync.prototype.onDoNothing = function(event) {
     dom.stopPropagation(event);
 };
 
-UIControlSync.prototype.onMouseLeave = function(event) {
+UIControlSync.prototype.onMouseLeave = function(/*event*/) {
 
-    var browser = this.ui.browser;
-    var screenSize = browser.getRenderer().getCanvasSize();
+    const browser = this.ui.browser;
+    //const screenSize = browser.getRenderer().getCanvasSize();
 
     if (browser.ws && browser.ws.readyState == 1) {
 
-        var coords = event.getMouseCoords();
+        //const coords = event.getMouseCoords();
 
         browser.ws.send('{ "command":"hide-cursor", "id": ' + browser.wsId + '  }');
     }
@@ -63,19 +67,19 @@ UIControlSync.prototype.onMouseLeave = function(event) {
 
 UIControlSync.prototype.onMouseMove = function(event) {
 
-    var browser = this.ui.browser;
-    var screenSize = browser.getRenderer().getCanvasSize();
+    const browser = this.ui.browser;
+    const screenSize = browser.getRenderer().getCanvasSize();
 
     if (browser.ws && browser.ws.readyState == 1) {
 
-        var coords = event.getMouseCoords();
+        const coords = event.getMouseCoords();
 
         browser.ws.send('{ "command":"cursor", "id": ' + browser.wsId + ', "label": "' + browser.config.syncId + '", "pos":[' + ((coords[0] - screenSize[0] * 0.5) / screenSize[1]) +  ',' + coords[1]/screenSize[1] + ']  }');
     }
 
 };
 
-UIControlSync.prototype.onUsername = function(event) {
+UIControlSync.prototype.onUsername = function(/*event*/) {
 
     if (this.input && this.input.element.value != '') {
         this.ui.browser.config.syncId = this.input.element.value;
@@ -90,15 +94,15 @@ UIControlSync.prototype.updateCursor = function(event) {
         event.color = 5;
     }
 
-    var div = document.getElementById('vts-sync' + event.color)
+    const div = document.getElementById('vts-sync' + event.color)
 
     if (div) {
 
         if (event.command == 'cursor') {
-            var screenSize = this.ui.browser.getRenderer().getCanvasSize();
+            const screenSize = this.ui.browser.getRenderer().getCanvasSize();
 
             if (event.label != "") {
-                var div2 = document.getElementById('vts-sync-id' + event.color);
+                const div2 = document.getElementById('vts-sync-id' + event.color);
 
                 if (div2 && div2.innerHTML != event.label) {
                     div2.innerHTML = event.label;

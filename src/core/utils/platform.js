@@ -1,11 +1,11 @@
 
-var platform = {
+const platform = {
 
     initialized : false,
 
     init: function () {
 
-        var self = platform;
+        const self = platform;
 
         self.browser = self.searchString(self.dataBrowser) || 'An unknown browser';
         self.version = self.searchVersion(navigator.userAgent.toLowerCase()) || self.searchVersion(navigator.appVersion) || 'an unknown version';
@@ -42,10 +42,10 @@ var platform = {
     },
 
     searchString: function (data) {
-        var self = platform;
-        for (var i=0; i<data.length; i++) {
-            var dataString = data[i].string;
-            var dataProp = data[i].prop;
+        const self = platform;
+        for (let i = 0; i < data.length; i++) {
+            const dataString = data[i].string;
+            const dataProp = data[i].prop;
             self.versionSearchString = data[i].versionSearch || data[i].identity;
 
             if (dataString) {
@@ -62,11 +62,11 @@ var platform = {
     },
 
     searchVersion: function (dataString) {
-        var self = platform;
+        const self = platform;
         if (self.version != null) {
             return self.version;
         }
-        var index = dataString.indexOf(self.versionSearchString);
+        const index = dataString.indexOf(self.versionSearchString);
         if (index == -1) return;
         return parseFloat(dataString.substring(index+self.versionSearchString.length+1));
     },

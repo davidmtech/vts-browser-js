@@ -5,12 +5,14 @@ import {Core as Core_} from './core';
 //import {CoreInterface as CoreInterface_} from './interface';
 
 //get rid of compiler mess
-//var CoreInterface = CoreInterface_;
-var Core = Core_;
-var proj4 = Proj4;
+//const CoreInterface = CoreInterface_;
+const Core = Core_;
+const proj4 = Proj4;
 
 
-var CoreInterface = function(element, config) {
+const CoreInterface = function(element, config) {
+    this.proj4 = proj4;
+    this.earcut = earcut;
     this.core = new Core(element, config, this);
 
     Object.defineProperty(this, 'map', {

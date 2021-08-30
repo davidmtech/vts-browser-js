@@ -5,12 +5,13 @@ import MapGeodataImport3DTiles2_ from '../geodata-import/3dtiles2';
 
 
 //get rid of compiler mess
-var globals = globals_;
-var parseMesh = parseMesh_;
-var MapGeodataImport3DTiles2 = MapGeodataImport3DTiles2_;
+const globals = globals_;
+const parseMesh = parseMesh_;
+const MapGeodataImport3DTiles2 = MapGeodataImport3DTiles2_;
 
 var packedEvents = [];
 var packedTransferables = [];
+
 
 function postPackedMessage(message, transferables) {
 
@@ -33,66 +34,67 @@ function postPackedMessage(message, transferables) {
     }
 }
 
+
 function loadBinary(path, onLoaded, onError, withCredentials, xhrParams, responseType, kind, options) {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = (function (){
 
         switch (xhr.readyState) {
-        case 0 : // UNINITIALIZED
-        case 1 : // LOADING
-        case 2 : // LOADED
-        case 3 : // INTERACTIVE
+        case 0: // UNINITIALIZED
+        case 1: // LOADING
+        case 2: // LOADED
+        case 3: // INTERACTIVE
             break;
-        case 4 : // COMPLETED
-    
-            if (xhr.status >= 400 || xhr.status == 0) {
-                if (onError) {
-                    postPackedMessage({'command' : 'on-error', 'path': path, 'status':xhr.status});
+        case 4: // COMPLETED
+            {
+                if (xhr.status >= 400 || xhr.status == 0) {
+                    if (onError) {
+                        postPackedMessage({'command' : 'on-error', 'path': path, 'status':xhr.status});
+                    }
+                    break;
                 }
-                break;
-            }
-    
-            var abuffer = xhr.response;
-                    
-            if (!abuffer) {
-                if (onError) {
-                    postPackedMessage({'command' : 'on-error', 'path': path});
+
+                const abuffer = xhr.response;
+
+                if (!abuffer) {
+                    if (onError) {
+                        postPackedMessage({'command' : 'on-error', 'path': path});
+                    }
+                    break;
                 }
-                break;
-            }
-    
-            if (onLoaded) {
-                if (kind == 'direct-texture') {
-                    createImageBitmap(abuffer).then((function(bitmap){
-                        postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': bitmap, 'filesize': abuffer.size}, [bitmap]);                        
-                    }).bind(this));
-                } else if (kind == 'direct-mesh') {
-                    var data = parseMesh({data:new DataView(abuffer), index:0});
-                    postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': data.mesh}, data.transferables);
-                } else if (kind == 'direct-3dtiles') {
-                    //debugger
-                    var data = parse3DTile(JSON.parse(abuffer), options);
-                    //postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': data.geodata}, data.transferables);
-                    postMessage({'command' : 'on-loaded', 'path': path, 'data': data.geodata}, data.transferables);
-                } else {
-                    postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': abuffer}, [abuffer]);
+
+                if (onLoaded) {
+                    if (kind == 'direct-texture') {
+                        createImageBitmap(abuffer).then((function(bitmap){
+                            postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': bitmap, 'filesize': abuffer.size}, [bitmap]);
+                        }).bind(this));
+                    } else if (kind == 'direct-mesh') {
+                        const data = parseMesh({data:new DataView(abuffer), index:0});
+                        postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': data.mesh}, data.transferables);
+                    } else if (kind == 'direct-3dtiles') {
+                        //debugger
+                        const data = parse3DTile(JSON.parse(abuffer), options);
+                        //postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': data.geodata}, data.transferables);
+                        postMessage({'command' : 'on-loaded', 'path': path, 'data': data.geodata}, data.transferables);
+                    } else {
+                        postPackedMessage({'command' : 'on-loaded', 'path': path, 'data': abuffer}, [abuffer]);
+                    }
                 }
             }
-    
             break;
-    
+
         default:
-    
+
             if (onError) {
                 postPackedMessage({'command' : 'on-error', 'path': path});
             }
-    
+
             break;
         }
 
     }).bind(this);
-    
+
     /*
     xhr.onerror  = (function() {
         if (onError) {
@@ -114,11 +116,12 @@ function loadBinary(path, onLoaded, onError, withCredentials, xhrParams, respons
     }
 
     xhr.send('');
-};
+}
+
 
 function parse3DTile(json, options) {
 
-    var geodata = new MapGeodataImport3DTiles2();
+    const geodata = new MapGeodataImport3DTiles2();
     geodata.processJSON(json, options);
 
     return { geodata:{
@@ -136,10 +139,11 @@ function parse3DTile(json, options) {
 
 }
 
+
 self.onmessage = function (e) {
-    var message = e.data;
-    var command = message['command'];
-    //var data = message['data'];
+    const message = e.data;
+    const command = message['command'];
+    //const data = message['data'];
 
     //console.log("workeronmessage: " + command);
 
@@ -170,4 +174,3 @@ self.onmessage = function (e) {
 
     }
 };
-

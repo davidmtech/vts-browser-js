@@ -1,15 +1,15 @@
 
 import BBox_ from '../renderer/bbox';
 import {utils as utils_} from '../utils/utils';
-import MapGeodataBuilder_ from './geodata-builder';
+//import MapGeodataBuilder_ from './geodata-builder';
 
 //get rid of compiler mess
-var BBox = BBox_;
-var utils = utils_;
-var MapGeodataBuilder = MapGeodataBuilder_;
+const BBox = BBox_;
+const utils = utils_;
+//const MapGeodataBuilder = MapGeodataBuilder_;
 
 
-var MapGeodata = function(map, url, extraInfo) {
+const MapGeodata = function(map, url, extraInfo) {
     this.map = map;
     this.stats = map.stats;
     this.mapLoaderUrl  = url;
@@ -41,7 +41,7 @@ MapGeodata.prototype.killGeodata = function(killedByCache) {
     if (this.geodata) {
         this.geodata = null;
     }
-    
+
     if (killedByCache !== true && this.cacheItem != null) {
         this.map.resourcesCache.remove(this.cacheItem);
     }
@@ -57,14 +57,14 @@ MapGeodata.prototype.killGeodata = function(killedByCache) {
 
 
 MapGeodata.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, fastParse) {
-    var doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.maxGpuUsed);
+    const doNotUseGpu = (this.map.stats.gpuRenderUsed >= this.map.maxGpuUsed);
     doNotLoad = doNotLoad || doNotUseGpu;
 
     if (this.loadState == 2) { //loaded
         this.map.resourcesCache.updateItem(this.cacheItem);
         return true;
     } else {
-        if (this.loadState == 0) { 
+        if (this.loadState == 0) {
             if (doNotLoad) {
                 //remove from queue
                 //if (this.mapLoaderUrl) {
@@ -74,10 +74,10 @@ MapGeodata.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, fast
                 //not loaded
                 //add to loading queue or top position in queue
 
-                /*if (typeof this.mapLoaderUrl !== 'object' || this..mapLoaderUrl.indexOf('tileset.json')) { 
+                /*if (typeof this.mapLoaderUrl !== 'object' || this..mapLoaderUrl.indexOf('tileset.json')) {
 
-                    var geodata = new MapGeodataBuilder(this.map);
-                    geodata.load3DTiles(this..mapLoaderUrl, {}, (function(){ 
+                    const geodata = new MapGeodataBuilder(this.map);
+                    geodata.load3DTiles(this..mapLoaderUrl, {}, (function(){
 
                         //TODO:
                     }));
@@ -98,7 +98,7 @@ MapGeodata.prototype.isReady = function(doNotLoad, priority, doNotCheckGpu, fast
             if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount &&
                 performance.now() > this.loadErrorTime + this.map.config.mapLoadErrorRetryTime) {
 
-                this.scheduleLoad(priority);                    
+                this.scheduleLoad(priority);
             }
         }  //else load in progress
     }
@@ -121,7 +121,7 @@ MapGeodata.prototype.onLoad = function(url, onLoaded, onError) {
     this.mapLoaderCallError = onError;
 
     this.loadState = 1;
-    
+
     if (this.map.config.mapGeodataBinaryLoad) {
         this.map.loader.processLoadBinary(url, this.onLoaded.bind(this), this.onLoadError.bind(this), null, 'geodata');
     } else {
@@ -142,9 +142,9 @@ MapGeodata.prototype.onLoadError = function() {
     this.loadErrorCounter ++;
 
     //make sure we try to load it again
-    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) { 
+    if (this.loadErrorCounter <= this.map.config.mapLoadErrorMaxRetryCount) {
         setTimeout((function(){ if (!this.map.killed) { this.map.markDirty(); } }).bind(this), this.map.config.mapLoadErrorRetryTime);
-    }    
+    }
 
     this.mapLoaderCallError();
 };
@@ -155,7 +155,7 @@ MapGeodata.prototype.onLoaded = function(data) {
         return;
     }
 
-    var size = data.length || data.byteLength;
+    let size = data.length || data.byteLength;
     if (!size) {
         size = 0;
     }
@@ -184,5 +184,3 @@ MapGeodata.prototype.onLoaded = function(data) {
 //};
 
 export default MapGeodata;
-
-

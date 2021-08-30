@@ -1,5 +1,5 @@
 
-var MapStats = function(map) {
+const MapStats = function(map) {
     this.map = map;
     this.core = map.core;
     this.inspector = map.core.inspector;
@@ -8,10 +8,10 @@ var MapStats = function(map) {
     this.drawnGeodataTilesFactor = 0;
     this.drawnGeodataTilesPerLayer = 0;
     this.drawnFaces = 0;
-    this.drawCalls = 0;    
-    this.usedNodes = 0;    
-    this.processedNodes = 0;    
-    this.processedMetatiles = 0;    
+    this.drawCalls = 0;
+    this.usedNodes = 0;
+    this.processedNodes = 0;
+    this.processedMetatiles = 0;
     this.counter = 0;
     this.statsCycle = 0;
     this.fps = 0;
@@ -82,7 +82,7 @@ var MapStats = function(map) {
 
 //Object.defineProperty(MapStats.prototype, 'gpuNeeded', {
     //get: function() { return this.gpuNeeded2; /*console.log(""+this.gpuNeeded);*/ },
-    //set: function(value) { 
+    //set: function(value) {
         //this.gpuNeeded2 = value; console.log(""+this.gpuNeeded);
     //}
 //});
@@ -91,7 +91,7 @@ var MapStats = function(map) {
 MapStats.prototype.resetGraphs = function() {
     this.graphsTimeIndex = 0;
 
-    for (var i = 0; i < this.graphsTimeSamples; i++) {
+    for (let i = 0; i < this.graphsTimeSamples; i++) {
         this.graphsRenderTimes[i] = 0;
         this.graphsCreateMeshTimes[i] = 0;
         this.graphsCreateGpuMeshTimes[i] = 0;
@@ -119,19 +119,19 @@ MapStats.prototype.begin = function(dirty) {
         this.drawnGeodataTiles = 0;
         this.drawnGeodataTilesFactor = 0;
         this.drawnGeodataTilesPerLayer = 0;
-        this.drawCalls = 0;        
+        this.drawCalls = 0;
         this.drawnFaces = 0;
         this.gpuRenderUsed = 0;
         this.gpuNeeded = 0;
-        this.usedNodes = 0;    
-        this.processedNodes = 0;    
-        this.processedMetatiles = 0;    
+        this.usedNodes = 0;
+        this.processedNodes = 0;
+        this.processedMetatiles = 0;
         this.meshesFaces = 0;
         this.meshesUVArea = 0;
 
-        for (var i = 0, li = this.renderedLods.length; i < li; i++) {
+        for (let i = 0, li = this.renderedLods.length; i < li; i++) {
             this.renderedLods[i] = 0;
-        } 
+        }
     }
 
     this.debugIds = {};
@@ -152,12 +152,12 @@ MapStats.prototype.begin = function(dirty) {
 
 
 MapStats.prototype.end = function(dirty) {
-    var timer = performance.now();
+    const timer = performance.now();
 
-    var renderTime = timer - this.renderTimeBegin;
-    //var frameTime = timer - this.frameTime;
+    const renderTime = timer - this.renderTimeBegin;
+    //const frameTime = timer - this.frameTime;
     //this.frameTime = timer;
-    if (dirty) { 
+    if (dirty) {
         this.renderTimeTmp += renderTime;
         this.lastRenderTime = renderTime;
     } else {
@@ -165,7 +165,7 @@ MapStats.prototype.end = function(dirty) {
     }
 
     if (this.recordGraphs) {
-        var i = this.graphsTimeIndex;
+        const i = this.graphsTimeIndex;
 
         this.graphsRenderTimes[i] = renderTime;
         this.graphsCreateMeshTimes[i] = 0;
@@ -186,7 +186,7 @@ MapStats.prototype.end = function(dirty) {
         this.graphsBuild[i] = this.renderBuild;
 
         this.graphsTimeIndex = (this.graphsTimeIndex + 1) % this.graphsTimeSamples;
-        
+
         if (this.inspector && this.inspector.graphs) {
             this.inspector.graphs.updateGraphs(this);
         }
@@ -206,8 +206,8 @@ MapStats.prototype.end = function(dirty) {
             this.inspector.stats.updateStatsPanel(this);
         }
     }
-    
-    //do not reset flux data in begin function, because we to collect data from events which     
+
+    //do not reset flux data in begin function, because we to collect data from events which
     this.graphsFluxTexture = [[0,0],[0,0]];
     this.graphsFluxMesh = [[0,0],[0,0]];
     this.graphsFluxGeodata = [[0,0],[0,0]];
@@ -216,4 +216,3 @@ MapStats.prototype.end = function(dirty) {
 
 
 export default MapStats;
-

@@ -7,12 +7,12 @@ import RoiLocation_ from './location/location';
 import {utils as utils_} from '../../core/utils/utils';
 
 //get rid of compiler mess
-var RoiLoadingQueue = RoiLoadingQueue_;
-var RoiProcessQueue = RoiProcessQueue_;
-var RoiPhoto = RoiPhoto_;
-var RoiPano = RoiPano_;
-var RoiLocation = RoiLocation_;
-var utils = utils_;
+const RoiLoadingQueue = RoiLoadingQueue_;
+const RoiProcessQueue = RoiProcessQueue_;
+const RoiPhoto = RoiPhoto_;
+const RoiPano = RoiPano_;
+const RoiLocation = RoiLocation_;
+const utils = utils_;
 
 
 /**
@@ -21,7 +21,7 @@ var utils = utils_;
  * Roi type.
  * @constructor
  */
-var Roi = function(config, browser, options) {
+const Roi = function(config, browser, options) {
     this.config = config;
     this.browser = browser;
     this.options = options;
@@ -36,7 +36,7 @@ var Roi = function(config, browser, options) {
     this.develAtFinishRequested = false;
     this.leaveAtFinishRequested = false;
     this.enterPosition = null;             // filled by devel function
-    this.refPosition = null;               // filled from config JSON 
+    this.refPosition = null;               // filled from config JSON
     this.needsRedraw = false;              // dirty flag for drawing
     this.alpha = 1.0;
     this.defaultControlMode = 'pano';
@@ -62,7 +62,7 @@ var Roi = function(config, browser, options) {
         get : function() {
             return this.core.getMap();
         },
-        set : function(val) {}
+        set : function(/*val*/) {}
     });
     this.controlMode = this.browser.getControlMode();
     this.loadingQueue = null;
@@ -78,20 +78,20 @@ Roi.Fetch = function(config, browser, options, clb) {
         clb = options;
         options = null;
     }
-    var done = function(json) {
-        if (typeof json === 'object' && json !== null) {
-            if (typeof json['type'] === 'string' 
+    const done = function(json) {
+        if (typeof json === 'object' && json !== null) {
+            if (typeof json['type'] === 'string'
                 && typeof Roi.Type[json['type']] === 'function') {
                 clb(null, new Roi.Type[json['type']](json, browser, options));
                 return;
             } else {
-                var err = new Error('Downloaded configuration JSON does not contain registered ROI type');
+                const err = new Error('Downloaded configuration JSON does not contain registered ROI type');
                 console.error(err);
                 clb(err);
                 return;
             }
         }
-        var err = new Error('Downloaded configuration is not JSON object');
+        const err = new Error('Downloaded configuration is not JSON object');
         console.error(err);
         clb(err);
         return;
@@ -99,16 +99,16 @@ Roi.Fetch = function(config, browser, options, clb) {
 
     if (typeof config === 'string') {
         // async load of config at URL and call processConfig again (with object)
-        utils.loadJSON(config, done, function(error) {
-            var err = new Error('Unable to download configuration JSON');
+        utils.loadJSON(config, done, function(/*error*/) {
+            const err = new Error('Unable to download configuration JSON');
             console.error(err);
             clb(err);
             return;
         });
         return;
-    } else if (typeof config !== 'object' 
+    } else if (typeof config !== 'object'
         || config === null) {
-        var err = new Error('Unknown configuration format passed to Pano browser')
+        const err = new Error('Unknown configuration format passed to Pano browser')
         console.error(err);
         clb(err);
         return;
@@ -144,8 +144,8 @@ Roi.State = {
 
 // Public methods
 
-Roi.prototype.delve = function(enterPosition) {
-    if (this.state === Roi.State.Created 
+Roi.prototype.delve = function(/*enterPosition*/) {
+    if (this.state === Roi.State.Created
         || this.state === Roi.State.FadingOut) {
         this.develAtFinishRequested = true;
         return;
@@ -171,7 +171,7 @@ Roi.prototype.delve = function(enterPosition) {
 
 
 Roi.prototype.leave = function() {
-    if (this.state === Roi.State.Created 
+    if (this.state === Roi.State.Created
         || this.state === Roi.State.FadingOut) {
         this.develAtFinishRequested = false;
         return;
@@ -195,10 +195,10 @@ Roi.prototype.leave = function() {
 
 Roi.prototype.deinit = function() {
     // remove tick listener
-    this.browser.off('tick', this.tickClb); 
+    this.browser.off('tick', this.tickClb);
     this.tickClb = null;
 
-    this.core.off('map-position-changed', this.updateClb); 
+    this.core.off('map-position-changed', this.updateClb);
     this.updateClb = null;
 };
 
@@ -226,7 +226,7 @@ Roi.prototype.alpha = function(alpha) {
     if (typeof alpha !== "number") {
         return this.alpha;
     }
-    if (alpha < 0.0) {
+    if (alpha < 0.0) {
         alpha = 0.0;
     }
     if (alpha > 1.0) {
@@ -243,22 +243,22 @@ Roi.prototype.alpha = function(alpha) {
 // Protected methods
 
 /**
- * Parent class (this class) init method MUST be caled from overidden method. 
+ * Parent class (this class) init method MUST be caled from overidden method.
  */
 Roi.prototype.init = function() {
     // Process options
-    if (typeof this.options === 'object' && this.options !== null) {
+    if (typeof this.options === 'object' && this.options !== null) {
         if (this.options.loadingQueue instanceof RoiLoadingQueue) {
             this.loadingQueue = this.options.loadingQueue;
         } else {
-            var opts = this.options.loadingQueueOptions;
-            this.loadingQueue = new RoiLoadingQueue(opts);    
+            const opts = this.options.loadingQueueOptions;
+            this.loadingQueue = new RoiLoadingQueue(opts);
         }
 
         if (this.options.processQueue instanceof RoiProcessQueue) {
             this.processQueue = this.options.processQueue;
         } else {
-            var opts = this.options.processQueueOptions;
+            const opts = this.options.processQueueOptions;
             this.processQueue = new RoiProcessQueue(opts);
         }
     } else {
@@ -269,13 +269,13 @@ Roi.prototype.init = function() {
     // Process configuration file
     if (typeof this.config !== 'object' || this.config === null) {
         this.state = Roi.State.Error;
-        var err = new Error('Config passed to ROI constructor is not object');
+        const err = new Error('Config passed to ROI constructor is not object');
         console.error(err);
         return;
     }
     this.processConfig();
-    
-    // If processing of configuration is successfull 
+
+    // If processing of configuration is successfull
     // (configuration JSON is valid) proceed to finalize initialization
     if (this.state != Roi.State.Error) {
         this.initFinalize();
@@ -284,15 +284,15 @@ Roi.prototype.init = function() {
 
 
 /**
- * Parent class (this class) init method MUST be caled from overidden method. 
+ * Parent class (this class) init method MUST be caled from overidden method.
  */
 Roi.prototype.processConfig = function() {
-    var err = null;
+    let err = null;
     if (typeof this.config['id'] !== 'string') {
         err = new Error('Missing (or type error) ROI id in config JSON');
-    } else if (!this instanceof Roi.Type[this.config['type']]) {
+    } else if (!(this instanceof Roi.Type[this.config['type']])) {
         err = new Error('ROI type in config JSON missing or is not registered');
-    } else if (!this.config['position'] instanceof Array
+    } else if (!(this.config['position'] instanceof Array)
 // TODO!! check position sanity
                ) {//|| !this.core.map.positionSanity(this.config['position'])) {
         err = new Error('ROI position in config JSON missing or is not valid');
@@ -313,7 +313,7 @@ Roi.prototype.processConfig = function() {
 
 
 /**
- * Parent class (this class) init method MUST be caled from overidden method. 
+ * Parent class (this class) init method MUST be caled from overidden method.
  */
 Roi.prototype.initFinalize = function() {
     // Change state and go ...
@@ -356,7 +356,7 @@ Roi.prototype.draw = function() {
 
 
 Roi.prototype.update = function() {
-    // nop   
+    // nop
 };
 
 

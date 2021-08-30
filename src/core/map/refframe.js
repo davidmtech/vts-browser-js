@@ -2,10 +2,10 @@
 import MapDivisionNode_ from './division-node';
 
 //get rid of compiler mess
-var MapDivisionNode = MapDivisionNode_;
+const MapDivisionNode = MapDivisionNode_;
 
 
-var MapRefFrame = function(map, json) {
+const MapRefFrame = function(map, json) {
     this.map = map;
     this.proj4 = map.proj4;
     this.valid = false;
@@ -13,7 +13,7 @@ var MapRefFrame = function(map, json) {
     this.description = json['description'] || '';
     this.nodesMap = [];
 
-    var model = json['model'];
+    const model = json['model'];
 
     if (model == null) {
         return;
@@ -30,12 +30,12 @@ var MapRefFrame = function(map, json) {
     this.params = {};
 
     if (json['parameters'] != null) {
-        var params = json['parameters'];
+        const params = json['parameters'];
         this.params.metaBinaryOrder = params['metaBinaryOrder'] || 1;
         this.params.navDelta = params['navDelta'] || 8;
     }
 
-    var division = json['division'];
+    const division = json['division'];
 
     if (division == null) {
         return;
@@ -47,23 +47,23 @@ var MapRefFrame = function(map, json) {
         heightRange : division['heightRange'] || [0,1]
     };
 
-    var extents = this.parseSpaceExtents(division['extents']);
+    const extents = this.parseSpaceExtents(division['extents']);
     this.division.extents = extents;
 
     map.spaceExtentSize = [extents.ur[0] - extents.ll[0], extents.ur[1] - extents.ll[1], extents.ur[2] - extents.ll[2]];
     map.spaceExtentOffset = extents.ll;
 
-    var divisionNodes = division['nodes'];
+    const divisionNodes = division['nodes'];
     this.division.nodes = [];
 
     if (divisionNodes == null) {
         return;
     }
 
-    this.hasPoles = (divisionNodes.length == 4); 
+    this.hasPoles = (divisionNodes.length == 4);
 
-    for (var i = 0, li = divisionNodes.length; i < li; i++) {
-        var node = this.parseNode(divisionNodes[i]);
+    for (let i = 0, li = divisionNodes.length; i < li; i++) {
+        const node = this.parseNode(divisionNodes[i]);
         this.nodesMap['' + node.id[0] + '.'  + node.id[1] + '.' + node.id[2]] = node;
         this.division.nodes.push(node);
     }
@@ -83,19 +83,19 @@ MapRefFrame.prototype.getInfo = function() {
 
 
 MapRefFrame.prototype.getGlobalHeightRange = function() {
-    return this.division.heightRange;     
+    return this.division.heightRange;
 };
 
 
 MapRefFrame.prototype.parseNode = function(nodeData) {
-    var node = {
+    const node = {
         srs : nodeData['srs'],
         partitioning : nodeData['partitioning']
     };
 
     node.extents = this.parseExtents(nodeData['extents']);
 
-    var nodeId = nodeData['id'];
+    const nodeId = nodeData['id'];
 
     if (nodeId == null) {
         return;
@@ -141,7 +141,7 @@ MapRefFrame.prototype.getSpatialDivisionNodes = function() {
 
 
 MapRefFrame.prototype.convertCoords = function(coords, source, destination) {
-    var sourceSrs, destinationSrs;
+    let sourceSrs, destinationSrs;
 
     switch(source) {
     case 'public':     sourceSrs = this.model.publicSrs;     break;
@@ -160,5 +160,3 @@ MapRefFrame.prototype.convertCoords = function(coords, source, destination) {
 
 
 export default MapRefFrame;
-
-

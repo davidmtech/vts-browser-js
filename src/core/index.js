@@ -8,13 +8,13 @@ import {math as math_} from './utils/math';
 import {platform as platform_} from './utils/platform';
 
 //get rid of compiler mess
-var getCoreVersion = getCoreVersion_, checkSupport = checkSupport_;
-var CoreInterface = CoreInterface_;
-var vec2 = vec2_, vec3 = vec3_, vec4 = vec4_, mat3 = mat3_, mat4 = mat4_;
-var utils = utils_;
-var math = math_;
-var proj4 = Proj4;
-var platform = platform_;
+const getCoreVersion = getCoreVersion_, checkSupport = checkSupport_;
+const CoreInterface = CoreInterface_;
+const vec2 = vec2_, vec3 = vec3_, vec4 = vec4_, mat3 = mat3_, mat4 = mat4_;
+const utils = utils_;
+const math = math_;
+const proj4 = Proj4;
+const platform = platform_;
 
 
 function core(element, config) {
@@ -29,4 +29,3 @@ function core(element, config) {
 
 
 export {vec2,vec3,vec4,mat3,mat4,math,utils,getCoreVersion,checkSupport,core,proj4,earcut,platform};
-

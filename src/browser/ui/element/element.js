@@ -4,12 +4,12 @@ import Dom_ from '../../utility/dom';
 import {platform as platform_} from '../../../core/utils/platform';
 
 //get rid of compiler mess
-var UIEvent = UIEvent_;
-var dom = Dom_;
-var platform = platform_;
+const UIEvent = UIEvent_;
+const dom = Dom_;
+const platform = platform_;
 
 
-var UIElement = function(control, element) {
+const UIElement = function(control, element) {
     this.control = control;
     this.ui = this.control.ui;
     this.element = element;
@@ -74,10 +74,10 @@ UIElement.prototype.removeClass = function(name) {
 
 
 UIElement.prototype.getRect = function() {
-    var rect = this.element.getBoundingClientRect();
-    var rect2 = this.ui.map.getMapElement().element.getBoundingClientRect();
-    var offsetX = window.pageXOffset || 0;
-    var offsetY = window.pageYOffset || 0;
+    const rect = this.element.getBoundingClientRect();
+    const rect2 = this.ui.map.getMapElement().element.getBoundingClientRect();
+    const offsetX = window.pageXOffset || 0;
+    const offsetY = window.pageYOffset || 0;
     return {
         'left' : (rect.left + offsetX) - (rect2.left + offsetX),
         'top' : (rect.top + offsetY) - (rect2.top + offsetY),
@@ -90,9 +90,9 @@ UIElement.prototype.getRect = function() {
 
 
 UIElement.prototype.getPageRect = function() {
-    var rect = this.element.getBoundingClientRect();
-    var offsetX = window.pageXOffset || 0;
-    var offsetY = window.pageYOffset || 0;
+    const rect = this.element.getBoundingClientRect();
+    const offsetX = window.pageXOffset || 0;
+    const offsetY = window.pageYOffset || 0;
     return {
         'left' : (rect.left + offsetX),
         'top' : (rect.top + offsetY),
@@ -105,11 +105,11 @@ UIElement.prototype.getPageRect = function() {
 UIElement.prototype.setHtml = function(html) {
     this.element.innerHTML = html;
 
-    var allElements = this.element.getElementsByTagName('*');
+    const allElements = this.element.getElementsByTagName('*');
 
     //store all elements with id attribute to the table
-    for (var i = 0, li = allElements.length; i < li; i++) {
-        var id = allElements[i].getAttribute('id');
+    for (let i = 0, li = allElements.length; i < li; i++) {
+        const id = allElements[i].getAttribute('id');
 
         if (id !== null) {
             //store element to the table
@@ -135,11 +135,11 @@ UIElement.prototype.on = function(type, call, externalElement) {
 
 
 UIElement.prototype.once = function(type, call, externalElement) {
-    var removeEventCall = (function() {
+    const removeEventCall = (function() {
         this.removeEvent(type, call, externalElement);
     }).bind(this);
 
-    var handler = function(e) {
+    const handler = function(e) {
         call(e);
         removeEventCall();
     };
@@ -154,10 +154,10 @@ UIElement.prototype.off = function(type, call, externalElement) {
 
 
 UIElement.prototype.fire = function(type, event) {
-    var hooks = this.events[type];
+    const hooks = this.events[type];
 
     if (hooks != null) {
-        for (var hook in hooks) {
+        for (let hook in hooks) {
             hooks[hook](event);
         }
     }
@@ -165,10 +165,10 @@ UIElement.prototype.fire = function(type, event) {
 
 
 UIElement.prototype.addEvent = function(type, call, externalElement) {
-    var id = type + '-' + dom.stamp(call)
-              + (externalElement ? ('-' + dom.stamp(externalElement)) : '');
+    const id = type + '-' + dom.stamp(call)
+               + (externalElement ? ('-' + dom.stamp(externalElement)) : '');
 
-    var handler = (function(e) {
+    const handler = (function(e) {
         if (this.ui.killed) {
             return; //todo remove event
         }
@@ -180,19 +180,19 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
                 return;
             }
 
-            var timer = Date.now();
+            const timer = Date.now();
 
             //console.log('wheel: ');
 
-            var bigInterval = 500;
-            var bigInterval2 = 500;
-            var time = timer - this.lastWheelTimer2;
+            const bigInterval = 500;
+            const bigInterval2 = 500;
+            let time = timer - this.lastWheelTimer2;
 
             this.wheelTimes.push(timer);
 
-            var avrg = 0;
+            let avrg = 0;
 
-            for (var i = 0; i < this.wheelTimes.length;) {
+            for (let i = 0; i < this.wheelTimes.length;) {
                 if (timer - this.wheelTimes[i] > bigInterval2) {
                     this.wheelTimes.splice(i, 1);
                 } else {
@@ -201,6 +201,7 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
                 }
             }
 
+            // eslint-disable-next-line
             avrg = this.wheelTimes.length ? avrg / this.wheelTimes.length : 0;
 
             //console.log('wheel count: ' + this.wheelTimes.length);
@@ -211,13 +212,13 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
                 time = 0;
             }
 
-            var x = time / (bigInterval);
-            //var lag = Math.min((x * x * x) * this.ui.browser.config.wheelInputLag, this.ui.browser.config.wheelInputLag);
-            //var lag = Math.min((x * x * x) * this.wheelTimes.length, this.ui.browser.config.wheelInputLag);
-            //var lag = Math.min((x) * this.wheelTimes.length*2, this.ui.browser.config.wheelInputLag);
-            var lag = Math.min(this.wheelTimes.length * this.ui.browser.config.wheelInputLag[1], this.ui.browser.config.wheelInputLag[0]);
-            //var lag = Math.max(0,Math.min(avrg - (0.5-(1-x)*0.5) * this.wheelTimes.length*2, this.ui.browser.config.wheelInputLag));
-            //var lag = Math.min(avrg, this.ui.browser.config.wheelInputLag);
+            //const x = time / (bigInterval);
+            //const lag = Math.min((x * x * x) * this.ui.browser.config.wheelInputLag, this.ui.browser.config.wheelInputLag);
+            //const lag = Math.min((x * x * x) * this.wheelTimes.length, this.ui.browser.config.wheelInputLag);
+            //const lag = Math.min((x) * this.wheelTimes.length*2, this.ui.browser.config.wheelInputLag);
+            const lag = Math.min(this.wheelTimes.length * this.ui.browser.config.wheelInputLag[1], this.ui.browser.config.wheelInputLag[0]);
+            //const lag = Math.max(0,Math.min(avrg - (0.5-(1-x)*0.5) * this.wheelTimes.length*2, this.ui.browser.config.wheelInputLag));
+            //const lag = Math.min(avrg, this.ui.browser.config.wheelInputLag);
             //lag = this.wheelTimes.length; //this.ui.browser.config.wheelInputLag;
             //console.log('lag: ' + lag + '  ' +x);
 
@@ -238,7 +239,7 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
         call(new UIEvent(type, this, e || window.event));
     }).bind(this);
 
-    var element =  externalElement || this.element;
+    const element =  externalElement || this.element;
     element.addEventListener(this.getEventName(type), handler, false);
 
     if (type == 'mousewheel') {
@@ -251,15 +252,15 @@ UIElement.prototype.addEvent = function(type, call, externalElement) {
 
 
 UIElement.prototype.removeEvent = function(type, call, externalElement) {
-    var id = type + '-' + dom.stamp(call)
-              + (externalElement ? ('-' + dom.stamp(externalElement)) : '');
+    const id = type + '-' + dom.stamp(call)
+               + (externalElement ? ('-' + dom.stamp(externalElement)) : '');
 
-    var handler = this.events[type] && this.events[type][id];
+    const handler = this.events[type] && this.events[type][id];
 
     if (handler != null) {
         delete this.events[type][id];
 
-        var element =  externalElement || this.element;
+        const element =  externalElement || this.element;
         element.removeEventListener(this.getEventName(type), handler, false);
     }
 };
@@ -347,7 +348,7 @@ UIElement.prototype.onDragBegin = function(touchUsed, event) {
 
     if (!this.dragging) {
         this.dragging = true;
-        var pos = event.getMouseCoords();//true);
+        const pos = event.getMouseCoords();//true);
         this.dragStartPos = [pos[0], pos[1]];
         this.dragCurrentPos = [pos[0], pos[1]];
         this.dragLastPos = [pos[0], pos[1]];
@@ -381,7 +382,7 @@ UIElement.prototype.onDragBegin = function(touchUsed, event) {
 
 
 UIElement.prototype.onDragMove = function(touchUsed, event) {
-    var pos = event.getMouseCoords();
+    const pos = event.getMouseCoords();
 
     if (event.getTouchesCount() != -1) {
         this.updateDragButtonsState(event, true);
@@ -389,17 +390,18 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
 
     dom.preventDefault(event);
 
-    var mode = '';
-    var zoom = 0;
-    var rotateDelta = 0;
-    var panDelta = [0,0];
-    var distanceDelta = 0;
+    let mode = '';
+    let zoom = 0;
+    let rotateDelta = 0;
+    let panDelta = [0,0];
+    let distanceDelta = 0;
+    let touchCount = 0;
 
-    //var el = document.getElementById("debug123");
+    //cont el = document.getElementById("debug123");
 
     if (touchUsed) {
 
-        var touchCount = event.getTouchesCount();
+        touchCount = event.getTouchesCount();
         if (touchCount != this.dragTouchCount) {
             this.dragLastPos[0] = pos[0];
             this.dragLastPos[1] = pos[1];
@@ -425,25 +427,25 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
             if (this.dragTouches.length == 6) {
 
                 //get vector for touch #1
-                var t = this.dragTouches;
-                var v1x = (t[5][0] - t[4][0]) + (t[4][0] - t[3][0]) + (t[3][0] - t[2][0]) + (t[2][0] - t[1][0]) + (t[1][0] - t[0][0]);
-                var v1y = (t[5][1] - t[4][1]) + (t[4][1] - t[3][1]) + (t[3][1] - t[2][1]) + (t[2][1] - t[1][1]) + (t[1][1] - t[0][1]);
+                let t = this.dragTouches;
+                const v1x = (t[5][0] - t[4][0]) + (t[4][0] - t[3][0]) + (t[3][0] - t[2][0]) + (t[2][0] - t[1][0]) + (t[1][0] - t[0][0]);
+                const v1y = (t[5][1] - t[4][1]) + (t[4][1] - t[3][1]) + (t[3][1] - t[2][1]) + (t[2][1] - t[1][1]) + (t[1][1] - t[0][1]);
 
                 //get vector for touch #2
-                var t2 = this.dragTouches2;
-                var v2x = (t2[5][0] - t2[4][0]) + (t2[4][0] - t2[3][0]) + (t2[3][0] - t2[2][0]) + (t2[2][0] - t2[1][0]) + (t2[1][0] - t2[0][0]);
-                var v2y = (t2[5][1] - t2[4][1]) + (t2[4][1] - t2[3][1]) + (t2[3][1] - t2[2][1]) + (t2[2][1] - t2[1][1]) + (t2[1][1] - t2[0][1]);
+                let t2 = this.dragTouches2;
+                const v2x = (t2[5][0] - t2[4][0]) + (t2[4][0] - t2[3][0]) + (t2[3][0] - t2[2][0]) + (t2[2][0] - t2[1][0]) + (t2[1][0] - t2[0][0]);
+                const v2y = (t2[5][1] - t2[4][1]) + (t2[4][1] - t2[3][1]) + (t2[3][1] - t2[2][1]) + (t2[2][1] - t2[1][1]) + (t2[1][1] - t2[0][1]);
 
                 //get distance of each vector
-                var d1 = Math.sqrt(v1x * v1x + v1y * v1y);
-                var d2 = Math.sqrt(v2x * v2x + v2y * v2y);
-                var cosAngle, cosAngle2;
+                let d1 = Math.sqrt(v1x * v1x + v1y * v1y);
+                let d2 = Math.sqrt(v2x * v2x + v2y * v2y);
+                let cosAngle, cosAngle2;
 
                 mode = 'pan';
 
                 if (d1 > d2 * 5 || d2 > d1 * 5) { //dectec situation where only one finger is closing to another
 
-                    var p1, p2, p3;
+                    let p1, p2, p3;
 
                     //make first vector from non moving point to beginnig position of moving point
                     //make seconf vector from non moving point to ending position of moving point
@@ -457,11 +459,11 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                         p3 = t2[5];
                     }
 
-                    var v1 = [p2[0] - p1[0], p2[1] - p1[1]];
-                    var v2 = [p3[0] - p1[0], p3[1] - p1[1]];
+                    const v1 = [p2[0] - p1[0], p2[1] - p1[1]];
+                    const v2 = [p3[0] - p1[0], p3[1] - p1[1]];
 
                     //normalize vectors
-                    var d =  Math.sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
+                    let d =  Math.sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
                     v1[0] /= d;
                     v1[1] /= d;
 
@@ -484,11 +486,11 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                 } else if (d1 > 1 && d2 > 1) { //are bouth vectors in motion
 
                     //normalize vectors
-                    var nv1x = v1x / d1;
-                    var nv1y = v1y / d1;
+                    const nv1x = v1x / d1;
+                    const nv1y = v1y / d1;
 
-                    var nv2x = v2x / d2;
-                    var nv2y = v2y / d2;
+                    const nv2x = v2x / d2;
+                    const nv2y = v2y / d2;
 
                     //do vectors move in same direction
                     cosAngle = nv1x * nv2x + nv1y * nv2y;
@@ -505,8 +507,8 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
                 t2 = this.dragTouches2;
 
                 //get distance between points at the beginig
-                var dx = (t2[0][0] - t[0][0]);
-                var dy = (t2[0][1] - t[0][1]);
+                let dx = (t2[0][0] - t[0][0]);
+                let dy = (t2[0][1] - t[0][1]);
                 d1 = Math.sqrt(dx * dx + dy * dy);
 
                 /*
@@ -521,7 +523,7 @@ UIElement.prototype.onDragMove = function(touchUsed, event) {
 
                 distanceDelta = 0;
 
-                for (var i = 1; i < 6; i++) {
+                for (let i = 1; i < 6; i++) {
 
                     //get distance between points at the end
                     dx = (t2[i][0] - t[i][0]);
@@ -571,9 +573,9 @@ UIElement.prototype.onDragEnd = function(touchUsed, event) {
     //this.dragButtons[event.getMouseButton()] = false;
     //console.log("end: 1#:  " + JSON.stringify(this.dragButtons));
 
-    var left = this.dragButtons['left'];
-    var right = this.dragButtons['right'];
-    var middle = this.dragButtons['middle'];
+    const left = this.dragButtons['left'];
+    const right = this.dragButtons['right'];
+    const middle = this.dragButtons['middle'];
 
     this.updateDragButtonsState(event, false);
 
@@ -596,7 +598,7 @@ UIElement.prototype.onDragEnd = function(touchUsed, event) {
     }
 
     if (this.dragging) {
-        var pos = event.getMouseCoords();
+        let pos = event.getMouseCoords();
         this.dragLastPos = pos;
 
         if (!this.dragButtons['left'] &&

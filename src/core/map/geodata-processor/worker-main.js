@@ -1,5 +1,5 @@
 
-import {globals as globals_, unint8ArrayToString as unint8ArrayToString_, Utf8ArrayToStr as Utf8ArrayToStr_} from './worker-globals.js';
+import {globals as globals_, /*unint8ArrayToString as unint8ArrayToString_,*/ Utf8ArrayToStr as Utf8ArrayToStr_} from './worker-globals.js';
 import {setFont as setFont_, setFontMap as setFontMap_,} from './worker-text.js';
 import {getLayer as getLayer_, getLayerPropertyValue as getLayerPropertyValue_,
         processStylesheet as processStylesheet_, getFilterResult as getFilterResult_,
@@ -13,21 +13,21 @@ import {postGroupMessageFast as postGroupMessageFast_,
 
 
 //get rid of compiler mess
-var globals = globals_;
-var setFont = setFont_;
-var unint8ArrayToString = unint8ArrayToString_, Utf8ArrayToStr = Utf8ArrayToStr_;
-var setFontMap = setFontMap_, makeFasterFilter = makeFasterFilter_;
-var getLayer = getLayer_, getLayerPropertyValue = getLayerPropertyValue_,
-    processStylesheet = processStylesheet_, getFilterResult = getFilterResult_;
-var processLineStringPass = processLineStringPass_;
-var processPointArrayPass = processPointArrayPass_;
-var processPointArrayVSwitchPass = processPointArrayVSwitchPass_;
-var processPolygonPass = processPolygonPass_;
-var processLineStringGeometry = processLineStringGeometry_;
-var processPointArrayGeometry = processPointArrayGeometry_,
-    postGroupMessageLite = postGroupMessageLite_, optimizeGroupMessages = optimizeGroupMessages_;
-var postGroupMessageFast = postGroupMessageFast_, postPackedMessage = postPackedMessage_, postPackedMessages = postPackedMessages_;
-var getLayerPropertyValueInner = getLayerPropertyValueInner_;
+const globals = globals_;
+const setFont = setFont_;
+const /*unint8ArrayToString = unint8ArrayToString_,*/ Utf8ArrayToStr = Utf8ArrayToStr_;
+const setFontMap = setFontMap_, makeFasterFilter = makeFasterFilter_;
+const getLayer = getLayer_, getLayerPropertyValue = getLayerPropertyValue_,
+      processStylesheet = processStylesheet_, getFilterResult = getFilterResult_;
+const processLineStringPass = processLineStringPass_;
+const processPointArrayPass = processPointArrayPass_;
+const processPointArrayVSwitchPass = processPointArrayVSwitchPass_;
+const processPolygonPass = processPolygonPass_;
+const processLineStringGeometry = processLineStringGeometry_;
+const processPointArrayGeometry = processPointArrayGeometry_,
+      postGroupMessageLite = postGroupMessageLite_, optimizeGroupMessages = optimizeGroupMessages_;
+const postGroupMessageFast = postGroupMessageFast_, postPackedMessage = postPackedMessage_, postPackedMessages = postPackedMessages_;
+const getLayerPropertyValueInner = getLayerPropertyValueInner_;
 
 var exportedGeometries = [];
 var featureCache = new Array(1024), featureCacheIndex = 0, finalFeatureCache = new Array(1024), finalFeatureCacheIndex = 0, finalFeatureCacheIndex2 = 0;
@@ -49,23 +49,23 @@ function processLayerFeaturePass(type, feature, lod, layer, featureIndex, zIndex
     case 'point-array':
         processPointArrayPass(feature, lod, layer, featureIndex, zIndex, eventInfo);
         break;
-            
+
     case 'polygon':
         processPolygonPass(feature, lod, layer, featureIndex, zIndex, eventInfo);
-        break;     
+        break;
     }
 
 }
 
 function processFeatures(type, features, lod, featureType, group) {
-    var reduceParams = globals.reduceParams;
+    const reduceParams = globals.reduceParams;
 
     //loop layers
-    for (var key in globals.stylesheetLayers) {
-        var layer = globals.stylesheetLayers[key];
+    for (let key in globals.stylesheetLayers) {
+        const layer = globals.stylesheetLayers[key];
 
         if (type == 'point-array') {
-            var importance = layer['importance-source'];
+            let importance = layer['importance-source'];
             //
 
             if ((typeof importance === 'undefined' || importance === null) && features[0] && features[0]['importance']) {
@@ -75,32 +75,34 @@ function processFeatures(type, features, lod, featureType, group) {
             if (!(typeof importance === 'undefined' || importance === null)) {
                 //importance = '$importance';
                 switch (globals.reduceMode) {
-                    case 'scr-count1': 
-                    case 'scr-count2': 
+                    case 'scr-count1':
+                    case 'scr-count2':
                         layer['reduce'] = ['top',100,importance];
                         layer['dynamic-reduce'] = ['scr-count2', reduceParams[0], reduceParams[1]];
                         break;
-                    case 'scr-count4': 
+                    case 'scr-count4':
                         layer['dynamic-reduce'] = ['scr-count4',importance];
                         break;
-                    case 'scr-count5': 
+                    case 'scr-count5':
                         layer['dynamic-reduce'] = ['scr-count5',importance];
                         break;
-                    case 'scr-count6': 
-                    case 'scr-count7': 
-                    case 'scr-count8': 
-                        var ppi = globals.reduceMode == 'scr-count8' ? reduceParams[6] : reduceParams[5];
-                        layer['dynamic-reduce'] = [globals.reduceMode,importance, (typeof layer['importance-weight'] !== 'undefined') ? layer['importance-weight'] : 1 ];
-                        layer['label-no-overlap-margin'] = [reduceParams[0]*ppi, reduceParams[0]*ppi];
-                        layer['icon-no-overlap-margin'] = [reduceParams[0]*ppi, reduceParams[0]*ppi];
-                        layer['label-no-overlap-factor'] = ["div-by-dist",importance];
+                    case 'scr-count6':
+                    case 'scr-count7':
+                    case 'scr-count8':
+                        {
+                            const ppi = globals.reduceMode == 'scr-count8' ? reduceParams[6] : reduceParams[5];
+                            layer['dynamic-reduce'] = [globals.reduceMode,importance, (typeof layer['importance-weight'] !== 'undefined') ? layer['importance-weight'] : 1 ];
+                            layer['label-no-overlap-margin'] = [reduceParams[0]*ppi, reduceParams[0]*ppi];
+                            layer['icon-no-overlap-margin'] = [reduceParams[0]*ppi, reduceParams[0]*ppi];
+                            layer['label-no-overlap-factor'] = ["div-by-dist",importance];
+                        }
                         break;
                 }
             }
         }
 
-        var filter =  layer['filter'];
-        var reduce =  layer['reduce'], i, li, j, lj;
+        let filter =  layer['filter'];
+        let reduce =  layer['reduce'], i, li, feature;
 
         if (filter) {
             filter = layer['#filter'];
@@ -113,13 +115,13 @@ function processFeatures(type, features, lod, featureType, group) {
         featureCacheIndex = 0, finalFeatureCacheIndex = 0, finalFeatureCacheIndex2 = 0;
 
         for (i = 0, li = features.length; i < li; i++) {
-            var feature = features[i];
+            feature = features[i];
             feature.properties = feature['properties'] || {};
 
             if (feature['id']) {
-                feature.properties['#id'] = feature['id']; 
+                feature.properties['#id'] = feature['id'];
             }
-            
+
             if (!filter || getFilterResult(filter, feature, featureType, group, layer, 'filter', lod, 0, true)) {
                 if (reduce) {
                     featureCache[featureCacheIndex] = feature;
@@ -132,8 +134,8 @@ function processFeatures(type, features, lod, featureType, group) {
 
         if (reduce) {
 
-            var count = reduce[1];
-            var property = reduce[2];
+            let count = reduce[1];
+            let property = reduce[2];
 
             switch (reduce[0]) {
                 case 'top':
@@ -148,7 +150,7 @@ function processFeatures(type, features, lod, featureType, group) {
                     }
 
                     if ((typeof property === 'string' && property.charAt(0) == '$') || (typeof property === 'object')) {
-                        var complexProperty = (typeof property === 'object');
+                        const complexProperty = (typeof property === 'object');
 
                         if (!complexProperty) {
                             property = property.substr(1);
@@ -158,12 +160,12 @@ function processFeatures(type, features, lod, featureType, group) {
                             count = featureCacheIndex;
                         }
 
-                        var top = (reduce[0] == 'top'), value;
-                        var currentIndex = 0;
-                        var currentValue2 = top ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+                        let top = (reduce[0] == 'top'), value;
+                        let currentIndex = 0;
+                        let currentValue2 = top ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
 
                         do {
-                            var currentValue = top ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
+                            let currentValue = top ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
                             finalFeatureCacheIndex2 = finalFeatureCacheIndex;
 
                             for (i = 0, li = featureCacheIndex; i < li; i++) {
@@ -208,6 +210,8 @@ function processFeatures(type, features, lod, featureType, group) {
                         finalFeatureCacheIndex++;
                     }
 
+                    break;  //???
+
                 case 'every':
 
                     if (count > featureCacheIndex) {
@@ -236,31 +240,31 @@ function processFeatures(type, features, lod, featureType, group) {
 
 
 function processLayerFeatureMultipass(type, feature, lod, layer, featureIndex, eventInfo) {
-    var multiPass = getLayerPropertyValue(layer, 'next-pass', feature, lod);
+    const multiPass = getLayerPropertyValue(layer, 'next-pass', feature, lod);
 
-    var mylayer;
+    let mylayer;
 
     if (multiPass != null) {
-        for (var i = 0, li = multiPass.length; i < li; i++) {
-            var zIndex = multiPass[i][0];
+        for (let i = 0, li = multiPass.length; i < li; i++) {
+            const zIndex = multiPass[i][0];
             mylayer = getLayer(multiPass[i][1], type, featureIndex);
-            
+
             if (!getLayerPropertyValue(mylayer, 'visible', feature, lod)) {
                 continue;
             }
 
-            var selectedLayerId = getLayerPropertyValue(mylayer, 'selected-layer', feature, lod);
-            var selectedLayer = (selectedLayerId != '') ? getLayer(selectedLayerId, type, featureIndex) : null;
+            const selectedLayerId = getLayerPropertyValue(mylayer, 'selected-layer', feature, lod);
+            const selectedLayer = (selectedLayerId != '') ? getLayer(selectedLayerId, type, featureIndex) : null;
 
-            var selectedHoverLayerId = getLayerPropertyValue(mylayer, 'selected-hover-layer', feature, lod);
-            var selectedHoverLayer = (selectedHoverLayerId != '') ? getLayer(selectedHoverLayerId, type, featureIndex) : null;
+            const selectedHoverLayerId = getLayerPropertyValue(mylayer, 'selected-hover-layer', feature, lod);
+            const selectedHoverLayer = (selectedHoverLayerId != '') ? getLayer(selectedHoverLayerId, type, featureIndex) : null;
 
-            var hoverLayerId = getLayerPropertyValue(mylayer, 'hover-layer', feature, lod);
-            var hoverLayer = (hoverLayerId != '') ? getLayer(hoverLayerId, type, featureIndex) : null;
+            const hoverLayerId = getLayerPropertyValue(mylayer, 'hover-layer', feature, lod);
+            const hoverLayer = (hoverLayerId != '') ? getLayer(hoverLayerId, type, featureIndex) : null;
 
-            var flags =  ((hoverLayer != null) ? (1<<8) : 0) | ((selectedLayer != null) ? (1<<9) : 0) | ((selectedHoverLayer != null) ? (1<<10) : 0);
+            const flags =  ((hoverLayer != null) ? (1<<8) : 0) | ((selectedLayer != null) ? (1<<9) : 0) | ((selectedHoverLayer != null) ? (1<<10) : 0);
 
-            var lastHitState = globals.hitState;
+            const lastHitState = globals.hitState;
 
             if (selectedLayer != null) {
                 globals.hitState = flags | 2;
@@ -276,7 +280,7 @@ function processLayerFeatureMultipass(type, feature, lod, layer, featureIndex, e
                 globals.hitState = flags | 1;
                 processLayerFeaturePass(type, feature, lod, hoverLayer, featureIndex, zIndex, eventInfo);
             }
-                
+
             //globals.hitState = flags | 0;
             processLayerFeaturePass(type, feature, lod, mylayer, featureIndex, zIndex, eventInfo);
 
@@ -295,14 +299,14 @@ function processLayerFeature(type, feature, lod, layer, featureIndex, skipPack) 
         if (layer['visibility-switch']) {
             postGroupMessageLite(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_VSWITCH_BEGIN);
             //postGroupMessage({'command':'addRenderJob', 'type':'vswitch-begin'});
-            var zIndex = getLayerPropertyValue(layer, 'z-index', feature, lod);
-            var eventInfo = feature.properties;
+            const zIndex = getLayerPropertyValue(layer, 'z-index', feature, lod);
+            const eventInfo = feature.properties;
             processPointArrayVSwitchPass(feature, lod, layer, featureIndex, zIndex, eventInfo);
 
-            var vswitch = layer['visibility-switch'];
-            for (var i = 0, li = vswitch.length; i <li; i++) {
+            const vswitch = layer['visibility-switch'];
+            for (let i = 0, li = vswitch.length; i <li; i++) {
                 if (vswitch[i][1]) {
-                    var slayer = getLayer(vswitch[i][1], type, featureIndex);
+                    const slayer = getLayer(vswitch[i][1], type, featureIndex);
                     processLayerFeature(type, feature, lod, slayer, featureIndex);
                 }
                 postGroupMessageLite(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_VSWITCH_STORE, vswitch[i][0]);
@@ -325,7 +329,7 @@ function processLayerFeature(type, feature, lod, layer, featureIndex, skipPack) 
         return;
     }
 
-    var zIndex = getLayerPropertyValue(layer, 'z-index', feature, lod);
+    const zIndex = getLayerPropertyValue(layer, 'z-index', feature, lod);
 
     if (getLayerPropertyValue(layer, 'export-geometry', feature, lod) && (typeof feature['id'] !== 'undefined')) {
         if (!exportedGeometries[feature]) {
@@ -338,27 +342,27 @@ function processLayerFeature(type, feature, lod, layer, featureIndex, skipPack) 
             case 'point-array':
                 processPointArrayGeometry(feature);
                 break;
-                    
+
             case 'polygon':
-                break;     
+                break;
             }
 
             exportedGeometries[feature] = true;
         }
     }
 
-    var eventInfo = feature.properties;
+    const eventInfo = feature.properties;
 
-    var selectedLayerId = getLayerPropertyValue(layer, 'selected-layer', feature, lod);
-    var selectedLayer = (selectedLayerId != '') ? getLayer(selectedLayerId, type, featureIndex) : null;
+    const selectedLayerId = getLayerPropertyValue(layer, 'selected-layer', feature, lod);
+    const selectedLayer = (selectedLayerId != '') ? getLayer(selectedLayerId, type, featureIndex) : null;
 
-    var selectedHoverLayerId = getLayerPropertyValue(layer, 'selected-hover-layer', feature, lod);
-    var selectedHoverLayer = (selectedHoverLayerId != '') ? getLayer(selectedHoverLayerId, type, featureIndex) : null;
+    const selectedHoverLayerId = getLayerPropertyValue(layer, 'selected-hover-layer', feature, lod);
+    const selectedHoverLayer = (selectedHoverLayerId != '') ? getLayer(selectedHoverLayerId, type, featureIndex) : null;
 
-    var hoverLayerId = getLayerPropertyValue(layer, 'hover-layer', feature, lod);
-    var hoverLayer = (hoverLayerId != '') ? getLayer(hoverLayerId, type, featureIndex) : null;
+    const hoverLayerId = getLayerPropertyValue(layer, 'hover-layer', feature, lod);
+    const hoverLayer = (hoverLayerId != '') ? getLayer(hoverLayerId, type, featureIndex) : null;
 
-    var flags =  ((hoverLayer != null) ? (1<<8) : 0) | ((selectedLayer != null) ? (1<<9) : 0) | ((selectedHoverLayer != null) ? (1<<10) : 0);
+    const flags =  ((hoverLayer != null) ? (1<<8) : 0) | ((selectedLayer != null) ? (1<<9) : 0) | ((selectedHoverLayer != null) ? (1<<10) : 0);
 
     if (selectedLayer != null) {
         globals.hitState = flags | 2;
@@ -384,25 +388,25 @@ function processLayerFeature(type, feature, lod, layer, featureIndex, skipPack) 
 }
 
 function processGroup(group, lod) {
-    var i, li;
-    var groupId = group['id'] || '';
+    //let i, li;
+    const groupId = group['id'] || '';
     globals.groupId = groupId;
 
-    var bbox = group['bbox'];    
+    const bbox = group['bbox'];
     if (!bbox) {
         return;
     }
-          
-    var bboxMin = bbox[0];
-    var bboxMax = bbox[1];
+
+    const bboxMin = bbox[0];
+    const bboxMax = bbox[1];
     globals.bboxMin = bboxMin;
     globals.bboxMax = bboxMax;
 
-    var bboxDelta = [bbox[1][0] - bbox[0][0],
+    const bboxDelta = [bbox[1][0] - bbox[0][0],
         bbox[1][1] - bbox[0][1],
         bbox[1][2] - bbox[0][2]];
-    var bboxResolution = group['resolution'] || 4096;
-    
+    const bboxResolution = group['resolution'] || 4096;
+
     globals.groupOrigin = [0,0,0];
     globals.forceScale = [bboxDelta[0] / bboxResolution,
         bboxDelta[1] / bboxResolution,
@@ -411,17 +415,17 @@ function processGroup(group, lod) {
     postGroupMessageFast(VTS_WORKERCOMMAND_GROUP_BEGIN, 0, {'id': group['id'], 'bbox': [bboxMin, bboxMax], 'origin': bboxMin}, [], "");
 
     //process points
-    var points = group['points'] || [];
+    const points = group['points'] || [];
     globals.featureType = 'point';
     processFeatures('point-array', points, lod, 'point', groupId);
 
     //process lines
-    var lines = group['lines'] || [];
+    const lines = group['lines'] || [];
     globals.featureType = 'line';
     processFeatures('line-string', lines, lod, 'line', groupId);
 
     //process polygons
-    var polygons = group['polygons'] || [];
+    const polygons = group['polygons'] || [];
     globals.featureType = 'polygon';
     processFeatures('polygon', polygons, lod, 'polygon', groupId);
 
@@ -434,23 +438,23 @@ function processGroup(group, lod) {
 
 
 function processNode(node, lod) {
-    var i, li;
+    let i, li;
 
     //TODO: get volume
 
     postGroupMessageFast(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_NODE_BEGIN, {'volume': node.volume, 'precision': node.precision, 'tileset': node.tileset }, [], "");
 
-    var meshes = node['meshes'] || [];
+    const meshes = node['meshes'] || [];
 
     //loop elements
     for (i = 0, li = meshes.length; i < li; i++) {
 
-        var signature = meshes[i];
+        const signature = meshes[i];
 
         postGroupMessageFast(VTS_WORKERCOMMAND_ADD_RENDER_JOB, VTS_WORKER_TYPE_MESH, { 'path':meshes[i] }, [], signature);
     }
 
-    var nodes = node['nodes'] || [];
+    const nodes = node['nodes'] || [];
 
     for (i = 0, li = nodes.length; i < li; i++) {
         processNode(nodes[i], lod);
@@ -462,10 +466,12 @@ function processNode(node, lod) {
 function processGeodata(data, lod) {
     //console.log("processGeodata");
 
+    let geodata;
+
     //create object from JSON
     if ((typeof data) == 'string') {
         try {
-            var geodata = JSON.parse(data);
+            geodata = JSON.parse(data);
         } catch (e) {
             geodata = null;
         }
@@ -475,16 +481,16 @@ function processGeodata(data, lod) {
 
     if (geodata) {
 
-        var groups = geodata['groups'] || [];
+        const groups = geodata['groups'] || [];
 
         //process layers
-        for (var i = 0, li = groups.length; i < li; i++) {
+        for (let i = 0, li = groups.length; i < li; i++) {
             processGroup(groups[i], lod);
         }
 
-        var nodes = geodata['nodes'] || [];
+        const nodes = geodata['nodes'] || [];
 
-        for (var i = 0, li = nodes.length; i < li; i++) {
+        for (let i = 0, li = nodes.length; i < li; i++) {
             postGroupMessageFast(VTS_WORKERCOMMAND_GROUP_BEGIN, 0, {}, [], "");
             processNode(nodes[i], lod);
             postGroupMessageLite(VTS_WORKERCOMMAND_GROUP_END, 0);
@@ -495,11 +501,11 @@ function processGeodata(data, lod) {
 }
 
 self.onmessage = function (e) {
-    var message = e.data;
-    var command = message['command'];
-    var data = message['data'];
-    var dataRaw = null;
-    var geodata2 = false;
+    const message = e.data;
+    const command = message['command'];
+    let data = message['data'];
+    let dataRaw = null;
+    let geodata2 = false;
 
     //console.log("workeronmessage: " + command);
 
@@ -538,9 +544,9 @@ self.onmessage = function (e) {
 
         //test geodata2
         if (data.length > 2) {
-            var dataView = new DataView(data);
+            const dataView = new DataView(data);
 
-            var magic = '';
+            let magic = '';
             magic += String.fromCharCode(dataView.getUint8(0, true));
             magic += String.fromCharCode(dataView.getUint8(1, true));
 
@@ -550,6 +556,8 @@ self.onmessage = function (e) {
         }
 
         data = Utf8ArrayToStr(data);
+
+        break; //????
 
     case 'processGeodata':
         globals.tileLod = message['lod'] || 0;
@@ -563,19 +571,20 @@ self.onmessage = function (e) {
         globals.invPixelsPerMM = 1.0 / globals.pixelsPerMM;
         exportedGeometries = [];
 
+        // eslint-disable-next-line
         if (geodata2) {
-            processGeodata2(dataView, globals.tileLod);
+            //processGeodata2(dataView, globals.tileLod);
         } else {
-            data = JSON.parse(data);            
+            data = JSON.parse(data);
             processGeodata(data, globals.tileLod);
         }
 
         postGroupMessageLite(VTS_WORKERCOMMAND_ALL_PROCESSED, 0);
-            
+
         if (globals.groupOptimize) {  //we need send all processed message
             optimizeGroupMessages();
         }
-            
+
         //postMessage({'command' : 'allProcessed'});
 
         if (dataRaw) {
@@ -596,4 +605,3 @@ self.onmessage = function (e) {
 
     }
 };
-

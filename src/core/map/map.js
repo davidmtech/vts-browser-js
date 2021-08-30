@@ -21,29 +21,29 @@ import MapUrl_ from './url';
 //import GpuTexture_ from '../renderer/gpu/texture';
 
 //get rid of compiler mess
-var vec3 = vec3_;
-var utils = utils_;
-var platform = platform_;
-var MapView = MapView_;
-var MapSurfaceTree = MapSurfaceTree_;
-var MapResourceTree = MapResourceTree_;
-var MapSrs = MapSrs_;
-var MapCache = MapCache_;
-var MapCamera = MapCamera_;
-var MapConfig = MapConfig_;
-var MapConvert = MapConvert_;
-var MapMeasure = MapMeasure_;
-var MapDraw = MapDraw_;
-var MapLoader = MapLoader_;
-var MapPosition = MapPosition_;
-var MapRenderSlots = MapRenderSlots_;
-var MapStats = MapStats_;
-var MapSurfaceSequence = MapSurfaceSequence_;
-var MapUrl = MapUrl_;
-//var GpuTexture = GpuTexture_;
+const vec3 = vec3_;
+const utils = utils_;
+const platform = platform_;
+const MapView = MapView_;
+const MapSurfaceTree = MapSurfaceTree_;
+const MapResourceTree = MapResourceTree_;
+const MapSrs = MapSrs_;
+const MapCache = MapCache_;
+const MapCamera = MapCamera_;
+const MapConfig = MapConfig_;
+const MapConvert = MapConvert_;
+const MapMeasure = MapMeasure_;
+const MapDraw = MapDraw_;
+const MapLoader = MapLoader_;
+const MapPosition = MapPosition_;
+const MapRenderSlots = MapRenderSlots_;
+const MapStats = MapStats_;
+const MapSurfaceSequence = MapSurfaceSequence_;
+const MapUrl = MapUrl_;
+//const GpuTexture = GpuTexture_;
 
 
-var Map = function(core, mapConfig, path, config, configStorage) {
+const Map = function(core, mapConfig, path, config, configStorage) {
     this.config = config || {};
     this.setConfigParams(config);
     this.setLoaderParams(mapConfig, configStorage);
@@ -140,7 +140,7 @@ var Map = function(core, mapConfig, path, config, configStorage) {
     this.draw = new MapDraw(this);
     this.draw.setupDetailDegradation();
 
-    var body = this.referenceFrame.body, c;
+    let body = this.referenceFrame.body, c;
 
     if (body && body.atmosphere) {
         c = body.atmosphere.colorHorizon;
@@ -183,8 +183,8 @@ Map.prototype.kill = function() {
         this.tree.kill();
     }
 
-    for (var key in this.freeLayers) {
-        var layer = this.freeLayers[key];
+    for (let key in this.freeLayers) {
+        const layer = this.freeLayers[key];
         if (layer && layer.tree) {
             layer.tree.kill();
         }
@@ -217,8 +217,8 @@ Map.prototype.setupCache = function() {
         return;
     }
 
-    var factor = 1 / (this.mobile ? Math.pow(2, Math.max(0,this.config.mapMobileDetailDegradation-1)) : 1);
-    var factor2 = 1 / (this.mobile ? Math.pow(2, this.config.mapMobileDetailDegradation) : 1);
+    let factor = 1 / (this.mobile ? Math.pow(2, Math.max(0,this.config.mapMobileDetailDegradation-1)) : 1);
+    const factor2 = 1 / (this.mobile ? Math.pow(2, this.config.mapMobileDetailDegradation) : 1);
     factor = (factor + factor2) * 0.5;
     this.resourcesCache.setMaxCost(this.config.mapCache*1024*1024*factor);
     this.gpuCache.setMaxCost(this.config.mapGPUCache*1024*1024*factor);
@@ -302,13 +302,13 @@ Map.prototype.getCredits = function() {
 
 
 Map.prototype.getVisibleCredits = function() {
-    var imagery = this.visibleCredits.imagery;
-    var glueImagery = this.visibleCredits.glueImagery;
-    var imageryArray = [];
-    var imagerySpecificity = [];
-    var i, li, t, sorted;
+    const imagery = this.visibleCredits.imagery;
+    const glueImagery = this.visibleCredits.glueImagery;
+    const imageryArray = [];
+    const imagerySpecificity = [];
+    let i, li, t, sorted;
 
-    for (var key in glueImagery) {
+    for (let key in glueImagery) {
         if (!imagery[key]) {
             imagery[key] = glueImagery[key];
         }
@@ -316,7 +316,7 @@ Map.prototype.getVisibleCredits = function() {
 
     this.visibleCredits.glueImagery = {};
 
-    for (key in imagery) {
+    for (let key in imagery) {
         imageryArray.push(key);
         imagerySpecificity.push(imagery[key]);
     }
@@ -339,11 +339,11 @@ Map.prototype.getVisibleCredits = function() {
 
     } while(!sorted);
 
-    var mapdata = this.visibleCredits.mapdata;
-    var mapdataArray = [];
-    var mapdataSpecificity = [];
+    const mapdata = this.visibleCredits.mapdata;
+    const mapdataArray = [];
+    const mapdataSpecificity = [];
 
-    for (key in mapdata) {
+    for (let key in mapdata) {
         mapdataArray.push(key);
         mapdataSpecificity.push(mapdata[key]);
     }
@@ -386,8 +386,8 @@ Map.prototype.getSurface = function(id) {
 
 
 Map.prototype.getSurfaces = function() {
-    var keys = [];
-    for (var i = 0, li = this.surfaces.length; i < li; i++) {
+    const keys = [];
+    for (let i = 0, li = this.surfaces.length; i < li; i++) {
         keys.push(this.surfaces[i].id);
     }
     return keys;
@@ -434,8 +434,8 @@ Map.prototype.removeBoundLayer = function(id) {
 
 
 Map.prototype.getBoundLayerByNumber = function(number) {
-    var layers = this.boundLayers;
-    for (var key in layers) {
+    const layers = this.boundLayers;
+    for (let key in layers) {
         if (layers[key].numberId == number) {
             return layers[key];
         }
@@ -495,8 +495,8 @@ Map.prototype.getFreeLayer = function(id) {
 
 
 Map.prototype.getFreeLayers = function() {
-    var keys = [];
-    for (var key in this.freeLayers) {
+    const keys = [];
+    for (let key in this.freeLayers) {
         keys.push(key);
     }
     return keys;
@@ -539,7 +539,7 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
     }
 
     if (posToFixed && this.convert) {
-        var p = this.getPosition();
+        let p = this.getPosition();
         p = this.convert.convertPositionHeightMode(p, 'fix', true);
         this.setPosition(p);
     }
@@ -566,7 +566,7 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
     }
 
     //construct view string without options
-    var string = {};
+    let string = {};
 
     if (view.surfaces) {
         string.surfaces = view.surfaces;
@@ -578,11 +578,11 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
 
     string = JSON.stringify(string);
 
-    var renderer = this.renderer;
+    const renderer = this.renderer;
 
     //process options
     if (view.options) {
-        var se = view.options.superelevation;
+        const se = view.options.superelevation;
 
         if (se && se[0] && se[1] && se[0].length >=2 && se[1].length >=2) {
             renderer.setSuperElevationState(true);
@@ -598,7 +598,8 @@ Map.prototype.setView = function(view, forceRefresh, posToFixed) {
         this.currentView.parse(view);
         this.currentViewString = string;
         this.viewCounter++;  //this also cause rest of geodata
-        renderer.draw.clearJobHBuffer(); //hotfix - reset hysteresis buffer
+
+        renderer.gpu.draw.clearJobHBuffer(); //hotfix - reset hysteresis buffer
     }
 
     this.surfaceSequence.generateSurfaceSequence();
@@ -622,9 +623,9 @@ Map.prototype.getStylesheet = function(id) {
 
 
 Map.prototype.getStylesheets = function() {
-    var keys = [];
+    const keys = [];
 
-    for (var key in this.stylesheets) {
+    for (let key in this.stylesheets) {
         keys.push(key);
     }
     return keys;
@@ -632,7 +633,7 @@ Map.prototype.getStylesheets = function() {
 
 
 Map.prototype.getStylesheetData = function(id) {
-    var stylesheet = this.getStylesheet(id);
+    const stylesheet = this.getStylesheet(id);
 
     if (stylesheet) {
         return {'url':stylesheet.url, 'data': stylesheet.data};
@@ -643,21 +644,21 @@ Map.prototype.getStylesheetData = function(id) {
 
 
 Map.prototype.setStylesheetData = function(id, data) {
-    var stylesheet = this.getStylesheet(id);
+    const stylesheet = this.getStylesheet(id);
 
     //if (stylesheet) {
       //  stylesheet.data = data;
     //}
 
-    this.renderer.draw.clearJobHBuffer();
+    this.renderer.gpu.draw.clearJobHBuffer();
 
     if (stylesheet) {
         if (data) {
             stylesheet.setData(data);
         }
 
-        for (var key in this.freeLayers) {
-            var freeLayer = this.getFreeLayer(key);
+        for (let key in this.freeLayers) {
+            const freeLayer = this.getFreeLayer(key);
             if (freeLayer && freeLayer.geodata && freeLayer.stylesheet == stylesheet) {
 
                 if (freeLayer.geodataProcessor) {
@@ -681,11 +682,11 @@ Map.prototype.getView = function() {
 
 
 Map.prototype.refreshFreelayesInView = function() {
-    var freeLayers = this.currentView.freeLayers;
+    const freeLayers = this.currentView.freeLayers;
     this.freeLayerSequence = [];
 
-    for (var key in freeLayers) {
-        var freeLayer = this.getFreeLayer(key);
+    for (let key in freeLayers) {
+        const freeLayer = this.getFreeLayer(key);
 
         if (freeLayer) {
 
@@ -715,7 +716,7 @@ Map.prototype.refreshView = function() {
 
 
 Map.prototype.searchArrayIndexById = function(array, id) {
-    for (var i = 0, li = array.length; i < li; i++) {
+    for (let i = 0, li = array.length; i < li; i++) {
         if (array[i].id == id) {
             return i;
         }
@@ -726,7 +727,7 @@ Map.prototype.searchArrayIndexById = function(array, id) {
 
 
 Map.prototype.searchArrayById = function(array, id) {
-    for (var i = 0, li = array.length; i < li; i++) {
+    for (let i = 0, li = array.length; i < li; i++) {
         if (array[i].id == id) {
             return array[i];
         }
@@ -737,7 +738,7 @@ Map.prototype.searchArrayById = function(array, id) {
 
 
 Map.prototype.searchMapByInnerId = function(map, id) {
-    for (var key in map) {
+    for (let key in map) {
         if (map[key].id == id) {
             return map[key];
         }
@@ -748,8 +749,8 @@ Map.prototype.searchMapByInnerId = function(map, id) {
 
 
 Map.prototype.getMapKeys = function(map) {
-    var keys = [];
-    for (var key in map) {
+    const keys = [];
+    for (let key in map) {
         keys.push(key);
     }
 
@@ -758,8 +759,8 @@ Map.prototype.getMapKeys = function(map) {
 
 
 Map.prototype.getMapIds = function(map) {
-    var keys = [];
-    for (var key in map) {
+    const keys = [];
+    for (let key in map) {
         keys.push(key.id);
     }
 
@@ -801,7 +802,7 @@ Map.prototype.getPosition = function() {
 
 
 Map.prototype.setLoaderParams = function(mapConfig, configStorage) {
-    var sources = [];
+    const sources = [];
 
     if (mapConfig && mapConfig['browserOptions']) {
         sources.push(mapConfig['browserOptions']);
@@ -811,9 +812,9 @@ Map.prototype.setLoaderParams = function(mapConfig, configStorage) {
         sources.push(configStorage);
     }
 
-    for (var i = 0, li = sources.length; i < li; i++) {
-        var source = sources[i];
-        for (var key in source) {
+    for (let i = 0, li = sources.length; i < li; i++) {
+        const source = sources[i];
+        for (let key in source) {
             switch(key) {
                 case 'mapSeparateLoader':
                 case 'mapGeodataBinaryLoad':
@@ -830,7 +831,7 @@ Map.prototype.setLoaderParams = function(mapConfig, configStorage) {
 
 Map.prototype.setConfigParams = function(params) {
     if (typeof params === 'object' && params !== null) {
-        for (var key in params) {
+        for (let key in params) {
             this.setConfigParam(key, params[key]);
         }
     }
@@ -1025,19 +1026,21 @@ Map.prototype.getScreenRay = function(screenX, screenY) {
 };
 
 
-Map.prototype.renderToImage = function(texture) {
-    //var renderer = this.renderer;
-    var canvas = this.renderer.gpu.canvas;
-    var w = canvas.width;
-    var h = canvas.height;
-    var w2 = utils.fitToPowerOfTwo(w);
-    var h2 = utils.fitToPowerOfTwo(h);
+Map.prototype.renderToImage = function() {
+    //const renderer = this.renderer;
+    const canvas = this.renderer.gpu.canvas;
+    const w = canvas.width;
+    const h = canvas.height;
+    const w2 = utils.fitToPowerOfTwo(w);
+    const h2 = utils.fitToPowerOfTwo(h);
 
-    var data = new Uint8Array( w2 * h2 * 4 );
+    let data = new Uint8Array( w2 * h2 * 4 );
 
-    var texture = new GpuTexture(this.renderer.gpu);
-    texture.createFromData(w2, h2, data);
-    texture.createFramebuffer(w2, h2);
+    //const texture = new GpuTexture(this.renderer.gpu);
+    //texture.createFromData(w2, h2, data);
+    //texture.createFramebuffer(w2, h2);
+
+    const texture = this.renderer.gpu.createTexture({ data: data, width: w2, height: h2, framebuffer: true});
 
     this.draw.drawToTexture(texture);
 
@@ -1046,12 +1049,12 @@ Map.prototype.renderToImage = function(texture) {
     texture.kill();
 
     //flip vertically
-    var data2 = new Uint8Array( w * h * 4 );
-    for (var y = 0; y < h; y++) {
-        var index = y * w * 4;
-        var index2 = (h - y - 1) * w * 4;
+    const data2 = new Uint8Array( w * h * 4 );
+    for (let y = 0; y < h; y++) {
+        let index = y * w * 4;
+        let index2 = (h - y - 1) * w * 4;
 
-        for (var x = 0; x < w; x++) {
+        for (let x = 0; x < w; x++) {
             data2[index2] = data[index];
             data2[index2+1] = data[index+1];
             data2[index2+2] = data[index+2];
@@ -1069,16 +1072,16 @@ Map.prototype.getScreenDepth = function(screenX, screenY, useFallback) {
 
     if (useFallback) {
 
-        var cameraPos = this.camera.position;
-        var ray = this.renderer.getScreenRay(screenX, screenY), a, d;
+        const cameraPos = this.camera.position;
+        let ray = this.renderer.getScreenRay(screenX, screenY);
 
         if (this.getNavigationSrs().isProjected()) { //plane fallback
-            var planePos = [0,0,Math.min(-1000,this.referenceFrame.getGlobalHeightRange()[0])];
-            var planeNormal = [0,0,1];
+            const planePos = [0,0,Math.min(-1000,this.referenceFrame.getGlobalHeightRange()[0])];
+            const planeNormal = [0,0,1];
 
-            d = vec3.dot(planeNormal, ray); //minification is wrong there
-            a = [planePos[0] - cameraPos[0], planePos[1] - cameraPos[1], planePos[2] - cameraPos[2]];
-            t = vec3.dot(a, planeNormal) / d;
+            const d = vec3.dot(planeNormal, ray); //minification is wrong there
+            const a = [planePos[0] - cameraPos[0], planePos[1] - cameraPos[1], planePos[2] - cameraPos[2]];
+            let t = vec3.dot(a, planeNormal) / d;
 
             if (t >= 0) {
                 return [true, t];
@@ -1087,20 +1090,20 @@ Map.prototype.getScreenDepth = function(screenX, screenY, useFallback) {
             }
 
         } else { //elipsoid fallback
-            var navigationSrsInfo = this.getNavigationSrs().getSrsInfo();
-            var planetRadius = navigationSrsInfo['b'] + this.referenceFrame.getGlobalHeightRange()[0];
+            const navigationSrsInfo = this.getNavigationSrs().getSrsInfo();
+            const planetRadius = navigationSrsInfo['b'] + this.referenceFrame.getGlobalHeightRange()[0];
 
-            var offset = [cameraPos[0], cameraPos[1], cameraPos[2]];
-            a = vec3.dot(ray, ray); //minification is wrong there
-            var b = 2 * vec3.dot(ray, offset);
-            var c = vec3.dot(offset, offset) - planetRadius * planetRadius;
-            d = b * b - 4 * a * c;
+            const offset = [cameraPos[0], cameraPos[1], cameraPos[2]];
+            const a = vec3.dot(ray, ray); //minification is wrong there
+            const b = 2 * vec3.dot(ray, offset);
+            const c = vec3.dot(offset, offset) - planetRadius * planetRadius;
+            let d = b * b - 4 * a * c;
 
             if (d > 0) {
                 d = Math.sqrt(d);
-                var t1 = (-b - d) / (2*a);
-                var t2 = (-b + d) / (2*a);
-                var t = (t1 < t2) ? t1 : t2;
+                const t1 = (-b - d) / (2*a);
+                const t2 = (-b + d) / (2*a);
+                const t = (t1 < t2) ? t1 : t2;
 
                 return [true, t];
             } else {
@@ -1111,15 +1114,15 @@ Map.prototype.getScreenDepth = function(screenX, screenY, useFallback) {
     } else {
 
         if (this.hitMapDirty) {
-            var tmp1 = this.draw.ndcToScreenPixel;
+            const tmp1 = this.draw.ndcToScreenPixel;
 
             this.draw.drawHitmap();
 
             this.draw.ndcToScreenPixel = tmp1;
 
-            var width = this.renderer.curSize[0], height = this.renderer.curSize[1];
+            const width = this.renderer.curSize[0], height = this.renderer.curSize[1];
 
-            var m = new Float32Array(16);
+            const m = new Float32Array(16);
             m[0] = 2.0/width; m[1] = 0; m[2] = 0; m[3] = 0;
             m[4] = 0; m[5] = -2.0/height; m[6] = 0; m[7] = 0;
             m[8] = 0; m[9] = 0; m[10] = 1; m[11] = 0;
@@ -1129,10 +1132,9 @@ Map.prototype.getScreenDepth = function(screenX, screenY, useFallback) {
             this.renderer.camera.update();
         }
 
-        var res = this.renderer.getDepth(screenX, screenY);
+        const res = this.renderer.getDepth(screenX, screenY);
+        return res;
     }
-
-    return res;
 };
 
 
@@ -1141,24 +1143,24 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
         this.draw.drawHitmap();
     }
 
-    var cameraSpaceCoords = this.renderer.hitTest(screenX, screenY);
+    const cameraSpaceCoords = this.renderer.hitTest(screenX, screenY);
+    const cameraPos = this.camera.position;
 
-    var fallbackUsed = false;
-    var cameraPos = this.camera.position;
-    var worldPos;
+    let fallbackUsed = false;
+    let worldPos;
 
-    var ray = cameraSpaceCoords[4], a, d;
+    const ray = cameraSpaceCoords[4];
 
     if (this.getNavigationSrs().isProjected()) { //plane fallback
-        var planePos = [0,0,Math.min(-1000,this.referenceFrame.getGlobalHeightRange()[0])];
-        var planeNormal = [0,0,1];
+        const planePos = [0,0,Math.min(-1000,this.referenceFrame.getGlobalHeightRange()[0])];
+        const planeNormal = [0,0,1];
 
-        d = vec3.dot(planeNormal, ray); //minification is wrong there
+        const d = vec3.dot(planeNormal, ray); //minification is wrong there
         //if (d > 1e-6) {
-        a = [planePos[0] - cameraPos[0], planePos[1] - cameraPos[1], planePos[2] - cameraPos[2]];
-        t = vec3.dot(a, planeNormal) / d;
+        const a = [planePos[0] - cameraPos[0], planePos[1] - cameraPos[1], planePos[2] - cameraPos[2]];
+        const t = vec3.dot(a, planeNormal) / d;
 
-            //var t = (vec3.dot(cameraPos, planeNormal) + (-500)) / d;
+            //const t = (vec3.dot(cameraPos, planeNormal) + (-500)) / d;
         if (t >= 0) {
             if (!cameraSpaceCoords[3] || t < cameraSpaceCoords[5]) {
                 worldPos = [ (ray[0] * t) + cameraPos[0],
@@ -1171,20 +1173,20 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
         //}
 
     } else /*if (false)*/ { //elipsoid fallback
-        var navigationSrsInfo = this.getNavigationSrs().getSrsInfo();
-        var planetRadius = navigationSrsInfo['b'] + this.referenceFrame.getGlobalHeightRange()[0];
+        const navigationSrsInfo = this.getNavigationSrs().getSrsInfo();
+        const planetRadius = navigationSrsInfo['b'] + this.referenceFrame.getGlobalHeightRange()[0];
 
-        var offset = [cameraPos[0], cameraPos[1], cameraPos[2]];
-        a = vec3.dot(ray, ray); //minification is wrong there
-        var b = 2 * vec3.dot(ray, offset);
-        var c = vec3.dot(offset, offset) - planetRadius * planetRadius;
-        d = b * b - 4 * a * c;
+        const offset = [cameraPos[0], cameraPos[1], cameraPos[2]];
+        const a = vec3.dot(ray, ray); //minification is wrong there
+        const b = 2 * vec3.dot(ray, offset);
+        const c = vec3.dot(offset, offset) - planetRadius * planetRadius;
+        let d = b * b - 4 * a * c;
 
         if (d > 0) {
             d = Math.sqrt(d);
-            var t1 = (-b - d) / (2*a);
-            var t2 = (-b + d) / (2*a);
-            var t = (t1 < t2) ? t1 : t2;
+            const t1 = (-b - d) / (2*a);
+            const t2 = (-b + d) / (2*a);
+            const t = (t1 < t2) ? t1 : t2;
 
             //console.log("hit: " + t + ",   " + cameraSpaceCoords[5]);
 
@@ -1208,7 +1210,7 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
             cameraSpaceCoords[2] + cameraPos[2] ];
     }
 
-    var navCoords = this.convert.convertCoords(worldPos, 'physical', 'navigation');
+    const navCoords = this.convert.convertCoords(worldPos, 'physical', 'navigation');
 
     if (this.renderer.useSuperElevation) {
         navCoords[2] = this.renderer.getUnsuperElevatedHeight(navCoords[2]);
@@ -1216,7 +1218,7 @@ Map.prototype.getHitCoords = function(screenX, screenY, mode, lod) {
 
     if (mode == 'float') {
         lod =  (lod != null) ? lod : this.measure.getOptimalHeightLod(navCoords, 100, this.config.mapNavSamplesPerViewExtent);
-        var surfaceHeight = this.measure.getSurfaceHeight(navCoords, lod);
+        const surfaceHeight = this.measure.getSurfaceHeight(navCoords, lod);
         navCoords[2] -= surfaceHeight[0];
     }
 
@@ -1240,15 +1242,15 @@ Map.prototype.hitTestGeoLayers = function(screenX, screenY, mode) {
         return [null, false, []];
     }
 
-    var res = this.renderer.hitTestGeoLayers(screenX, screenY);
-    var relatedEvents, elementIndex;
+    let res = this.renderer.hitTestGeoLayers(screenX, screenY);
+    let relatedEvents, elementIndex;
 
     if (res[0]) { //do we hit something?
         //console.log(JSON.stringify([id, JSON.stringify(this.hoverFeatureList[id])]));
 
-        var id = (res[1]) + (res[2]<<8);
+        const id = (res[1]) + (res[2]<<8);
 
-        var feature = this.hoverFeatureList[id];
+        const feature = this.hoverFeatureList[id];
 
         if (!feature) {
             return [null, false, [], elementIndex];
@@ -1327,17 +1329,15 @@ Map.prototype.hitTestGeoLayers = function(screenX, screenY, mode) {
 Map.prototype.getCurrentGeometry = function() {
     if (this.draw.tree.surfaceSequence.length > 0) {
         this.draw.tree.draw(true);
-        var res = this.storedTilesRes;
+        const res = this.storedTilesRes;
         this.storedTilesRes = [];
         return res;
     }
-
-    return res;
 };
 
 Map.prototype.applyCredits = function(tile) {
-    var value, value2;
-    for (var key in tile.imageryCredits) {
+    let value, value2;
+    for (let key in tile.imageryCredits) {
         value = tile.imageryCredits[key];
         value2 = this.visibleCredits.imagery[key];
 
@@ -1347,7 +1347,7 @@ Map.prototype.applyCredits = function(tile) {
             this.visibleCredits.imagery[key] = value;
         }
     }
-    for (key in tile.glueImageryCredits) {
+    for (let key in tile.glueImageryCredits) {
         value = tile.glueImageryCredits[key];
         value2 = this.visibleCredits.imagery[key];
 
@@ -1357,7 +1357,7 @@ Map.prototype.applyCredits = function(tile) {
             this.visibleCredits.glueImagery[key] = value;
         }
     }
-    for (key in tile.mapdataCredits) {
+    for (let key in tile.mapdataCredits) {
         value = tile.mapdataCredits[key];
         value2 = this.visibleCredits.mapdata[key];
 
@@ -1411,9 +1411,9 @@ Map.prototype.addProcessingTask2 = function(task) {
 
 /*
 Map.prototype.updateGeodataProcessors = function(task) {
-    var processors = this.map.geodataProcessors;
-    for (var i = 0, li = processors.length; i < li; i++) {
-        var processor = processors[i];
+    const processors = this.map.geodataProcessors;
+    for (let i = 0, li = processors.length; i < li; i++) {
+        const processor = processors[i];
 
         if (!processor.ready && processor.processing) {
             processor.
@@ -1456,16 +1456,16 @@ Map.prototype.update = function() {
     this.camera.lastTerrainHeight = this.camera.terrainHeight;
     this.drawFog = this.config.mapFog;
 
-    var rect = this.renderer.div.getBoundingClientRect();
-    var renderer = this.renderer, p;
-    var camPos = renderer.cameraPosition;
+    const rect = this.renderer.div.getBoundingClientRect();
+    const renderer = this.renderer;
+    const camPos = renderer.cameraPosition;
 
     if (renderer.curSize[0] != rect.width || renderer.curSize[1] != rect.height) {
         renderer.onResize();
         this.dirty = true;
     }
 
-    var dirty = (this.dirty || this.dirtyCountdown > 0), result;
+    let dirty = (this.dirty || this.dirtyCountdown > 0), result, p;
     this.stats.begin(dirty);
 
     this.loader.update();
@@ -1506,11 +1506,11 @@ Map.prototype.update = function() {
         if (this.hoverEvent != null) {
             result = this.hitTestGeoLayers(this.hoverEvent[0], this.hoverEvent[1], 'hover');
 
-            var relatedEvents = result[2];
+            const relatedEvents = result[2];
 
             if (relatedEvents != null) {
-                for(var i = 0, li = relatedEvents.length; i < li; i++) {
-                    var event = relatedEvents[i];
+                for(let i = 0, li = relatedEvents.length; i < li; i++) {
+                    const event = relatedEvents[i];
 
                     switch(event[0]) {
                     case 'enter':

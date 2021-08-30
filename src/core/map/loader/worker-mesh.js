@@ -2,12 +2,12 @@
 import {globals as globals_} from './worker-globals.js';
 
 //get rid of compiler mess
-var globals = globals_;
+const globals = globals_;
 
-var flagsInternalTexcoords =  1;
-var flagsExternalTexcoords =  2;
-var flagsPerVertexUndulation =  4;
-var flagsTextureMode =  8;
+const flagsInternalTexcoords =  1;
+const flagsExternalTexcoords =  2;
+//const flagsPerVertexUndulation =  4;
+//const flagsTextureMode =  8;
 
 
 function parseMesh(stream) {
@@ -23,11 +23,11 @@ function parseMesh(stream) {
     };
     */
 
-    var mesh = {}, i, li, submesh;
+    let mesh = {}, i, li, submesh;
 
     //parase header
-    var streamData = stream.data;
-    var magic = '';
+    const streamData = stream.data;
+    let magic = '';
 
     if (streamData.length < 2) {
         return false;
@@ -45,23 +45,23 @@ function parseMesh(stream) {
     if (mesh.version > 3) {
         return false;
     }
-    
+
     stream.uint8Data = new Uint8Array(stream.data.buffer);
 
     mesh.meanUndulation = streamData.getFloat64(stream.index, true); stream.index += 8;
     mesh.numSubmeshes = streamData.getUint16(stream.index, true); stream.index += 2;
 
     mesh.submeshes = [];
-    mesh.gpuSize = 0; 
+    mesh.gpuSize = 0;
     mesh.faces = 0;
     mesh.size = 0;
 
-    var use16bit = globals.config.map16bitMeshes;
+    //const use16bit = globals.config.map16bitMeshes;
 
     for (i = 0, li = mesh.numSubmeshes; i < li; i++) {
-        var submesh = parseSubmesh(mesh, stream);
+        const submesh = parseSubmesh(mesh, stream);
         if (submesh.valid) {
-            mesh.submeshes.push(submesh); 
+            mesh.submeshes.push(submesh);
             mesh.size += submesh.size;
             mesh.faces += submesh.faces;
 
@@ -69,13 +69,13 @@ function parseMesh(stream) {
             mesh.gpuSize += submesh.size;
         }
     }
-    
+
     mesh.numSubmeshes = mesh.submeshes.length;
 
     //prevent minification
 
-    var submeshes = [];
-    var transferables = [];
+    const submeshes = [];
+    const transferables = [];
 
     for (i = 0, li = mesh.numSubmeshes; i < li; i++) {
         submesh = mesh.submeshes[i];
@@ -115,7 +115,7 @@ function parseMesh(stream) {
              },
              transferables:transferables
            };
-};
+}
 
 
 function parseSubmesh(mesh, stream) {
@@ -128,7 +128,7 @@ function parseSubmesh(mesh, stream) {
     };
     */
 
-    var submesh = { valid:true };
+    const submesh = { valid:true };
 
     parseHeader(mesh, submesh, stream);
     if (mesh.version >= 3) {
@@ -138,7 +138,7 @@ function parseSubmesh(mesh, stream) {
     }
 
     return submesh;
-};
+}
 
 
 function parseHeader(mesh, submesh, stream) {
@@ -148,7 +148,7 @@ function parseHeader(mesh, submesh, stream) {
                                        // bit 1 - contains external texture coords
                                        // bit 2 - contains per vertex undulation
                                        // bit 3 - texture mode (0 - internal, 1 - external)
-        
+
         uchar surfaceReference;        // reference to the surface of origin, see bellow
         ushort textureLayer;           // applicable if texture mode is external: texture layer numeric id
         double boundingBox[2][3];      // read more about bounding box bellow
@@ -156,7 +156,7 @@ function parseHeader(mesh, submesh, stream) {
     */
 
     //debugger
-    var streamData = stream.data;
+    const streamData = stream.data;
 
     submesh.flags = streamData.getUint8(stream.index, true); stream.index += 1;
 
@@ -169,8 +169,8 @@ function parseHeader(mesh, submesh, stream) {
     submesh.textureLayer = streamData.getUint16(stream.index, true); stream.index += 2;
     submesh.textureLayer2 = submesh.textureLayer; //hack for presentation
 
-    var bboxMin = [];
-    var bboxMax = [];
+    const bboxMin = [];
+    const bboxMax = [];
 
     bboxMin[0] = streamData.getFloat64(stream.index, true); stream.index += 8;
     bboxMin[1] = streamData.getFloat64(stream.index, true); stream.index += 8;
@@ -179,10 +179,10 @@ function parseHeader(mesh, submesh, stream) {
     bboxMax[0] = streamData.getFloat64(stream.index, true); stream.index += 8;
     bboxMax[1] = streamData.getFloat64(stream.index, true); stream.index += 8;
     bboxMax[2] = streamData.getFloat64(stream.index, true); stream.index += 8;
-    
+
     submesh.bboxMin = bboxMin;
     submesh.bboxMax = bboxMax;
-};
+}
 
 
 function parseVerticesAndFaces(mesh, submesh, stream) {
@@ -207,24 +207,22 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
     };
     */
 
-    var data = stream.data;
-    var index = stream.index;
-    var uint8Data = stream.uint8Data;
-
-    var use16bit = globals.config.map16bitMeshes;
-
-    var numVertices = data.getUint16(index, true); index += 2;
+    let index = stream.index;
+    const data = stream.data;
+    const uint8Data = stream.uint8Data;
+    const use16bit = globals.config.map16bitMeshes;
+    const numVertices = data.getUint16(index, true); index += 2;
 
     if (!numVertices) {
         submesh.valid = false;
     }
 
-    var internalUVs = null;
-    var externalUVs = null;
-    var onlyOneUVs = globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords);
-    var tmpVertices, tmpExternalUVs, tmpInternalUVs;
+    const onlyOneUVs = globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords);
 
-    var vertices = use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
+    let internalUVs, externalUVs;
+    let tmpVertices, tmpExternalUVs, tmpInternalUVs;
+
+    let vertices = use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
 
     if (submesh.flags & flagsExternalTexcoords) {
         if (onlyOneUVs) {
@@ -234,10 +232,10 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
         }
     }
 
-    var uvfactor = use16bit ? 1.0 : (1.0 / 65535);
-    var vindex = 0;
-    var uvindex = 0;
-    var i, li;
+    const uvfactor = use16bit ? 1.0 : (1.0 / 65535);
+    let vindex = 0;
+    let uvindex = 0;
+    let i, li;
 
     for (i = 0; i < numVertices; i++) {
         vertices[vindex] = (uint8Data[index] + (uint8Data[index + 1]<<8)) * uvfactor;
@@ -260,7 +258,7 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
 
     tmpVertices = vertices;
     tmpExternalUVs = externalUVs;
-   
+
     /*
     struct TexcoorsBlock {
         ushort numTexcoords;              // number of texture coordinates
@@ -276,17 +274,17 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
     */
 
     if (submesh.flags & flagsInternalTexcoords) {
-        var numUVs = data.getUint16(index, true); index += 2;
-    
+        const numUVs = data.getUint16(index, true); index += 2;
+
         internalUVs = use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
-        //var uvfactor = 1.0 / 65535;
-    
+        //const uvfactor = 1.0 / 65535;
+
         for (i = 0, li = numUVs * 2; i < li; i+=2) {
             internalUVs[i] = (uint8Data[index] + (uint8Data[index + 1]<<8)) * uvfactor;
             internalUVs[i+1] = (65535 - (uint8Data[index+2] + (uint8Data[index + 3]<<8))) * uvfactor;
             index += 4;
         }
-    
+
         tmpInternalUVs = internalUVs;
     }
 
@@ -303,15 +301,15 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
     };
     */
 
-    var numFaces = data.getUint16(index, true); index += 2;
-    var indices = null;
+    const numFaces = data.getUint16(index, true); index += 2;
+    let indices = null;
 
     internalUVs = null;
     externalUVs = null;
 
-    var onlyExternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && !(submesh.flags & flagsInternalTexcoords));
-    var onlyInternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords));
-    var onlyIndices = onlyExternalIndices || onlyInternalIndices;
+    const onlyExternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && !(submesh.flags & flagsInternalTexcoords));
+    const onlyInternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords));
+    const onlyIndices = onlyExternalIndices || onlyInternalIndices;
 
     if (onlyIndices) {
         indices = new Uint16Array(numFaces * 3);
@@ -327,10 +325,10 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
         }
     }
 
-    var vtmp = tmpVertices;
-    var eUVs = tmpExternalUVs;
-    var iUVs = tmpInternalUVs;
-    var v1, v2, v3, vv1, vv2, vv3, sindex;
+    let vtmp = tmpVertices;
+    let eUVs = tmpExternalUVs;
+    let iUVs = tmpInternalUVs;
+    let v1, v2, v3, vv1, vv2, vv3, sindex;
 
     if (onlyExternalIndices) {
         vertices = tmpVertices;
@@ -443,12 +441,12 @@ function parseVerticesAndFaces(mesh, submesh, stream) {
     if (submesh.externalUVs) submesh.size += submesh.externalUVs.byteLength;
     if (submesh.indices) submesh.size += submesh.indices.byteLength;
     submesh.faces = numFaces;
-};
+}
 
 
 function parseWord(data, res) {
-    var value = data[res[1]];
-    
+    const value = data[res[1]];
+
     if (value & 0x80) {
         res[0] = (value & 0x7f) | (data[res[1]+1] << 7);
         res[1] += 2;
@@ -456,32 +454,32 @@ function parseWord(data, res) {
         res[0] = value;
         res[1] ++;
     }
-};
+}
 
 
 function parseDelta(data, res) {
-    var value = data[res[1]];
-    
+    let value = data[res[1]];
+
     if (value & 0x80) {
         value = (value & 0x7f) | (data[res[1]+1] << 7);
 
         if (value & 1) {
-            res[0] = -((value >> 1)+1); 
+            res[0] = -((value >> 1)+1);
             res[1] += 2;
         } else {
-            res[0] = (value >> 1); 
+            res[0] = (value >> 1);
             res[1] += 2;
         }
     } else {
         if (value & 1) {
-            res[0] = -((value >> 1)+1); 
+            res[0] = -((value >> 1)+1);
             res[1] ++;
         } else {
-            res[0] = (value >> 1); 
+            res[0] = (value >> 1);
             res[1] ++;
         }
     }
-};
+}
 
 
 function parseVerticesAndFaces2(mesh, submesh, stream) {
@@ -499,44 +497,45 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
     };
     */
 
-    var data = stream.data;
-    var index = stream.index;
-    var uint8Data = stream.uint8Data;
+    const data = stream.data;
+    const uint8Data = stream.uint8Data;
 
-    var use16bit = globals.config.map16bitMeshes;
-    var onlyOneUVs = globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords);
-    var tmpVertices, tmpExternalUVs, tmpInternalUVs;
+    const use16bit = globals.config.map16bitMeshes;
+    const onlyOneUVs = globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords);
 
-    var numVertices = data.getUint16(index, true); index += 2;
-    var quant = data.getUint16(index, true); index += 2;
+    let index = stream.index;
+    let tmpVertices, tmpExternalUVs, tmpInternalUVs;
+
+    const numVertices = data.getUint16(index, true); index += 2;
+    let quant = data.getUint16(index, true); index += 2;
 
     if (!numVertices) {
         submesh.valid = false;
     }
 
-    var bmin = submesh.bboxMin;
-    var bmax = submesh.bboxMax;
+    const bmin = submesh.bboxMin;
+    const bmax = submesh.bboxMax;
 
-    var center = [(bmin[0] + bmax[0])*0.5, (bmin[1] + bmax[1])*0.5, (bmin[2] + bmax[2])*0.5];
-    var scale = Math.abs(Math.max(bmax[0] - bmin[0], bmax[1] - bmin[1], bmax[2] - bmin[2]));
+    const center = [(bmin[0] + bmax[0])*0.5, (bmin[1] + bmax[1])*0.5, (bmin[2] + bmax[2])*0.5];
+    const scale = Math.abs(Math.max(bmax[0] - bmin[0], bmax[1] - bmin[1], bmax[2] - bmin[2]));
 
-    var multiplier = 1.0 / quant;
-    var externalUVs = null;
+    let multiplier = 1.0 / quant;
+    let externalUVs = null, internalUVs = null;
 
-    var vertices = use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
-    var vindex;
-    
-    var x = 0, y = 0,z = 0;
-    var cx = center[0], cy = center[1], cz = center[2];
-    var mx = bmin[0];
-    var my = bmin[1];
-    var mz = bmin[2];
-    var sx = 1.0 / (bmax[0] - bmin[0]);
-    var sy = 1.0 / (bmax[1] - bmin[1]);
-    var sz = 1.0 / (bmax[2] - bmin[2]);
-    
-    var res = [0, index];
-    var i, li, t;
+    let vertices = use16bit ? (new Uint16Array(numVertices * 3)) : (new Float32Array(numVertices * 3));
+    let vindex;
+
+    let x = 0, y = 0,z = 0;
+    const cx = center[0], cy = center[1], cz = center[2];
+    const mx = bmin[0];
+    const my = bmin[1];
+    const mz = bmin[2];
+    const sx = 1.0 / (bmax[0] - bmin[0]);
+    const sy = 1.0 / (bmax[1] - bmin[1]);
+    const sz = 1.0 / (bmax[2] - bmin[2]);
+
+    let res = [0, index];
+    let i, li, t;
 
     if (use16bit) {
         for (i = 0; i < numVertices; i++) {
@@ -546,7 +545,7 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
             y += res[0];
             parseDelta(uint8Data, res);
             z += res[0];
-            
+
             vindex = i * 3;
             t = ((x * multiplier * scale + cx) - mx) * sx;
             if (t < 0) t = 0; if (t > 1.0) t = 1.0;
@@ -566,14 +565,14 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
             y += res[0];
             parseDelta(uint8Data, res);
             z += res[0];
-            
+
             vindex = i * 3;
             vertices[vindex] = ((x * multiplier * scale + cx) - mx) * sx;
             vertices[vindex+1] = ((y * multiplier * scale + cy) - my) * sy;
             vertices[vindex+2] = ((z * multiplier * scale + cz) - mz) * sz;
         }
     }
-    
+
     index = res[1];
 
     if (submesh.flags & flagsExternalTexcoords) {
@@ -599,7 +598,7 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
                     parseDelta(uint8Data, res);
                     y += res[0];
 
-                    var uvindex = i * 2;
+                    const uvindex = i * 2;
                     t = x * multiplier;
                     if (t < 0) t = 0; if (t > 65535) t = 65535;
                     externalUVs[uvindex] = t;
@@ -614,7 +613,7 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
                     parseDelta(uint8Data, res);
                     y += res[0];
 
-                    var uvindex = i * 2;
+                    const uvindex = i * 2;
                     externalUVs[uvindex] = x * multiplier;
                     externalUVs[uvindex+1] = 1 - (y * multiplier);
                 }
@@ -626,7 +625,7 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
 
     tmpVertices = vertices;
     tmpExternalUVs = externalUVs;
-    
+
     /*
     struct TexcoorsBlock {
         ushort numTexcoords;              // number of texture coordinates
@@ -642,14 +641,14 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
     */
 
     if (submesh.flags & flagsInternalTexcoords) {
-        var numUVs = data.getUint16(index, true); index += 2;
-        var quantU = data.getUint16(index, true); index += 2;
-        var quantV = data.getUint16(index, true); index += 2;
-        var multiplierU = (use16bit) ? (65536.0 / quantU) : (1.0 / quantU);
-        var multiplierV = (use16bit) ? (65536.0 / quantV) : (1.0 / quantV);
+        const numUVs = data.getUint16(index, true); index += 2;
+        const quantU = data.getUint16(index, true); index += 2;
+        const quantV = data.getUint16(index, true); index += 2;
+        const multiplierU = (use16bit) ? (65536.0 / quantU) : (1.0 / quantU);
+        const multiplierV = (use16bit) ? (65536.0 / quantV) : (1.0 / quantV);
         x = 0, y = 0;
-    
-        var internalUVs = use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
+
+        internalUVs = use16bit ? (new Uint16Array(numUVs * 2)) : (new Float32Array(numUVs * 2));
         res[1] = index;7
 
         if (use16bit) {
@@ -679,7 +678,7 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
         }
 
         index = res[1];
-    
+
         tmpInternalUVs = internalUVs;
     }
 
@@ -696,15 +695,15 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
     };
     */
 
-    var numFaces = data.getUint16(index, true); index += 2;
-    var indices = null;
+    const numFaces = data.getUint16(index, true); index += 2;
+    let indices = null;
 
     internalUVs = null;
     externalUVs = null;
 
-    var onlyExternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && !(submesh.flags & flagsInternalTexcoords));
-    var onlyInternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords));
-    var onlyIndices = onlyExternalIndices || onlyInternalIndices;
+    const onlyExternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && !(submesh.flags & flagsInternalTexcoords));
+    const onlyInternalIndices = (globals.config.mapIndexBuffers && globals.config.mapOnlyOneUVs && (submesh.flags & flagsInternalTexcoords));
+    const onlyIndices = onlyExternalIndices || onlyInternalIndices;
 
     if (onlyIndices) {
         indices = new Uint16Array(numFaces * 3);
@@ -720,11 +719,11 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
         }
     }
 
-    var vtmp = tmpVertices;
-    var eUVs = tmpExternalUVs;
-    var iUVs = tmpInternalUVs;
-    var high = 0;
-    var v1, v2, v3, vv1, vv2, vv3;
+    let vtmp = tmpVertices;
+    let eUVs = tmpExternalUVs;
+    let iUVs = tmpInternalUVs;
+    let high = 0;
+    let v1, v2, v3, vv1, vv2, vv3;
     res[1] = index;
 
     for (i = 0; i < numFaces; i++) {
@@ -747,7 +746,7 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
             indices[vindex+2] = v3;
         } else {
             vindex = i * (3 * 3);
-            var sindex = v1 * 3;
+            let sindex = v1 * 3;
             vertices[vindex] = vtmp[sindex];
             vertices[vindex+1] = vtmp[sindex+1];
             vertices[vindex+2] = vtmp[sindex+2];
@@ -791,11 +790,11 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
             parseWord(uint8Data, res);
             v1 = high - res[0];
             if (!res[0]) { high++; }
-    
+
             parseWord(uint8Data, res);
             v2 = high - res[0];
             if (!res[0]) { high++; }
-    
+
             parseWord(uint8Data, res);
             v3 = high - res[0];
             if (!res[0]) { high++; }
@@ -852,7 +851,6 @@ function parseVerticesAndFaces2(mesh, submesh, stream) {
     if (submesh.externalUVs) submesh.size += submesh.externalUVs.byteLength;
     if (submesh.indices) submesh.size += submesh.indices.byteLength;
     submesh.faces = numFaces;
-};
+}
 
 export {parseMesh};
-

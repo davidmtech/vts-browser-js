@@ -6,14 +6,14 @@ import MapPosition_ from './position';
 import MapGeodataBuilder_ from './geodata-builder';
 
 //get rid of compiler mess
-var MapTrajectory = MapTrajectory_;
-var MapBoundLayer = MapBoundLayer_;
-var MapSurface = MapSurface_;
-var MapPosition = MapPosition_;
-var MapGeodataBuilder = MapGeodataBuilder_;
+const MapTrajectory = MapTrajectory_;
+const MapBoundLayer = MapBoundLayer_;
+const MapSurface = MapSurface_;
+const MapPosition = MapPosition_;
+const MapGeodataBuilder = MapGeodataBuilder_;
 
 
-var MapInterface = function(map) {
+const MapInterface = function(map) {
     this.map = map;
     this.config = map.config;
 };
@@ -52,7 +52,7 @@ MapInterface.prototype.getCurrentCredits = function() {
 
 
 MapInterface.prototype.getCreditInfo = function(creditId) {
-    var credit = this.map.getCreditById(creditId);
+    const credit = this.map.getCreditById(creditId);
     return credit ? credit.getInfo() : {};
 };
 
@@ -63,7 +63,7 @@ MapInterface.prototype.getViews = function() {
 
 
 MapInterface.prototype.getViewInfo = function(viewId) {
-    var view = this.map.getNamedView(viewId);
+    const view = this.map.getNamedView(viewId);
     return view ? view.getInfo() : {};
 };
 
@@ -84,7 +84,7 @@ MapInterface.prototype.getFreeLayers = function() {
 
 
 MapInterface.prototype.getFreeLayerInfo = function(layerId) {
-    var layer = this.map.getFreeLayer(layerId);
+    const layer = this.map.getFreeLayer(layerId);
     return layer ? layer.getInfo() : {};
 };
 
@@ -95,7 +95,7 @@ MapInterface.prototype.getSurfaces = function() {
 
 
 MapInterface.prototype.getSurfaceInfo = function(surfaceId) {
-    var surface = this.map.getFreeLayer(surfaceId);
+    const surface = this.map.getFreeLayer(surfaceId);
     return surface ? surface.getInfo() : {};
 };
 
@@ -106,7 +106,7 @@ MapInterface.prototype.getSrses = function() {
 
 
 MapInterface.prototype.getSrsInfo = function(srsId) {
-    var srs = this.map.getSrs(srsId);
+    const srs = this.map.getSrs(srsId);
     return srs ? srs.getInfo() : {};
 };
 
@@ -117,7 +117,7 @@ MapInterface.prototype.getReferenceFrame = function() {
 
 
 MapInterface.prototype.addFreeLayer = function(id, options) {
-    var layer = new MapSurface(this.map, options, 'free');
+    const layer = new MapSurface(this.map, options, 'free');
     this.map.addFreeLayer(id, layer);
 };
 
@@ -138,7 +138,7 @@ MapInterface.prototype.getFreeLayerOptions = function(id) {
 
 
 MapInterface.prototype.addBoundLayer = function(id, options) {
-    var layer = new MapBoundLayer(this.map, options, id);
+    const layer = new MapBoundLayer(this.map, options, id);
     this.map.addBoundLayer(id, layer);
 };
 
@@ -168,8 +168,8 @@ MapInterface.prototype.convertPositionHeightMode = function(position, mode, noPr
 
 
 MapInterface.prototype.convertCoords = function(sourceSrs, destinationSrs, coords) {
-    var srs = this.map.getSrs(sourceSrs);
-    var srs2 = this.map.getSrs(destinationSrs);
+    const srs = this.map.getSrs(sourceSrs);
+    const srs2 = this.map.getSrs(destinationSrs);
     if (!srs || !srs2) {
         return null;
     }
@@ -179,20 +179,20 @@ MapInterface.prototype.convertCoords = function(sourceSrs, destinationSrs, coord
 
 
 MapInterface.prototype.convertCoordsFromNavToPublic = function(pos, mode, lod) {
-    var p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
+    const p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
     return this.map.convert.getPositionPublicCoords((new MapPosition(p)), lod);
 };
 
 
 MapInterface.prototype.convertCoordsFromPublicToNav = function(pos, mode, lod) {
-    var p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
+    const p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
     return this.map.convert.getPositionNavCoordsFromPublic((new MapPosition(p)), lod);
 };
 
 
 MapInterface.prototype.convertCoordsFromPhysToPublic = function(pos, containsSE) {
     if (containsSE && this.map.renderer.useSuperElevation) {
-        var p = this.map.renderer.transformPointBySE(pos);
+        const p = this.map.renderer.transformPointBySE(pos);
         return this.map.convert.convertCoords(p, 'physical', 'public');
     } else {
         return this.map.convert.convertCoords(pos, 'physical', 'public');
@@ -201,7 +201,7 @@ MapInterface.prototype.convertCoordsFromPhysToPublic = function(pos, containsSE)
 
 
 MapInterface.prototype.convertCoordsFromNavToPhys = function(pos, mode, lod, includeSE) {
-    var p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
+    const p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
     return this.map.convert.getPositionPhysCoords((new MapPosition(p)), lod, includeSE);
 };
 
@@ -212,25 +212,25 @@ MapInterface.prototype.convertCoordsFromPhysToNav = function(pos, mode, lod, con
 
 
 MapInterface.prototype.convertCoordsFromNavToCanvas = function(pos, mode, lod) {
-    var p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
+    const p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
     return this.map.convert.getPositionCanvasCoords((new MapPosition(p)), lod);
 };
 
 
 MapInterface.prototype.convertCoordsFromPhysToCanvas = function(pos, containsSE) {
-    var p = ['obj', pos[0], pos[1], 'fix', pos[2], 0, 0, 0, 10, 45 ];
+    const p = ['obj', pos[0], pos[1], 'fix', pos[2], 0, 0, 0, 10, 45 ];
     return this.map.convert.getPositionCanvasCoords((new MapPosition(p)), null, true, containsSE);
 };
 
 
 MapInterface.prototype.convertCoordsFromNavToCameraSpace = function(pos, mode, lod) {
-    var p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
+    const p = ['obj', pos[0], pos[1], mode, pos[2], 0, 0, 0, 10, 45 ];
     return this.map.convert.getPositionCameraSpaceCoords((new MapPosition(p)), lod);
 };
 
 
 MapInterface.prototype.convertCoordsFromPhysToCameraSpace = function(pos) {
-    var p = this.map.camera.position;
+    const p = this.map.camera.position;
     return [pos[0] - p[0], pos[1] - p[1], pos[2] - p[2]];
 };
 
@@ -266,13 +266,14 @@ MapInterface.prototype.getSurfaceHeight = function(coords, precision) {
 
 
 MapInterface.prototype.getSurfaceAreaGeometry = function(coords, radius, mode, limit, callback, loadTextures) {
-    var res = this.map.measure.getSurfaceAreaGeometry(coords, radius, mode, limit, true, loadTextures);
+    const res = this.map.measure.getSurfaceAreaGeometry(coords, radius, mode, limit, true, loadTextures);
     //console.log('getSurfaceAreaGeometry');
 
     if (!res[0]) {
         return this.map.core.once('map-update', this.getSurfaceAreaGeometry.bind(this, coords, radius, mode, limit, callback, loadTextures), 1);
     } else {
-        var buffer = res[1], ret = [], map = this.map;
+        const buffer = res[1], map = this.map;
+        let ret = [];
 
         if (map.tree) {
             map.storedTilesRes = [];
@@ -307,7 +308,7 @@ MapInterface.prototype.getNED2 = function(coords, onlyMatrix) {
 
 
 MapInterface.prototype.getCameraInfo = function() {
-    var camera = this.map.camera;
+    const camera = this.map.camera;
     return {
         'projectionMatrix' : camera.camera.projection.slice(),
         'viewMatrix' : camera.camera.modelview.slice(),
@@ -339,7 +340,7 @@ MapInterface.prototype.generateTrajectory = function(p1, p2, options) {
 
 
 MapInterface.prototype.generatePIHTrajectory = function(position, azimuth, distance, options) {
-    var p = new MapPosition(position);
+    const p = new MapPosition(position);
     options['distance'] = distance;
     options['azimuth'] = azimuth;
     options['distanceAzimuth'] = true;
@@ -448,8 +449,8 @@ MapInterface.prototype.getStats = function(switches) {
         };
     }
 
-    var busyWorkers = 0;
-    for (var i = 0, li = this.map.geodataProcessors; i < li; i++) {
+    let busyWorkers = 0;
+    for (let i = 0, li = this.map.geodataProcessors; i < li; i++) {
         if (this.map.geodataProcessors[i].busy) {
             busyWorkers++;
         }

@@ -5,7 +5,7 @@
  * @constructor
  */
 
-var Rois = function(roiServers) {
+const Rois = function(roiServers) {
     this.roiServers = roiServers;
 };
 
@@ -13,7 +13,7 @@ var Rois = function(roiServers) {
 /**
  * roisAtPosition
  * Request rois intended for specific position
- * @param position position array 
+ * @param position position array
  * @param count number of requested rois
  * @param clb callback
  * @return Response promise object (if ES6 is supported otherwise null)
@@ -25,4 +25,3 @@ Rois.prototype.roisAtPosition = function(/*position, count, clb*/) {
 
 
 export default Rois;
-

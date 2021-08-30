@@ -1,5 +1,5 @@
 
-var ControlModeDisabled = function() {
+const ControlModeDisabled = function() {
 
 };
 

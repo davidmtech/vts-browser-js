@@ -5,13 +5,13 @@
 import {Octree as Octree_, OctreeRaycaster as OctreeRaycaster_} from './raycaster.js';
 
 //get rid of compiler mess
-//var GpuTexture = GpuTexture_;
-//var GpuMesh = GpuMesh_;
-//var GpuProgram = GpuProgram_;
-var Octree = Octree_;
-var OctreeRaycaster = OctreeRaycaster_;
+//const GpuTexture = GpuTexture_;
+//const GpuMesh = GpuMesh_;
+//const GpuProgram = GpuProgram_;
+const Octree = Octree_;
+const OctreeRaycaster = OctreeRaycaster_;
 
-var RendererInterface = function(renderer) {
+const RendererInterface = function(renderer) {
     this.renderer = renderer;
     this.gpu = renderer.gpu;
 };
@@ -36,7 +36,7 @@ RendererInterface.prototype.createState = function(options) {
         return this;
     }
 
-    var stateOptions = {
+    const stateOptions = {
         blend : (options['blend'] != null) ? options['blend'] : false,
         stencil : (options['stencil'] != null) ? options['stencil'] : false,
         zoffset : (options['zoffset'] != null) ? options['zoffset'] : 0,
@@ -63,28 +63,30 @@ RendererInterface.prototype.createTexture = function(options) {
         return null;
     }
 
-    var source = options['source'];
+    const source = options['source'];
     if (source == null) {
         return null;
     }
 
-    var filter = options['filter'] || 'linear';
-    var repeat = options['repeat'] || false, texture;
+    const filter = options['filter'] || 'linear';
+    const repeat = options['repeat'] || false;
 
     if (source instanceof Uint8Array) {
-        var width = options['width'];
-        var height = options['height'];
+        const width = options['width'];
+        const height = options['height'];
 
         if (width && height) {
-            texture = new GpuTexture(this.gpu);
-            texture.createFromData(width, height, source, filter, repeat);
+            //const texture = new GpuTexture(this.gpu);
+            //texture.createFromData(width, height, source, filter, repeat);
+            const texture = this.gpu.createTexture({data:source, width:width, height:height, filter: filter, repeat: repeat });
             return texture;
         }
     }
 
     if (source instanceof Image) {
-        texture = new GpuTexture(this.gpu);
-        texture.createFromImage(source, filter, repeat);
+        //const texture = new GpuTexture(this.gpu);
+        //texture.createFromImage(source, filter, repeat);
+        const texture = this.gpu.createTexture({image:source, filter: filter, repeat: repeat });
         return texture;
     }
 
@@ -105,7 +107,7 @@ RendererInterface.prototype.createMesh = function(options) {
         return null;
     }
 
-    var data = {
+    const data = {
         vertices : options['vertices'],
         uvs : options['uvs'],
         uvs2 : options['normals'],
@@ -118,7 +120,8 @@ RendererInterface.prototype.createMesh = function(options) {
         bbox : options['bbox']
     };
 
-    return new GpuMesh(this.gpu, data, 0, this.renderer.core);
+//    return new GpuMesh(this.gpu, data, 0, this.renderer.core);
+    return this.gpu.createMesh(data);
 };
 
 
@@ -131,23 +134,25 @@ RendererInterface.prototype.removeMesh = function(mesh) {
 
 
 RendererInterface.prototype.createShader = function(options) {
-    if (options == null || typeof options !== 'object') {
+    if (!options || typeof options !== 'object') {
         return null;
     }
 
-    var vertexShader = options['vertexShader'];
-    var fragmentShader = options['fragmentShader'];
+    const vertexShader = options['vertexShader'];
+    const fragmentShader = options['fragmentShader'];
 
-    if (vertexShader != null && fragmentShader) {
-        return new GpuProgram(this.gpu, vertexShader, fragmentShader);
+    if (vertexShader && fragmentShader) {
+        //return new GpuProgram(this.gpu, vertexShader, fragmentShader);
+        return this.gpu.createShader({ vertexShader: vertexShader, fragmentShader: fragmentShader});
     }
 };
 
 
 RendererInterface.prototype.removeResource = function(resource) {
-    if (resource != null && resource.kill != null) {
+    if (resource && resource.kill != null) {
         resource.kill();
     }
+
     return this;
 };
 
@@ -171,22 +176,21 @@ RendererInterface.prototype.drawMesh = function(options) {
         return this;
     }
 
-    //var shaderAttributes = options['shaderAttributes'];
-    var vertexAttr = options['vertex'] || 'aPosition';
-    var uvAttr = options['uv'] || 'aTexCoord';
-    var uv2Attr = options['normal'] || 'aNormal';
-    var depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
+    //const shaderAttributes = options['shaderAttributes'];
+    const vertexAttr = options['vertex'] || 'aPosition';
+    const depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
+    const shaderVariables = options['shaderVariables'];
 
-    var shaderVariables = options['shaderVariables'];
-    var shader = options['shader'] || 'textured';
+    let shader = options['shader'] || 'textured';
+    let uvAttr = options['uv'] || 'aTexCoord';
+    let uv2Attr = options['normal'] || 'aNormal';
+    let texture = options['texture'];
 
-
-    var renderer = this.renderer;
-    var mesh = options['mesh'];
-    var texture = options['texture'];
-    var mv = renderer.camera.getModelviewMatrix();
-    var proj = renderer.camera.getProjectionMatrix();
-    var fogDensity = renderer.fogDensity;
+    const renderer = this.renderer;
+    const mesh = options['mesh'];
+    const mv = renderer.camera.getModelviewMatrix();
+    const proj = renderer.camera.getProjectionMatrix();
+    const fogDensity = renderer.fogDensity;
 
     if (typeof shader === 'string') {
         switch(shader) {
@@ -203,7 +207,7 @@ RendererInterface.prototype.drawMesh = function(options) {
             uvAttr = null;
             uv2Attr = null;
             texture = null;
-            shader = renderer.progDepthTile[0];
+            shader = renderer.gpu.progDepthTile[0];
             break;
 
         case 'shaded':
@@ -226,7 +230,7 @@ RendererInterface.prototype.drawMesh = function(options) {
             }
 
             uv2Attr = (shader == 'textured') ? null : 'aNormal';
-            shader = (shader == 'textured') ? renderer.progTile[0] : ((shader == 'shaded') ? renderer.progShadedTile : renderer.progTShadedTile);
+            shader = (shader == 'textured') ? renderer.gpu.progTile[0] : ((shader == 'shaded') ? renderer.gpu.progShadedTile : renderer.gpu.progTShadedTile);
             break;
         }
     }
@@ -235,7 +239,7 @@ RendererInterface.prototype.drawMesh = function(options) {
         return;
     }
 
-    var attributes = [vertexAttr];
+    const attributes = [vertexAttr];
     if (uvAttr){
         attributes.push(uvAttr);
     }
@@ -245,8 +249,8 @@ RendererInterface.prototype.drawMesh = function(options) {
 
     renderer.gpu.useProgram(shader, attributes);
 
-    for (var key in shaderVariables) {
-        var item = shaderVariables[key];
+    for (let key in shaderVariables) {
+        const item = shaderVariables[key];
 
         if (item.length == 2) {
             switch(item[0]){
@@ -301,17 +305,17 @@ RendererInterface.prototype.drawImage = function(options) {
         return this;
     }
 
-    var rect = options['rect'];
-    var color = options['color'] || [255,255,255,255];
-    var depth = (options['depth'] != null) ? options['depth'] : 0;
-    var depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
-    var depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
-    var blend = (options['blend'] != null) ? options['blend'] : false;
-    var writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
-    var useState = (options['useState'] != null) ? options['useState'] : false;
+    const rect = options['rect'];
+    const depth = (options['depth'] != null) ? options['depth'] : 0;
+    const depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
+    const depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
+    const blend = (options['blend'] != null) ? options['blend'] : false;
+    const writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
+    const useState = (options['useState'] != null) ? options['useState'] : false;
+    let color = options['color'] || [255,255,255,255];
     color = [ color[0] * (1.0/255), color[1] * (1.0/255), color[2] * (1.0/255), color[3] * (1.0/255) ];
 
-    this.renderer.draw.drawImage(rect[0], rect[1], rect[2], rect[3], options['texture'], color, depth, depthOffset, depthTest, blend, writeDepth, useState);
+    this.renderer.gpu.draw.drawImage(rect[0], rect[1], rect[2], rect[3], options['texture'], color, depth, depthOffset, depthTest, blend, writeDepth, useState);
     return this;
 };
 
@@ -325,19 +329,19 @@ RendererInterface.prototype.drawBillboard = function(options) {
         return this;
     }
 
-    var mvp = options['mvp'];
-    var color = options['color'] || [255,255,255,255];
-    var depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
-    var depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
-    var blend = (options['blend'] != null) ? options['blend'] : false;
-    var writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
-    var useState = (options['useState'] != null) ? options['useState'] : false;
+    const mvp = options['mvp'];
+    const depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
+    const depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
+    const blend = (options['blend'] != null) ? options['blend'] : false;
+    const writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
+    const useState = (options['useState'] != null) ? options['useState'] : false;
+    let color = options['color'] || [255,255,255,255];
     color[0] *= 1.0/255;
     color[1] *= 1.0/255;
     color[2] *= 1.0/255;
     color[3] *= 1.0/255;
 
-    this.renderer.draw.drawBillboard(mvp, options['texture'], color, depthOffset, depthTest, blend, writeDepth, useState);
+    this.renderer.gpu.draw.drawBillboard(mvp, options['texture'], color, depthOffset, depthTest, blend, writeDepth, useState);
     return this;
 };
 
@@ -351,21 +355,21 @@ RendererInterface.prototype.drawLineString = function(options) {
         return this;
     }
 
-    var points = options['points'];
-    var color = options['color'] || [255,255,255,255];
-    var depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
-    var size = options['size'] || 2;
-    var screenSpace = (options['screenSpace'] != null) ? options['screenSpace'] : true;
-    var depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
-    var blend = (options['blend'] != null) ? options['blend'] : false;
-    var writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
-    var useState = (options['useState'] != null) ? options['useState'] : false;
+    const points = options['points'];
+    const depthOffset = (options['depthOffset'] != null) ? options['depthOffset'] : null;
+    const size = options['size'] || 2;
+    const screenSpace = (options['screenSpace'] != null) ? options['screenSpace'] : true;
+    const depthTest = (options['depthTest'] != null) ? options['depthTest'] : false;
+    const blend = (options['blend'] != null) ? options['blend'] : false;
+    const writeDepth = (options['writeDepth'] != null) ? options['writeDepth'] : false;
+    const useState = (options['useState'] != null) ? options['useState'] : false;
+    let color = options['color'] || [255,255,255,255];
     color[0] *= 1.0/255;
     color[1] *= 1.0/255;
     color[2] *= 1.0/255;
     color[3] *= 1.0/255;
 
-    this.renderer.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, blend, writeDepth, useState);
+    this.renderer.gpu.draw.drawLineString(points, screenSpace, size, color, depthOffset, depthTest, blend, writeDepth, useState);
     return this;
 };
 
@@ -385,42 +389,43 @@ RendererInterface.prototype.drawDebugText = function(options) {
         return this;
     }
 
-    var text = options['text'];
-    var coords = options['coords'];
+    const text = options['text'];
+    const coords = options['coords'];
 
     if (!text || !coords) {
         return this;
     }
 
-    var color = options['color'] || [255,255,255,255];
-    var size = options['size'] || 16;
-    var depth = options['depth'];
-    var useState = options['useState'] || false;
+    const size = options['size'] || 16;
+    const depth = options['depth'];
+    const useState = options['useState'] || false;
+    let color = options['color'] || [255,255,255,255];
     color[0] *= 1.0/255;
     color[1] *= 1.0/255;
     color[2] *= 1.0/255;
     color[3] *= 1.0/255;
 
-    var lx = this.renderer.draw.getTextSize(size, text);
+    const lx = this.renderer.gpu.draw.getTextSize(size, text);
 
-    this.renderer.draw.drawText(coords[0] - (lx * 0.5), coords[1], size, text, color, depth, useState);
+    this.renderer.gpu.draw.drawText(coords[0] - (lx * 0.5), coords[1], size, text, color, depth, useState);
 
     return this;
 };
 
 
 RendererInterface.prototype.buildOctreeFromGeometry = function(geometry) {
-    var octree = new Octree();
+    const octree = new Octree();
     octree.buildFromGeometry(geometry);
     return octree;
 };
 
 
 RendererInterface.prototype.raycastOctreeGeometry = function(octree, rayPos, rayDir) {
-    var raycaster = new OctreeRaycaster(), intersects = [];
+    const raycaster = new OctreeRaycaster(), intersects = [];
     raycaster.intersectOctree(rayPos, rayDir, octree, intersects);
     return raycaster.intersectOctants(rayPos, rayDir, intersects);
 };
+
 
 RendererInterface.prototype.saveScreenshot = function(output, filename, filetype) {
     return this.renderer.saveScreenshot(output, filename, filetype);

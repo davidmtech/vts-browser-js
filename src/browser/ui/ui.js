@@ -1,15 +1,8 @@
 
 import Dom_ from '../utility/dom';
-var dom = Dom_;
-
 import {utils as utils_} from '../../core/utils/utils';
-var utils = utils_;
-
 import UIControlHolder_ from './control/holder';
-var UIControlHolder = UIControlHolder_;
-
 import UIControlMap_ from './control/map';
-var UIControlMap = UIControlMap_;
 
 import UIControlCompass_ from './control/compass';
 import UIControlCredits_ from './control/credits';
@@ -28,24 +21,29 @@ import UIControlMeasureLite_ from './control/measure-lite';
 import UIControlSync_ from './control/sync';
 
 //get rid of compiler mess
-var UIControlCompass = UIControlCompass_;
-var UIControlCredits = UIControlCredits_;
-var UIControlFullscreen = UIControlFullscreen_;
-var UIControlZoom = UIControlZoom_;
-var UIControlSpace = UIControlSpace_;
-var UIControlSearch = UIControlSearch_;
-var UIControlLink = UIControlLink_;
-var UIControlGithub = UIControlGithub_;
-var UIControlMeasure = UIControlMeasure_;
-var UIControlMeasureLite = UIControlMeasureLite_;
-var UIControlLayers = UIControlLayers_;
-var UIControlFallback = UIControlFallback_;
-var UIControlPopup = UIControlPopup_;
-var UIControlLoading = UIControlLoading_;
-var UIControlSync = UIControlSync_;
+const dom = Dom_;
+const utils = utils_;
+const UIControlHolder = UIControlHolder_;
+const UIControlMap = UIControlMap_;
+
+const UIControlCompass = UIControlCompass_;
+const UIControlCredits = UIControlCredits_;
+const UIControlFullscreen = UIControlFullscreen_;
+const UIControlZoom = UIControlZoom_;
+const UIControlSpace = UIControlSpace_;
+const UIControlSearch = UIControlSearch_;
+const UIControlLink = UIControlLink_;
+const UIControlGithub = UIControlGithub_;
+const UIControlMeasure = UIControlMeasure_;
+const UIControlMeasureLite = UIControlMeasureLite_;
+const UIControlLayers = UIControlLayers_;
+const UIControlFallback = UIControlFallback_;
+const UIControlPopup = UIControlPopup_;
+const UIControlLoading = UIControlLoading_;
+const UIControlSync = UIControlSync_;
 
 
-var UI = function(browser, element) {
+const UI = function(browser, element) {
     this.browser = browser;
     this.config = browser.config;
     this.rootElement = element;
@@ -57,7 +55,7 @@ var UI = function(browser, element) {
 
     Object.defineProperty(this, 'dom', {
         get: function() {
-            if (this.killed) return;
+            if (this.killed) return null;
             return dom;
         }
     });
@@ -75,7 +73,7 @@ UI.prototype.init = function() {
     this.map = new UIControlMap(this);
 
     //create other ui controls
-    var loading = this.config.controlLoading;
+    const loading = this.config.controlLoading;
     this.compass = new UIControlCompass(this, (!loading && this.config.controlCompass), loading);
     this.credits = new UIControlCredits(this, (!loading && this.config.controlCredits), loading);
     //this.logo = new UIControlLogo(this, this.config.controlLogo);
@@ -104,7 +102,7 @@ UI.prototype.init = function() {
 UI.prototype.kill = function() {
     this.killed = true;
 
-    for (var key in this.controls) {
+    for (let key in this.controls) {
         delete this.controls[key];
     }
 
@@ -115,7 +113,7 @@ UI.prototype.kill = function() {
 
 
 UI.prototype.addControl = function(id, html, visible, visibleLock, parentElement) {
-    var control = new UIControlHolder(this, html, visible, visibleLock, parentElement);
+    const control = new UIControlHolder(this, html, visible, visibleLock, parentElement);
     this.controls[id] = control;
     return control;
 };
@@ -141,8 +139,8 @@ UI.prototype.setControlVisible = function(id, state, lockState) {
             this.controls[id].setVisibleLock(lockState);
         }
 
-        var renderer = this.browser.getRenderer();
-        var flags = renderer.getMarginFlags();
+        const renderer = this.browser.getRenderer();
+        let flags = renderer.getMarginFlags();
 
         if (id == 'compass') flags |= 1;
         if (id == 'search') flags |= 2;

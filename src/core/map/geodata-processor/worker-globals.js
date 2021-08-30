@@ -1,5 +1,5 @@
 
-var globals = {
+const globals = {
     stylesheetData : {},
     stylesheetLayers : {},
     stylesheetBitmaps : {},
@@ -62,7 +62,7 @@ function clamp(value, min, max) {
 
 function vec3Normalize(a, b) {
     b || (b = a);
-    var c = a[0],
+    let c = a[0],
         d = a[1],
         e = a[2],
         g = Math.sqrt(c * c + d * d + e * e);
@@ -88,7 +88,7 @@ function vec3Normalize(a, b) {
 
 
 function vec3Length(a) {
-    var b = a[0],
+    let b = a[0],
         c = a[1];
     a = a[2];
     return Math.sqrt(b * b + c * c + a * a);
@@ -97,10 +97,10 @@ function vec3Length(a) {
 
 function vec3Cross(a, b, c) {
     c || (c = a);
-    var d = a[0],
+    let d = a[0],
         e = a[1];
     a = a[2];
-    var g = b[0],
+    let g = b[0],
         f = b[1];
     b = b[2];
     c[0] = e * b - a * f;
@@ -112,11 +112,11 @@ function vec3Cross(a, b, c) {
 
 function getHash(str) {
     if (!str || str.length === 0) {
-        return 0;    
+        return 0;
     }
 
-    var hash = 0, c;
-    for (var i = 0, li = str.length; i < li; i++) {
+    let hash = 0, c;
+    for (let i = 0, li = str.length; i < li; i++) {
         c   = str.charCodeAt(i);
         hash  = ((hash << 5) - hash) + c;
         hash |= 0; // Convert to 32bit integer
@@ -126,12 +126,12 @@ function getHash(str) {
 }
 
 
-var simpleFmtCall = (function obj(str, call) {
+function simpleFmtCall(str, call) {
     if (!str || str == '') {
         return '';
     }
 
-    var i = str.indexOf('{'), li, str2;
+    let i = str.indexOf('{'), li, str2;
 
     if (i == -1) {
         return str;
@@ -139,11 +139,11 @@ var simpleFmtCall = (function obj(str, call) {
         str2 = i > 0 ? str.substring(0, i) : '';
     }
 
-    var counter = 0;
-    var begin = -1;
+    let counter = 0;
+    let begin = -1;
 
     for (li = str.length; i < li; i++) {
-        var c = str.charAt(i);
+        let c = str.charAt(i);
 
         if (c == '{') {
             if (counter == 0) {
@@ -157,18 +157,18 @@ var simpleFmtCall = (function obj(str, call) {
             if (counter == 0) {
                 str2 += call(str.substring(begin+1, i));
             }
-            
+
         } else if (counter == 0) {
             str2 += c;
         }
     }
 
     return str2;
-});
+}
 
 /*
 function copyArrayToBuffer(view, index, array) {
-    for (var i = 0, li = array.length; i < li; i++) {
+    for (let i = 0, li = array.length; i < li; i++) {
         view.setFloat32(index, array[i]); index += 4;
     }
 
@@ -179,7 +179,7 @@ function copyDynamicArrayToBuffer(view, index, array) {
     if (array) {
         view.setUint8(index, array.length); index += 1;
 
-        for (var i = 0, li = array.length; i < li; i++) {
+        for (let i = 0, li = array.length; i < li; i++) {
             view.setFloat32(index, array[i]); index += 4;
         }
     } else {
@@ -193,10 +193,10 @@ function copyDynamicArrayOfArraysToBuffer(view, index, array) {
     if (array) {
         view.setUint16(index, array.length); index += 2;
 
-        for (var i = 0, li = array.length; i < li; i++) {
-            var subarray = array[i];
+        for (let i = 0, li = array.length; i < li; i++) {
+            const subarray = array[i];
 
-            for (var j = 0, lj = array.length; j < lj; j++) {
+            for (let j = 0, lj = array.length; j < lj; j++) {
                 view.setUint16(index, subarray[j]); index += 2;
             }
         }
@@ -208,9 +208,9 @@ function copyDynamicArrayOfArraysToBuffer(view, index, array) {
 }
 
 function getSizeOfArrayOfArrays(array) {
-    var size = 0;
+    let size = 0;
 
-    for (var i = 0, li = array.length; i < li; i++) {
+    for (let i = 0, li = array.length; i < li; i++) {
         size += array[i].length;
     }
 
@@ -218,8 +218,8 @@ function getSizeOfArrayOfArrays(array) {
 }
 */
 
-//var textEncoderUtf8 = null; //(typeof TextEncoder !== 'undefined') ? (new TextEncoder('utf-8')) : null;
-var textEncoderUtf8 = (typeof TextEncoder !== 'undefined') ? (new TextEncoder('utf-8')) : null;
+//const textEncoderUtf8 = null; //(typeof TextEncoder !== 'undefined') ? (new TextEncoder('utf-8')) : null;
+const textEncoderUtf8 = (typeof TextEncoder !== 'undefined') ? (new TextEncoder('utf-8')) : null;
 
 function stringToUint8Array(str) {
     if (textEncoderUtf8) {
@@ -229,9 +229,9 @@ function stringToUint8Array(str) {
         /*
         console.log('' + (str.length * 2));
 
-        var buffer = new ArrayBuffer(str.length * 2);
-        var view = new Uint16Array(buffer);
-        for (var i = 0, li = str.length; i < li; i++) {
+        const buffer = new ArrayBuffer(str.length * 2);
+        const view = new Uint16Array(buffer);
+        for (let i = 0, li = str.length; i < li; i++) {
             view[i] = str.charCodeAt(i);
         }
         return new Uint8Array(buffer);
@@ -239,22 +239,22 @@ function stringToUint8Array(str) {
 
 
         // 1. Let S be the DOMString value.
-        var s = String(str);
+        const s = String(str);
 
         // 2. Let n be the length of S.
-        var n = s.length;
+        const n = s.length;
 
         // 3. Initialize i to 0.
-        var i = 0;
+        let i = 0;
 
         // 4. Initialize U to be an empty sequence of Unicode characters.
-        var u = [];
+        const u = [];
 
         // 5. While i < n:
         while (i < n) {
 
           // 1. Let c be the code unit in S at index i.
-          var c = s.charCodeAt(i);
+          const c = s.charCodeAt(i);
 
           // 2. Depending on the value of c:
 
@@ -280,15 +280,15 @@ function stringToUint8Array(str) {
             // 2. Otherwise, i < n−1:
             else {
               // 1. Let d be the code unit in S at index i+1.
-              var d = s.charCodeAt(i + 1);
+              const d = s.charCodeAt(i + 1);
 
               // 2. If 0xDC00 ≤ d ≤ 0xDFFF, then:
               if (0xDC00 <= d && d <= 0xDFFF) {
                 // 1. Let a be c & 0x3FF.
-                var a = c & 0x3FF;
+                const a = c & 0x3FF;
 
                 // 2. Let b be d & 0x3FF.
-                var b = d & 0x3FF;
+                const b = d & 0x3FF;
 
                 // 3. Append to U the Unicode character with code point
                 // 2^16+2^10*a+b.
@@ -311,12 +311,12 @@ function stringToUint8Array(str) {
         }
 
         // 6. Return U.
-        return new Uint8Array((new Uint32Array(u)).buffer);        
+        return new Uint8Array((new Uint32Array(u)).buffer);
     }
 }
 
 /*
-var textDecoderUtf8 = TextEncoder ? (new TextDecoder('utf-8')) : null;
+const textDecoderUtf8 = TextEncoder ? (new TextDecoder('utf-8')) : null;
 
 function unint8ArrayToString(array) {
     if (textDecoderUtf8) {
@@ -328,7 +328,7 @@ function unint8ArrayToString(array) {
 */
 
 
-var textDecoderUtf8 = (typeof TextDecoder !== 'undefined') ? (new TextDecoder('utf-8')) : null;
+const textDecoderUtf8 = (typeof TextDecoder !== 'undefined') ? (new TextDecoder('utf-8')) : null;
 
 function unint8ArrayToString(array, skip) {
     if (textDecoderUtf8 && !skip) {
@@ -336,14 +336,14 @@ function unint8ArrayToString(array, skip) {
     } else {
         // return String.fromCharCode.apply(null, new Uint8Array(array.buffer)); //works only for small strings
 
-        var s = '';
-        //var code_points2 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
-        var code_points2 = new Uint8Array(array.byteLength);
+        let s = '';
+        //const code_points2 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+        const code_points2 = new Uint8Array(array.byteLength);
         code_points2.set(array);
-        var code_points = new Uint32Array(code_points2.buffer);
+        const code_points = new Uint32Array(code_points2.buffer);
 
-        for (var i = 0, li = code_points.length; i < li; ++i) {
-          var cp = code_points[i];
+        for (let i = 0, li = code_points.length; i < li; ++i) {
+          let cp = code_points[i];
           if (cp <= 0xFFFF) {
             s += String.fromCharCode(cp);
           } else {
@@ -363,8 +363,8 @@ function Utf8ArrayToStr(array, skip) {  //more universal
         return textDecoderUtf8.decode(array);
     } else {
 
-        var out, i, len, c;
-        var char2, char3;
+        let out, i, len, c;
+        let char2, char3;
 
         array = new Uint8Array(array);
 
@@ -375,7 +375,7 @@ function Utf8ArrayToStr(array, skip) {  //more universal
         while(i < len) {
             c = array[i++];
 
-            switch(c >> 4) { 
+            switch(c >> 4) {
               case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
                 // 0xxxxxxx
                 out += String.fromCharCode(c);
