@@ -81,6 +81,11 @@ ThreeDevice.prototype.init = function() {
     this.models = new THREE.Group();
     this.models.frustumCulled = false;
     this.scene.add(this.models);
+
+    this.models2 = new THREE.Group();
+    this.models2.frustumCulled = false;
+    this.scene.add(this.models2);
+
     this.scene.add(this.helper);
 
     this.tileMaterialInjectVersion = this.generateMaterial(new THREE.MeshBasicMaterial({}), {
@@ -661,6 +666,8 @@ ThreeDevice.prototype.createTexture = function(options) {
     texture.height = options.height;
     //texture.magFilter = THREE.NearestFilter;
     texture.minFilter = THREE.NearestFilter;
+
+    texture.flipY = false;
     texture.gpuSize = texture.width * texture.height * 4;
     texture.needsUpdate = true;
 

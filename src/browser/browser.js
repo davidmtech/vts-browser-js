@@ -604,7 +604,7 @@ Browser.prototype.setConfigParam = function(key, value, ignoreCore) {
     case 'sync':                   this.config.sync = value; break;
     case 'syncCursor':             this.config.syncCursor = utils.validateBool(value, false); break;
     case 'syncServer':             this.config.syncServer = value; break;
-    case 'syncId':                  this.config.syncId = value; break;
+    case 'syncId':                 this.config.syncId = value; break;
     case 'geodata':                this.config.geodata = value; break;
     case 'tiles3d':                this.config.tiles3d = value; break;
     case 'geojson':                this.config.geojson = value; break;
@@ -703,6 +703,7 @@ Browser.prototype.getConfigParam = function(key) {
     case 'controlSearchFilter':    return this.config.controlSearchFilter;
     case 'minViewExtent':          return this.config.minViewExtent;
     case 'maxViewExtent':          return this.config.maxViewExtent;
+    case 'fixedHeight':            retrun this.config.fixedHeight;
     case 'rotate':                 return this.config.autoRotate;
     case 'pan':                    return this.config.autoPan;
     }
