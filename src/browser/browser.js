@@ -703,7 +703,7 @@ Browser.prototype.getConfigParam = function(key) {
     case 'controlSearchFilter':    return this.config.controlSearchFilter;
     case 'minViewExtent':          return this.config.minViewExtent;
     case 'maxViewExtent':          return this.config.maxViewExtent;
-    case 'fixedHeight':            retrun this.config.fixedHeight;
+    case 'fixedHeight':            return this.config.fixedHeight;
     case 'rotate':                 return this.config.autoRotate;
     case 'pan':                    return this.config.autoPan;
     }
