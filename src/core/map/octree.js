@@ -415,11 +415,11 @@ MapOctree.prototype.drawMesh = function(job ,node, splitMask, splitSpace) {
 
         if (job.direct) {
             if (submesh.texture) {
-                mesh.drawSubmesh(cameraPos, i, submesh.texture, this.drawChannel == 1 ? VTS_MATERIAL_DEPTH : VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
+                mesh.drawSubmesh(cameraPos, i, submesh.texture, this.map.draw.drawChannel == 1 ? VTS_MATERIAL_DEPTH : VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
             }
         } else {
             if (job.textures[i]) {
-                mesh.drawSubmesh(cameraPos, i, job.textures[i], this.drawChannel == 1 ? VTS_MATERIAL_DEPTH : VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
+                mesh.drawSubmesh(cameraPos, i, job.textures[i], this.map.draw.drawChannel == 1 ? VTS_MATERIAL_DEPTH : VTS_MATERIAL_INTERNAL /*type*/, null /*alpha*/, null /*layer*/, null /*surface*/,  splitMask, splitSpace);
             }
         }
     }
@@ -907,6 +907,7 @@ MapOctree.prototype.onBinFileLoaded = function(info, data) {
             const pos = this.map.getPosition();
             pos.setCoords(coords);
             pos.pos[3] = 'fix';
+            pos.setViewExtent(500);
             this.map.setPosition(pos);
         }
     }

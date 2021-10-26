@@ -179,11 +179,11 @@ ThreeDevice.prototype.init = function() {
 
      this.wireferameMaterial = new THREE.MeshBasicMaterial({color:0x000000,wireframe:true, /*depthTest:false*/ });
 
-     this.testScreenPlane = new THREE.Mesh( new THREE.PlaneGeometry( this.hitmapSize*0.25, this.hitmapSize*0.25 ), new THREE.MeshBasicMaterial( { /*color: 0xffffff,*/ depthTest: false, depthWrite: false, side: THREE.DoubleSide } ));
+     this.testScreenPlane = new THREE.Mesh( new THREE.PlaneGeometry( this.renderer.hitmapSize*0.25, this.renderer.hitmapSize*0.25 ), new THREE.MeshBasicMaterial( { /*color: 0xffffff,*/ depthTest: false, depthWrite: false, side: THREE.DoubleSide } ));
      this.testScreenPlane.material.map = this.textTexture;
      //this.testScreenPlane.needsUpdate = true;
 
-     this.textureRenderTarget = this.createRenderTarget( this.hitmapSize, this.hitmapSize, false);
+     this.textureRenderTarget = this.createRenderTarget( this.renderer.hitmapSize, this.renderer.hitmapSize, false);
 
      //this.testScreenPlane.material.uniforms.map.value = this.textureRenderTarget.texture;
      this.testScreenPlane.material.map = this.textureRenderTarget.texture;
@@ -221,7 +221,9 @@ ThreeDevice.prototype.setSize = function(width, height) {
        //    this.gpu = new GpuDevice(this, div, this.curSize, this.config.rendererAllowScreenshots, this.config.rendererAntialiasing, this.config.rendererAnisotropic);
 
        this.div.appendChild( this.gpu2.domElement );
-    }
+   } else {
+       this.gpu2.setSize( width, height );
+   }
 
     this.camera2.aspect = width / height;
     this.camera2.updateProjectionMatrix();

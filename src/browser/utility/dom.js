@@ -19,7 +19,7 @@ Dom.hasClass = function(element, name) {
 
 Dom.addClass = function(element, name) {
     if (element.classList !== undefined) {
-        const classes = Dom.splitWords(name);
+        const classes = name.trim().split(/\s+/);
         for (let i = 0, li = classes.length; i < li; i++) {
             element.classList.add(classes[i]);
         }
