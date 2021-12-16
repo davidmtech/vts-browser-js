@@ -252,6 +252,14 @@ MapSurfaceSequence.prototype.generateBoundLayerSequence = function() {
 
             freeLayer.options = freeLayersProperties['options'] || {};
 
+            let flatShade = freeLayersProperties['shader'] || freeLayer.options['shader'];
+
+            if (flatShade) {
+                freeLayer.flatShade = (flatShade == 'flatShade');
+            } else {
+                freeLayer.flatShade = freeLayer.flatShadeOriginal;
+            }
+
             freeLayer.boundLayerSequence = [];
 
             const boundLayers = freeLayersProperties['boundLayers'];

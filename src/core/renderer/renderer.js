@@ -7,7 +7,7 @@ import WebGLDevice_ from './devices/webgl/device';
 
 import RendererFont_ from './font';
 import Camera_ from './camera';
-import RenderRMap_ from './rmap2';
+import RenderRMap_ from './rmap';
 
 
 //get rid of compiler mess

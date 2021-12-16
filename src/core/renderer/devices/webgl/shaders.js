@@ -1434,11 +1434,16 @@ WebGLShaders.tileFragmentShader = 'precision mediump float;\n'+
 
         '#ifdef flatShade\n'+
 
-            '#ifdef fogAndColor\n'+
-               // 'gl_FragColor = vec4(mix(uColor.xyz * flatShadeData.xyz, uParams2.xyz, vTexCoord.z), uColor.w);\n'+
-                'gl_FragColor = vec4(uColor.xyz * flatShadeData.xyz, uColor.w);\n'+
+            '#ifdef flatShadeInner\n'+
+                'gl_FragColor.xyz = texture2D(uSampler, vTexCoord.xy).xyz * flatShadeData.xyz;\n'+
+                'gl_FragColor.w = 1.0;\n'+
             '#else\n'+
-                'gl_FragColor = vec4(flatShadeData.xyz, 1.0);\n'+
+                '#ifdef fogAndColor\n'+
+                   // 'gl_FragColor = vec4(mix(uColor.xyz * flatShadeData.xyz, uParams2.xyz, vTexCoord.z), uColor.w);\n'+
+                    'gl_FragColor = vec4(uColor.xyz * flatShadeData.xyz, uColor.w);\n'+
+                '#else\n'+
+                    'gl_FragColor = vec4(flatShadeData.xyz, 1.0);\n'+
+                '#endif\n'+
             '#endif\n'+
 
         '#else\n'+

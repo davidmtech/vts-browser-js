@@ -103,6 +103,13 @@ MapSurface.prototype.parseJson = function(json) {
     this.creditsUrl = null;
     this.displaySize = json['displaySize'] || 1024;
     this.hitable = this.geodata ? (json['hitable'] || false) : false;
+    this.flatShade = false;
+
+    if (json['options']) {
+        this.flatShade = (json['options']['shader'] === 'flatShade');
+    }
+
+    this.flatShadeOriginal = this.flatShade;
 
     let i, li;
 

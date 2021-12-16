@@ -383,6 +383,14 @@ WebGLDevice.prototype.generateTileShader = function (progs, v, useSuperElevation
             str += '#define TMIN ' + (0.5-this.config.mapSplitMargin) + '\n' + '#define TMAX ' + (0.5+this.config.mapSplitMargin) + '\n';
         }
     }
+
+    if (v & VTS_TILE_SHADER_FLAT_INNER) {
+        str +=  '#extension GL_OES_standard_derivatives : enable\n';
+        str += '#define flatShade\n';
+        str += '#define flatShadeVar\n';
+        str += '#define flatShadeInner\n';
+    }
+
     if (useSuperElevation) str += '#define applySE\n';
     const prog = (new WebGLProgram(this, progs[0].vertex.replace('#define variants\n', str), progs[0].fragment.replace('#define variants\n', str)));
     progs[v] = prog;
@@ -447,6 +455,10 @@ WebGLDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
     let attributes = ['aPosition'];
     let vbits = (useSuperElevation) ? VTS_TILE_SHADER_SE : 0;
 
+    if (drawWireframe == 2) {
+        type = VTS_MATERIAL_FLAT;
+    }
+
     if (splitMask) {
         vbits |= VTS_TILE_SHADER_CLIP4;
 
@@ -498,6 +510,10 @@ WebGLDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
 
                 texcoordsAttr = 'aTexCoord';
                 attributes.push('aTexCoord');
+
+                if (surface && surface.flatShade) {
+                    vbits |= VTS_TILE_SHADER_FLAT_INNER;
+                }
 
                 program = this.progTile[vbits];
 
@@ -745,10 +761,11 @@ WebGLDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
 
 
     if (drawWireframe == 1 || drawWireframe == 2) { //very slow debug only
-        program = this.progWireFrameBasic[v];
+        program = this.progWireFrameBasic[vbits];
 
         if (!program) {
-            program = this.generateTileShader(this.progWireFrameBasic, v, useSuperElevation, splitMask);
+            program = this.generateTileShader(this.progWireFrameBasic, vbits, useSuperElevation, splitMask);
+            this.progWireFrameBasic[vbits] = program;
         }
 
         this.useProgram(program, attributes, gpuMask);

@@ -510,6 +510,7 @@ ThreeDevice.prototype.generateTileMaterial = function(options) {
         }
 
         if (options.flags & VTS_MAT_FLAG_FLAT) defines.flatShade = true, defines.flatShadeVar = true;
+        if (options.flags & VTS_MAT_FLAG_FLAT_INNER) defines.flatShadeInner = true;
         if (options.flags & VTS_MAT_FLAG_UVS) defines.uvs = true;
     }
 
@@ -595,7 +596,9 @@ ThreeDevice.prototype.finishRender = function(options) {
     if (this.renderer.core.map.draw.drawChannel == 1) {
         this.scene.background = new THREE.Color( 0xffffff );
         this.gpu2.setRenderTarget( this.textureRenderTarget );
+        this.models2.visible = false;
         this.gpu2.render( this.scene, this.camera2 );
+        this.models2.visible = true;
         this.gpu2.setRenderTarget( null );
         return;
     }
@@ -861,7 +864,14 @@ ThreeDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
             break;
         case VTS_MATERIAL_INTERNAL:
         case VTS_MATERIAL_INTERNAL_NOFOG:
+
             flags |= VTS_MAT_FLAG_UVS;
+
+            if (surface && surface.flatShade) {
+                flags |= VTS_MAT_FLAG_FLAT;
+                flags |= VTS_MAT_FLAG_FLAT_INNER;
+            }
+
             break;
         case VTS_MATERIAL_FLAT:
             flags |= VTS_MAT_FLAG_FLAT;

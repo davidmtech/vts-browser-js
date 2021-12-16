@@ -1,5 +1,6 @@
 
 var PROD = (process.env.NODE_ENV === 'production')
+var NO_THREEJS = (process.env.NO_THREEJS === '1')
 var TARGET_DIR = PROD ? __dirname + "/dist/" : __dirname + "/build/";
 
 var fs = require("fs");
@@ -10,7 +11,7 @@ var CopyPlugin = require('copy-webpack-plugin');
 
 var path = require('path');
 
-process.env.VTS_DEVICE = 'webgl';
+//process.env.VTS_DEVICE = 'webgl';
 
 var plugins = [
     new LicenseWebpackPlugin({ outputFilename: '3rdpartylicenses.txt' }),
@@ -31,8 +32,10 @@ var plugins = [
 
     new webpack.NormalModuleReplacementPlugin(
 //        /some\/path\/config\.development\.js/,
-        /\.\/rmap2/,
-      './rmap'
+//        /\.\/rmap2/,
+//      './rmap'
+        /\.\/devices\/three\/device/,
+        NO_THREEJS ? './devices/empty/device' : './devices/three/device'
     ),
 
     new webpack.DefinePlugin({
@@ -48,13 +51,14 @@ var plugins = [
       'VTS_MATERIAL_EXTERNAL':        6,
       'VTS_MATERIAL_EXTERNAL_NOFOG':  7,
 
-      'VTS_MAT_FLAG_UVS':  (1<<0),
-      'VTS_MAT_FLAG_C4':  (1<<1),
-      'VTS_MAT_FLAG_C8':  (1<<2),
-      'VTS_MAT_FLAG_FLAT':  (1<<3),
-      'VTS_MAT_FLAG_FOG':  (1<<4),
-      'VTS_MAT_FLAG_MASK':  (1<<5),
-      'VTS_MAT_FLAG_DEPTH':  (1<<6),
+      'VTS_MAT_FLAG_UVS':        (1<<0),
+      'VTS_MAT_FLAG_C4':         (1<<1),
+      'VTS_MAT_FLAG_C8':         (1<<2),
+      'VTS_MAT_FLAG_FLAT':       (1<<3),
+      'VTS_MAT_FLAG_FOG':        (1<<4),
+      'VTS_MAT_FLAG_MASK':       (1<<5),
+      'VTS_MAT_FLAG_DEPTH':      (1<<6),
+      'VTS_MAT_FLAG_FLAT_INNER': (1<<7),
 
       'VTS_PIPELINE_BASIC':           0,
       'VTS_PIPELINE_HMAP':            1,
@@ -132,6 +136,7 @@ var plugins = [
       'VTS_TILE_SHADER_CLIP4':            (1<<0),
       'VTS_TILE_SHADER_CLIP8':            (1<<1),
       'VTS_TILE_SHADER_SE':               (1<<2),
+      'VTS_TILE_SHADER_FLAT_INNER':       (1<<3),
 
       'VTS_IMPORATANCE_LOG_BASE':     1.0017,
       'VTS_IMPORATANCE_INV_LOG':      1355.6127860321758038669705901537 // 1/log(LOG_BASE)

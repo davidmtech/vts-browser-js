@@ -390,6 +390,7 @@ MapDrawTiles.prototype.drawMeshTile = function(tile, node, cameraPos, pixelSize,
                                             type : VTS_DRAWCOMMAND_SUBMESH,
                                             mesh : tile.surfaceMesh,
                                             submesh : i,
+                                            surface: surface,
                                             texture : tile.surfaceTextures[i],
                                             material : VTS_MATERIAL_INTERNAL
                                         });
@@ -416,6 +417,7 @@ MapDrawTiles.prototype.drawMeshTile = function(tile, node, cameraPos, pixelSize,
                                 type : VTS_DRAWCOMMAND_SUBMESH,
                                 mesh : tile.surfaceMesh,
                                 submesh : i,
+                                surface: surface,
                                 texture : tile.surfaceTextures[i],
                                 material : VTS_MATERIAL_INTERNAL
                             });
@@ -433,6 +435,7 @@ MapDrawTiles.prototype.drawMeshTile = function(tile, node, cameraPos, pixelSize,
                     type : VTS_DRAWCOMMAND_SUBMESH,
                     mesh : tile.surfaceMesh,
                     submesh : i,
+                    surface: surface,
                     texture : tile.surfaceTextures[i],
                     material : VTS_MATERIAL_INTERNAL
                 });
