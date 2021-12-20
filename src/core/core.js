@@ -26,8 +26,8 @@ const Core = function(element, config, coreInterface) {
     this.killed = false;
     this.config = {
         map : null,
-        mapCache : 1100, //old value 900
-        mapGPUCache : 600, //old value 500, 360
+        mapCache : 1500, //old value 900
+        mapGPUCache : 990, //old value 500, 360
         mapMetatileCache : 60,
         mapTexelSizeFit : 1.1,
         mapMaxHiresLodLevels : 2,
@@ -113,6 +113,7 @@ const Core = function(element, config, coreInterface) {
         mapForcePipeline: 0,
         mapLogGeodataStyles: true,
         mapBenevolentMargins: false,
+        mapForceCredentials: false,
 
         rendererDevice : 'webgl',
         rendererAnisotropic : 0,
@@ -510,6 +511,8 @@ Core.prototype.setConfigParam = function(key, value, solveStorage) {
         this.config.mapDMapMode = utils.validateNumber(value, 1, Number.MAXINTEGER, 1); break;
     case 'map16bitMeshes':
         this.config.map16bitMeshes = utils.validateBool(value, false); break;
+    case 'mapForceCredentials':
+        this.config.mapForceCredentials = utils.validateBool(value, false); utils.forceCredentials = this.config.mapForceCredentials; break
     case 'inspector':
         this.config.inspector = utils.validateBool(value, true); break;
     case 'authorization':
@@ -591,7 +594,7 @@ string getCoreVersion()
 */
 
 function getCoreVersion(full) {
-    return (full ? 'Core: ' : '') + '2.30.3';
+    return (full ? 'Core: ' : '') + '2.30.4';
 }
 
 

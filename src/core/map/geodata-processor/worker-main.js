@@ -557,7 +557,7 @@ self.onmessage = function (e) {
 
         data = Utf8ArrayToStr(data);
 
-        break; //????
+        //break; //????
 
     case 'processGeodata':
         globals.tileLod = message['lod'] || 0;

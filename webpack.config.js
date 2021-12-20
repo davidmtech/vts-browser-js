@@ -25,8 +25,8 @@ var plugins = [
     }),
     new CopyPlugin({
       patterns: [
-        { from: './LICENSE', to: 'vts-browser.js' + (PROD ? '.min' : '') + '.LICENSE' },
-        { from: './LICENSE', to: 'vts-core.js' + (PROD ? '.min' : '') + '.LICENSE' }
+        { from: './LICENSE', to: 'vts-browser' + (PROD ? '.min.js' : '.js') + '.LICENSE' },
+        { from: './LICENSE', to: 'vts-core' + (PROD ? '.min.js' : '.js') + '.LICENSE' }
       ],
     }),
 

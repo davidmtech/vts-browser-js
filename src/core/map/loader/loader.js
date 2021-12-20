@@ -144,7 +144,7 @@ MapLoader.prototype.onWorkerMessage = function(message, direct) {
 
 
 MapLoader.prototype.processLoadBinary = function(path, onLoaded, onError, responseType, kind, options) {
-    const withCredentials = (utils.useCredentials ? (this.mapLoaderUrl.indexOf(this.map.url.baseUrl) != -1) : false);
+    const withCredentials = utils.forceCredentials ?  true : ((utils.useCredentials ? (this.mapLoaderUrl.indexOf(this.map.url.baseUrl) != -1) : false));
 
     if (this.processWorker) {
 

@@ -821,6 +821,7 @@ Map.prototype.setLoaderParams = function(mapConfig, configStorage) {
                 case 'mapPackLoaderEvents':
                 case 'mapParseMeshInWorker':
                 case 'mapPackGeodataEvents':
+                case 'mapForceCredentials':
                     this.setConfigParam(key, source[key]);
                     break;
             }
@@ -912,6 +913,7 @@ Map.prototype.setConfigParam = function(key, value) {
     case 'mapDMapSize':                   this.config.mapDMapSize = utils.validateNumber(value, 16, Number.MAXINTEGER, 512); break;
     case 'mapDMapMode':                   this.config.mapDMapMode = utils.validateNumber(value, 1, Number.MAXINTEGER, 1); break;
     case 'mapSplitSpace':                 this.config.mapSplitSpace = value; break;
+    case 'mapForceCredentials':           this.config.mapForceCredentials = utils.validateBool(value, false); utils.forceCredentials = this.config.mapForceCredentials; break;
     case 'mario':                         this.config.mario = utils.validateBool(value, true); break;
     case 'mapFeaturesReduceMode':
         value = utils.validateString(value, 'scr-count4');
@@ -929,7 +931,9 @@ Map.prototype.setConfigParam = function(key, value) {
 
 
 Map.prototype.getConfigParam = function(key) {
-    switch (key) {
+    return this.config[key];
+
+    /*switch (key) {
     case 'map':                           return this.config.map;
     case 'mapCache':                      return this.config.mapCache;
     case 'mapGPUCache':                   return this.config.mapGPUCache;
@@ -1000,7 +1004,7 @@ Map.prototype.getConfigParam = function(key) {
     case 'mapDMapSize':                   return this.config.mapDMapSize;
     case 'mapDMapMode':                   return this.config.mapDMapMode;
     case 'mario':                         return this.config.mario;
-    }
+    }*/
 };
 
 

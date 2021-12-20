@@ -8,7 +8,8 @@ const utilsUrl = utilsUrl_;
 
 
 const utils = {};
-utils.useCredentials = false;
+utils.useCredentials = false; //
+utils.forceCredentials = false;
 utils.instanceCounter = 0;
 
 
@@ -332,7 +333,7 @@ utils.loadJSON = function(path, onLoaded, onError, skipParse, withCredentials, x
     }).bind(this);*/
 
     xhr.open('GET',  path, true);
-    xhr.withCredentials = withCredentials;
+    xhr.withCredentials = utils.forceCredentials || withCredentials;
 
     if (xhrParams && xhrParams['token'] /*&& xhrParams["tokenHeader"]*/) {
         //xhr.setRequestHeader(xhrParams["tokenHeader"], xhrParams["token"]); //old way
@@ -403,7 +404,7 @@ utils.loadBinary = function(path, onLoaded, onError, withCredentials, xhrParams,
 
     xhr.open('GET', path, true);
     xhr.responseType = responseType ? responseType : 'arraybuffer';
-    xhr.withCredentials = withCredentials;
+    xhr.withCredentials = utils.forceCredentials || withCredentials;
 
     if (xhrParams && xhrParams['token'] /*&& xhrParams["tokenHeader"]*/) {
         //xhr.setRequestHeader(xhrParams["tokenHeader"], xhrParams["token"]); //old way
@@ -451,7 +452,7 @@ utils.headRequest = function(url, onLoaded, onError, withCredentials, xhrParams)
 
     xhr.open('HEAD', url, true);
     //xhr.responseType = responseType ? responseType : "arraybuffer";
-    xhr.withCredentials = withCredentials;
+    xhr.withCredentials = utils.forceCredentials || withCredentials;
 
     if (xhrParams && xhrParams['token'] /*&& xhrParams["tokenHeader"]*/) {
         //xhr.setRequestHeader(xhrParams["tokenHeader"], xhrParams["token"]); //old way
