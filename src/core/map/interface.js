@@ -105,6 +105,21 @@ MapInterface.prototype.getSrses = function() {
 };
 
 
+MapInterface.prototype.getPhysicalSrsId = function() {
+    return this.map.referenceFrame.model.physicalSrs.id;
+};
+
+
+MapInterface.prototype.getPublicSrsId = function() {
+    return this.map.referenceFrame.model.publicSrs.id;
+};
+
+
+MapInterface.prototype.getNavigationSrsId = function() {
+    return this.map.referenceFrame.model.navigationSrs.id;
+};
+
+
 MapInterface.prototype.getSrsInfo = function(srsId) {
     const srs = this.map.getSrs(srsId);
     return srs ? srs.getInfo() : {};
@@ -232,6 +247,12 @@ MapInterface.prototype.convertCoordsFromNavToCameraSpace = function(pos, mode, l
 MapInterface.prototype.convertCoordsFromPhysToCameraSpace = function(pos) {
     const p = this.map.camera.position;
     return [pos[0] - p[0], pos[1] - p[1], pos[2] - p[2]];
+};
+
+
+MapInterface.prototype.convertCoordsFromCameraSpaceToPhys = function(pos) {
+    const p = this.map.camera.position;
+    return [p[0]+pos[0], p[1] + pos[1], p[2] + pos[2]];
 };
 
 

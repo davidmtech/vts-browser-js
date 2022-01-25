@@ -65,6 +65,8 @@ WebGLDevice.prototype.init = function() {
     canvas.width = this.curSize[0];
     canvas.height = this.curSize[1];
     canvas.style.display = 'block';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
 
     if (canvas.getContext == null) {
         //canvas not supported
