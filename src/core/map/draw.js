@@ -618,7 +618,7 @@ MapDraw.prototype.getDrawCommandsGpuSize = function(commands) {
                     gpuNeeded += mesh.gpuSize;
                 }
 
-                if (texture) {
+                if (texture && !(this.config.mapNoTextures || this.debug.drawWireframe)) {
                     gpuNeeded += texture.getGpuSize();
                 }
             }
@@ -674,7 +674,7 @@ MapDraw.prototype.areDrawCommandsReady = function(commands, priority, doNotLoad,
                 const texture = command.texture;
 
                 const meshReady = (mesh && mesh.isReady(doNotLoad, priority, checkGpu));
-                const textureReady = this.config.mapNoTextures ? true : (!texture  || (texture && texture.isReady(doNotLoad, priority, checkGpu)));
+                const textureReady = (this.config.mapNoTextures || this.debug.drawWireframe) ? true : (!texture  || (texture && texture.isReady(doNotLoad, priority, checkGpu)));
 
                 if (!(meshReady && textureReady) ) {
                     ready = false;

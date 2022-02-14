@@ -137,7 +137,14 @@ InspectorStats.prototype.updateStatsPanel = function(stats) {
         text2 += stats.debugStr + '<br/>';
     }
 
-    let text3 =  'PixelRatio: ' + (window.devicePixelRatio || 1).toFixed(3) +'<br/>'+
+    let device = "WebGL"
+
+    if (renderer.device == VTS_DEVICE_THREE) {
+        device = "Three"
+    }
+
+    let text3 =  'Device: ' + device +'<br/>'+
+                 'PixelRatio: ' + (window.devicePixelRatio || 1).toFixed(3) +'<br/>'+
                  'BFRate: ' + Math.round(1000 / (stats.frameTime+0.00001)) +'<br/><br/>';
 
     const map = this.core.getMap();

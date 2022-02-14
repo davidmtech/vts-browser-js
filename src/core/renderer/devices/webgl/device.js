@@ -614,23 +614,27 @@ WebGLDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
     let gpuTexture;
 
     if (texture) {
-        gpuTexture = texture.getGpuTexture();
 
-        if (gpuTexture) {
-            if (texture.statsCoutner != stats.counter) {
-                texture.statsCoutner = stats.counter;
-                stats.gpuRenderUsed += gpuTexture.getSize();
+        if (!(draw.config.mapNoTextures || drawWireframe)) {
+            gpuTexture = texture.getGpuTexture();
+
+            if (gpuTexture) {
+                if (texture.statsCoutner != stats.counter) {
+                    texture.statsCoutner = stats.counter;
+                    stats.gpuRenderUsed += gpuTexture.getSize();
+                }
+
+                this.bindTexture(gpuTexture);
+
+                if (gpuMask) {
+                    this.bindTexture(gpuMask, 1);
+                }
+
+            } else {
+                return;
             }
-
-            this.bindTexture(gpuTexture);
-
-            if (gpuMask) {
-                this.bindTexture(gpuMask, 1);
-            }
-
-        } else {
-            return;
         }
+        
     } else if (type != VTS_MATERIAL_FOG && type != VTS_MATERIAL_DEPTH && type != VTS_MATERIAL_FLAT) {
         return;
     }

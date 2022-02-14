@@ -824,7 +824,7 @@ ThreeDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
     let drawWireframe = map.draw.debug.drawWireframe;
     let gpuTexture = null, t = null;
 
-    if (texture) {
+    if (texture && !(map.draw.config.mapNoTextures || drawWireframe)) {
         gpuTexture = texture.getGpuTexture();
         t = texture.getTransform();
     }
