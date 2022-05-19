@@ -432,6 +432,7 @@ WebGLDevice.prototype.generateTileShaderWithFilter = function (progs, v, useSupe
     }
 
     const program = new WebGLProgram(this, vertexShader, pixelShader.replace('__FILTER__', filter));
+    progs[v] = program;
     return program;
 };
 
@@ -634,7 +635,7 @@ WebGLDevice.prototype.drawTileSubmesh = function (cameraPos, index, texture, typ
                 return;
             }
         }
-        
+
     } else if (type != VTS_MATERIAL_FOG && type != VTS_MATERIAL_DEPTH && type != VTS_MATERIAL_FLAT) {
         return;
     }

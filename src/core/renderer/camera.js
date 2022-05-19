@@ -392,7 +392,10 @@ Camera.prototype.update = function(zoffset) {
     mat4.multiply(this.rotationview, math.translationMatrix(-this.position[0], -this.position[1], -this.position[2]), this.modelview);
 
     if (this.ortho) {
-        this.projection = math.orthographicMatrix(this.viewHeight, this.aspect, this.near, this.far);
+        const near = -2*this.viewHeight;
+        const far = 2*this.viewHeight;
+
+        this.projection = math.orthographicMatrix(this.viewHeight, this.aspect, near, far);
     } else {
         this.projection = math.perspectiveMatrix(this.fov, this.aspect, this.near, this.far);
     }

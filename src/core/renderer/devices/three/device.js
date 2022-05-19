@@ -77,6 +77,7 @@ ThreeDevice.prototype.init = function() {
     let widthOrtho = 1024, heightOrtho = 768;
     //this.orthoCamera = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0.001, 1000 );
     this.orthoCamera = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0, 1000 );
+    this.orthoCamera2 = new THREE.OrthographicCamera( widthOrtho / - 2, widthOrtho / 2, heightOrtho / 2, heightOrtho / - 2, 0.1, 10000 );
 
     this.models = new THREE.Group();
     this.models.frustumCulled = false;
@@ -576,6 +577,24 @@ ThreeDevice.prototype.startRender = function(options) {
     this.camera2.far = this.renderer.camera.far;
     this.camera2.updateProjectionMatrix();
 
+    this.orthoCamera2.position.fromArray(this.renderer.camera.position);
+    this.orthoCamera2.setRotationFromMatrix( new THREE.Matrix4().fromArray(this.renderer.camera.rotationview).invert());
+    //this.camera2.fov = this.renderer.camera.fov * 2;
+    this.orthoCamera2.near = -2*this.renderer.camera.viewHeight;
+    this.orthoCamera2.far = 2*this.renderer.camera.viewHeight;
+
+    const factor = 2;
+    const height = this.renderer.camera.viewHeight;
+    const width = height * this.renderer.camera.aspect;
+
+    this.orthoCamera2.left = width / -factor;
+    this.orthoCamera2.right = width / factor;
+    this.orthoCamera2.top = height / factor;
+    this.orthoCamera2.bottom = height / -factor;
+    this.orthoCamera2.updateProjectionMatrix();
+
+    //console.log(JSON.stringify(this.renderer.camera.projection));
+
     this.cleanTexts();
 }
 
@@ -593,11 +612,13 @@ ThreeDevice.prototype.finishRender = function(options) {
         this.onBeforeFinish();
     }
 
+    let camera = this.renderer.camera.ortho ? this.orthoCamera2 : this.camera2;
+
     if (this.renderer.core.map.draw.drawChannel == 1) {
         this.scene.background = new THREE.Color( 0xffffff );
         this.gpu2.setRenderTarget( this.textureRenderTarget );
         this.models2.visible = false;
-        this.gpu2.render( this.scene, this.camera2 );
+        this.gpu2.render( this.scene, camera );
         this.models2.visible = true;
         this.gpu2.setRenderTarget( null );
         return;
@@ -610,7 +631,7 @@ ThreeDevice.prototype.finishRender = function(options) {
     }
 
     this.gpu2.setRenderTarget( null );
-    this.gpu2.render( this.scene, this.camera2 );
+    this.gpu2.render( this.scene, camera );
 
 
     /*
