@@ -914,6 +914,7 @@ Map.prototype.setConfigParam = function(key, value) {
     case 'mapDMapMode':                   this.config.mapDMapMode = utils.validateNumber(value, 1, Number.MAXINTEGER, 1); break;
     case 'mapSplitSpace':                 this.config.mapSplitSpace = value; break;
     case 'mapForceCredentials':           this.config.mapForceCredentials = utils.validateBool(value, false); utils.forceCredentials = this.config.mapForceCredentials; break;
+    case 'mapNoTiltConstraint':           this.config.mapNoTiltConstraint = utils.validateBool(value, false); break;
     case 'mario':                         this.config.mario = utils.validateBool(value, true); break;
     case 'mapFeaturesReduceMode':
         value = utils.validateString(value, 'scr-count4');

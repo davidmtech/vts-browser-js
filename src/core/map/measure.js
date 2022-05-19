@@ -825,11 +825,15 @@ MapMeasure.prototype.getPositionCameraInfo = function(position, projected, clamp
     const orientation = position.getOrientation();
     const distance = position.getViewDistance();
 
-    if (clampTilt) { //used for street labels
-        orientation[1] = math.clamp(orientation[1], -89.0, 90.0);
-    }
+    let roty = orientation[1]
+    if (!this.config.mapNoTiltConstraint)
+    {
+        if (clampTilt) { //used for street labels
+            orientation[1] = math.clamp(orientation[1], -89.0, 90.0);
+        }
 
-    const roty = math.clamp(orientation[1], -89.5, 89.5);
+        roty = math.clamp(orientation[1], -89.5, 89.5);
+    }
 
     let tmpMatrix = mat4.create();
     mat4.multiply(math.rotationMatrix(2, math.radians(-orientation[0])), math.rotationMatrix(0, math.radians(roty)), tmpMatrix);
