@@ -206,6 +206,7 @@ ControlModeMapObserver.prototype.doubleclick = function(event) {
 
     if (mapCoords) {
         let pos = map.getPosition();
+        if (map.getDistance(pos.getCoords(), mapCoords, false, true)[0] > (Math.abs(pos.getViewExtent()) * 1.5)) return; // hack
         pos.setCoords(mapCoords);
         pos = map.convertPositionHeightMode(pos, 'fix');
         pos.setHeight(mapCoords[2]);
