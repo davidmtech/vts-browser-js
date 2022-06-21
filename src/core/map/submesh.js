@@ -909,7 +909,7 @@ MapSubmesh.prototype.drawBBox = function(cameraPos) {
     renderer.gpu.progBBox.setMat4('uMVP', mvp);
 
     //draw bbox
-    renderer.bboxMesh.draw(renderer.gpu.progBBox, 'aPosition');
+    renderer.gpu.bboxMesh.draw(renderer.gpu.progBBox, 'aPosition');
 };
 
 

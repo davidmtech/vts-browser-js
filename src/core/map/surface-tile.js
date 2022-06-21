@@ -693,8 +693,8 @@ MapSurfaceTile.prototype.insideCone = function(coneVec, angle, node) {
 
 
 MapSurfaceTile.prototype.getPixelSize = function(bbox, screenPixelSize, cameraPos, worldPos, returnDistance) {
-    const min = bbox.min;
-    const max = bbox.max;
+    const min = [bbox[9],bbox[10],bbox[11]];
+    const max = [bbox[15],bbox[16],bbox[17]];
     const tilePos1x = min[0] - cameraPos[0];
     const tilePos1y = min[1] - cameraPos[1];
     const tilePos2x = max[0] - cameraPos[0];
@@ -939,7 +939,7 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
                     v = camera.vector; //move camera away hack
                     p = [cameraPos[0] - v[0] * factor, cameraPos[1] - v[1] * factor, cameraPos[2] - v[2] * factor];
 
-                    pixelSize = this.getPixelSize(node.bbox, screenPixelSize, p, p, true);
+                    pixelSize = this.getPixelSize(node.bbox2, screenPixelSize, p, p, true);
                 } else {
                     if (draw.isGeocent) {
                         screenPixelSize = draw.ndcToScreenPixel * ((node.diskAngle2A * draw.planetRadius * 1.41421356236) / node.displaySize);
@@ -958,12 +958,12 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
                     v = camera.vector; //move camera away hack
                     p = [cameraPos[0] - v[0] * factor, cameraPos[1] - v[1] * factor, cameraPos[2] - v[2] * factor];
 
-                    pixelSize = this.getPixelSize(node.bbox, screenPixelSize, p, p, true);
+                    pixelSize = this.getPixelSize(node.bbox2, screenPixelSize, p, p, true);
                 } else {
                     if (preciseDistance) {
                         pixelSize = this.getPixelSize3(node, screenPixelSize);
                     } else {
-                        pixelSize = this.getPixelSize(node.bbox, screenPixelSize, cameraPos, cameraPos, true);
+                        pixelSize = this.getPixelSize(node.bbox2, screenPixelSize, cameraPos, cameraPos, true);
                     }
                 }
             }
@@ -972,10 +972,10 @@ MapSurfaceTile.prototype.updateTexelSize = function() {
         if (preciseDistance) {
             pixelSize = this.getPixelSize3(node, 1, 1);
         } else {
-            pixelSize = this.getPixelSize(node.bbox, 1, cameraPos, cameraPos, true);
+            pixelSize = this.getPixelSize(node.bbox2, 1, cameraPos, cameraPos, true);
         }
 
-        //pixelSize = this.getPixelSize(node.bbox, 1, cameraPos, cameraPos, true);
+        //pixelSize = this.getPixelSize(node.bbox2, 1, cameraPos, cameraPos, true);
         pixelSize[0] = Number.POSITIVE_INFINITY;
     }
 
@@ -1029,6 +1029,11 @@ MapSurfaceTile.prototype.drawGrid = function(cameraPos, divNode, angle, onlySetB
             return; //prevent rendering same grid more then on time
         }
     } */
+
+    if (this.map.renderer.device === VTS_DEVICE_THREE) {  //grid is not supported yet
+        return;
+    }
+
 
     if ((this.texelSize == Number.POSITIVE_INFINITY || this.texelSize > 4.4) && this.metanode && this.metanode.hasChildren()) {
         return;

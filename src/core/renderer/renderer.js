@@ -749,6 +749,10 @@ Renderer.prototype.getZoffsetFactor = function(params) {
 
 
 Renderer.prototype.saveScreenshot = function(output, filename, filetype) {
+    if (this.device === VTS_DEVICE_THREE) {
+        return;
+    }
+
     const gl = this.gpu.gl;
 
     //get current screen size
