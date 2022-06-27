@@ -114,14 +114,17 @@ const Core = function(element, config, coreInterface) {
         mapLogGeodataStyles: true,
         mapBenevolentMargins: false,
         mapForceCredentials: false,
+        mapManualRender: false,
 
         rendererDevice : 'webgl',
         rendererAnisotropic : 0,
         rendererAntialiasing : true,
         rendererAllowScreenshots : false,
+        rendererThree : null,
         inspector : true,
         authorization : null,
-        mario : false
+        mario : false,
+        manualTick : false
     };
 
     this.configStorage = {};
@@ -168,7 +171,7 @@ const Core = function(element, config, coreInterface) {
 
     this.loadMap(this.config.map);
 
-    this.requestAnimFrame.call(window, this.onUpdate.bind(this));
+    this.requestAnimFrame.call(window, this.onUpdate.bind(this, this.config.manualTick));
 };
 
 
@@ -444,7 +447,7 @@ Core.prototype.markDirty = function() {
     }
 };
 
-Core.prototype.onUpdate = function() {
+Core.prototype.onUpdate = function(manualTick) {
     if (this.killed || this.contextLost) {
         return;
     }
@@ -455,7 +458,7 @@ Core.prototype.onUpdate = function() {
             this.callListener('map-loaded', { 'browserOptions':this.map.browserOptions});
         }
 
-        this.map.update();
+        this.map.update(this.config.manualRender);
     }
 
     //TODO: detect view change
@@ -466,7 +469,11 @@ Core.prototype.onUpdate = function() {
 
     this.callListener('tick', {});
 
-    this.requestAnimFrame.call(window, this.onUpdate.bind(this));
+    //console.log('' + manualTick);
+
+    if (!manualTick) {
+      this.requestAnimFrame.call(window, this.onUpdate.bind(this,false));
+    }
 };
 
 
@@ -513,11 +520,16 @@ Core.prototype.setConfigParam = function(key, value, solveStorage) {
         this.config.map16bitMeshes = utils.validateBool(value, false); break;
     case 'mapForceCredentials':
         this.config.mapForceCredentials = utils.validateBool(value, false); utils.forceCredentials = this.config.mapForceCredentials; break
+    case 'mapManualRender':
+        this.config.mapManualRender = utils.validateBool(value, false); break
     case 'inspector':
         this.config.inspector = utils.validateBool(value, true); break;
     case 'authorization':
         this.config.authorization = ((typeof value === 'string') || (typeof value === 'function')) ? value : null;
-         break;
+        break;
+   case 'manualTick':
+       this.config.manualTick = utils.validateBool(value, false); break
+       break;
     default:
         if (key.indexOf('map') == 0 || key == 'mario') {
 
@@ -574,17 +586,20 @@ Core.prototype.setRendererConfigParam = function(key, value) {
     case 'rendererAnisotropic':        this.config.rendererAnisotropic = utils.validateNumber(value, -1, 2048, 0); if (this.rederer) this.rederer.gpu.setAniso(this.config.rendererAnisotropic); break;
     case 'rendererAntialiasing':       this.config.rendererAntialiasing = utils.validateBool(value, true); break;
     case 'rendererAllowScreenshots':   this.config.rendererAllowScreenshots = utils.validateBool(value, false); break;
+    case 'rendererThree':              this.config.rendererThree = value; break;
     }
 };
 
 
 Core.prototype.getRendererConfigParam = function(key) {
+    return this.config[key];
+    /*
     switch (key) {
     case 'rendererDevice':             return this.config.rendererDevice;
     case 'rendererAnisotropic':        return this.config.rendererAnisotropic;
     case 'rendererAntialiasing':       return this.config.rendererAntialiasing;
     case 'rendererAllowScreenshots':   return this.config.rendererAllowScreenshots;
-    }
+    }*/
 };
 
 /*
@@ -594,7 +609,7 @@ string getCoreVersion()
 */
 
 function getCoreVersion(full) {
-    return (full ? 'Core: ' : '') + '2.30.9';
+    return (full ? 'Core: ' : '') + '2.30.10';
 }
 
 

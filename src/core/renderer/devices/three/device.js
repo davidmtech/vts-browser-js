@@ -210,21 +210,27 @@ ThreeDevice.prototype.setSize = function(width, height) {
     this.textMaterial.uniforms.uProj.value = (new THREE.Matrix4()).fromArray(this.renderer.imageProjectionMatrix),
     this.textMaterial.uniforms.uProj.needsUpdate = true;
 
-    if (!this.gpu2) {
-       this.gpu2 = new THREE.WebGLRenderer( { antialias: false } );
+    if (!this.config.rendererThree) {
 
-       this.gpu2.autoClear = false;
-       this.gpu2.autoUpdateScene = false;
-       this.gpu2.outputEncoding = THREE.sRGBEncoding;
-       this.gpu2.setPixelRatio( window.devicePixelRatio );
-       this.gpu2.setSize( width, height );
+      if (!this.gpu2) {
+         this.gpu2 = new THREE.WebGLRenderer( { antialias: false } );
 
-       //    this.gpu = new GpuDevice(this, div, this.curSize, this.config.rendererAllowScreenshots, this.config.rendererAntialiasing, this.config.rendererAnisotropic);
+         this.gpu2.autoClear = false;
+         this.gpu2.autoUpdateScene = false;
+         this.gpu2.outputEncoding = THREE.sRGBEncoding;
+         this.gpu2.setPixelRatio( window.devicePixelRatio );
+         this.gpu2.setSize( width, height );
 
-       this.div.appendChild( this.gpu2.domElement );
-   } else {
-       this.gpu2.setSize( width, height );
-   }
+         //    this.gpu = new GpuDevice(this, div, this.curSize, this.config.rendererAllowScreenshots, this.config.rendererAntialiasing, this.config.rendererAnisotropic);
+
+         this.div.appendChild( this.gpu2.domElement );
+      } else {
+         this.gpu2.setSize( width, height );
+      }
+
+    } else {
+      this.gpu2 = this.config.rendererThree;
+    }
 
     this.camera2.aspect = width / height;
     this.camera2.updateProjectionMatrix();
@@ -605,6 +611,12 @@ ThreeDevice.prototype.addSceneObject = function(object) {
 
 }
 
+ThreeDevice.prototype.getCamera = function() {
+
+  return this.renderer.camera.ortho ? this.orthoCamera2 : this.camera2;
+}
+
+
 // eslint-disable-next-line
 ThreeDevice.prototype.finishRender = function(options) {
 
@@ -630,8 +642,10 @@ ThreeDevice.prototype.finishRender = function(options) {
         this.scene.background = new THREE.Color( 0x000000 );
     }
 
-    this.gpu2.setRenderTarget( null );
-    this.gpu2.render( this.scene, camera );
+    if (!this.config.rendererThree) {
+      this.gpu2.setRenderTarget( null );
+      this.gpu2.render( this.scene, camera );
+    }
 
 
     /*
@@ -656,22 +670,23 @@ ThreeDevice.prototype.finishRender = function(options) {
     }*/
 
 
-    if (this.textBuffers.length && this.textBuffers[0].index > 0) {
-        this.scene2D.clear();
+    if (!this.config.rendererThree) {
+      if (this.textBuffers.length && this.textBuffers[0].index > 0) {
+          this.scene2D.clear();
 
-        for (let i = 0, li = this.textBufferIndex + 1; i < li; i++) {
-            const buffer = this.textBuffers[i];
-            buffer.mesh.geometry.attributes.position.needsUpdate = true;
-            buffer.mesh.geometry.attributes.color.needsUpdate = true;
-            buffer.mesh.geometry.attributes.uv.needsUpdate = true;
+          for (let i = 0, li = this.textBufferIndex + 1; i < li; i++) {
+              const buffer = this.textBuffers[i];
+              buffer.mesh.geometry.attributes.position.needsUpdate = true;
+              buffer.mesh.geometry.attributes.color.needsUpdate = true;
+              buffer.mesh.geometry.attributes.uv.needsUpdate = true;
 
-            buffer.mesh.geometry.setDrawRange(0, Math.floor(buffer.index / 3));
-            this.scene2D.add(buffer.mesh);
-        }
+              buffer.mesh.geometry.setDrawRange(0, Math.floor(buffer.index / 3));
+              this.scene2D.add(buffer.mesh);
+          }
 
-        this.gpu2.render( this.scene2D, this.orthoCamera );
+          this.gpu2.render( this.scene2D, this.orthoCamera );
+      }
     }
-
 
     /*this.scene2D.clear();
     this.scene2D.add(this.testScreenPlane);

@@ -104,16 +104,21 @@ MapCamera.prototype.update = function() {
 
     //console.log("word-pos: " + JSON.stringify(worldPos));
 
-    //set near and far of camera by distance of orbit
-    let factor = Math.max(this.height, this.distance) / 600000;
+    if (!this.map.config.mapManualRender) {
 
-    const near = Math.max(this.near, this.near * (factor * 20));
-    factor = Math.max(1.0, factor);
-    const far = 600000 * (factor * 10);
+      //set near and far of camera by distance of orbit
+      let factor = Math.max(this.height, this.distance) / 600000;
 
-    //console.log("near: " + near + "  far: " + far);
+      const near = Math.max(this.near, this.near * (factor * 20));
+      factor = Math.max(1.0, factor);
+      const far = 600000 * (factor * 10);
 
-    this.camera.setParams(map.position.getFov()*0.5, near, far * 2.0);
+      //console.log("near: " + near + "  far: " + far);
+
+      this.camera.setParams(map.position.getFov()*0.5, near, far * 2.0);
+
+    }
+
 
     return camInfo;
 };

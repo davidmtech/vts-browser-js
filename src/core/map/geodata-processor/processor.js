@@ -15,10 +15,10 @@ const MapGeodataProcessor = function(surface, listener) {
 
     // eslint-disable-next-line
     const worker = require('worker-loader?inline&fallback=false!./worker-main');
-    //const worker = require('worker-loader?!./worker-main');
 
     //debug worker
     this.processWorker = new worker;
+    //this.processWorker = new Worker(new URL('./worker-main.js', import.meta.url));
 
     this.processWorker.onerror = function(event){
         throw new Error(event.message + ' (' + event.filename + ':' + event.lineno + ')');
@@ -26,7 +26,7 @@ const MapGeodataProcessor = function(surface, listener) {
 
     this.processWorker.onmessage = this.onMessage.bind(this);
 
-    this.processWorker.postMessage({'command':'config', 'data': this.map.config});
+    this.processWorker.postMessage({'command':'config', 'data': JSON.parse(JSON.stringify(this.map.config))});
 };
 
 

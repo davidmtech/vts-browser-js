@@ -55,7 +55,7 @@ const Renderer = function(core, div, onUpdate, onResize, config) {
 
     this.touchSurfaceEvent = [];
 
-    const rect = this.div.getBoundingClientRect();
+    const rect = this.div ? this.div.getBoundingClientRect() : {width:1024, height:1024};
 
     this.winSize = [rect.width, rect.height]; //QSize
     this.curSize = [rect.width, rect.height]; //QSize
@@ -207,7 +207,7 @@ Renderer.prototype.onResize = function() {
         return;
     }
 
-    const rect = this.div.getBoundingClientRect();
+    const rect = this.div ? this.div.getBoundingClientRect() : {width:1024, height:1024};
     this.resizeGL(Math.floor(rect.width), Math.floor(rect.height));
 
     if (this.onResizeCall) {

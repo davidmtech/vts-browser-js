@@ -109,6 +109,10 @@ MapPosition.prototype.getHeightMode = function() {
     return this.pos[3];
 };
 
+MapPosition.prototype.setHeightMode = function(mode) {
+    this.pos[3] = mode;
+};
+
 
 MapPosition.prototype.check = function() {
     //check pich

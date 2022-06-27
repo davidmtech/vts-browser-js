@@ -33,6 +33,9 @@ const MapLoader = function(map, maxThreads) {
         const worker = require('worker-loader?inline&fallback=false!./worker-main');
 
         this.processWorker = new worker;
+        //this.processWorker = new Worker();
+
+        //this.processWorker = new Worker(new URL('./worker-main.js', import.meta.url));
 
         this.processWorker.onerror = function(event){
             throw new Error(event.message + ' (' + event.filename + ':' + event.lineno + ')');
@@ -40,7 +43,7 @@ const MapLoader = function(map, maxThreads) {
 
         this.processWorker.onmessage = this.onWorkerMessage.bind(this);
 
-        this.processWorker.postMessage({'command':'config', 'data': this.config});
+        this.processWorker.postMessage({'command':'config', 'data': JSON.parse(JSON.stringify(this.config))});
     }
 
 };

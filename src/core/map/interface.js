@@ -427,6 +427,11 @@ MapInterface.prototype.getRenderSlotEnabled = function(id) {
 };
 
 
+MapInterface.prototype.processRenderSlots = function() {
+    return this.map.renderSlots.processRenderSlots();
+};
+
+
 MapInterface.prototype.setLoaderSuspended = function(state) {
     this.map.loaderSuspended = state;
     return this;

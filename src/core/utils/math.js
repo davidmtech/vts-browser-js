@@ -68,7 +68,12 @@ math.orthographicMatrix = function(vsize, aspect, near, far) {
         0, 1/h, 0, 0,
         0, 0, -2/d, -((far+near)/d),
         0, 0, 0, 1]);
-
+/*
+        const m = mat4.create([1/w, 0, 0, 0,
+            0, 1/h, 0, 0,
+            0, 0, -2/d,0,
+            0, 0,  -((far+near)/d), 1]);
+*/
     mat4.transpose(m);
     return m;
 };

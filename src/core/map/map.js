@@ -1427,7 +1427,7 @@ Map.prototype.updateGeodataProcessors = function(task) {
 };*/
 
 
-Map.prototype.update = function() {
+Map.prototype.update = function(manualRender) {
     if (this.killed) {
         return;
     }
@@ -1461,9 +1461,10 @@ Map.prototype.update = function() {
     this.camera.lastTerrainHeight = this.camera.terrainHeight;
     this.drawFog = this.config.mapFog;
 
-    const rect = this.renderer.div.getBoundingClientRect();
     const renderer = this.renderer;
     const camPos = renderer.cameraPosition;
+
+    const rect = renderer.div.getBoundingClientRect();
 
     if (renderer.curSize[0] != rect.width || renderer.curSize[1] != rect.height) {
         renderer.onResize();
@@ -1490,7 +1491,9 @@ Map.prototype.update = function() {
         this.bestMeshTexelSize = 0;//Number.MAX_VALUE;
         this.bestGeodataTexelSize = 0;//Number.MAX_VALUE;
 
-        this.renderSlots.processRenderSlots();
+        if (!manualRender) {
+            this.renderSlots.processRenderSlots();
+        }
 
         this.loader.update();
 
