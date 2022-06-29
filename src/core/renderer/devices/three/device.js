@@ -87,7 +87,7 @@ ThreeDevice.prototype.init = function() {
     this.models2.frustumCulled = false;
     this.scene.add(this.models2);
 
-    this.scene.add(this.helper);
+    //this.scene.add(this.helper);
 
     this.tileMaterialInjectVersion = this.generateMaterial(new THREE.MeshBasicMaterial({}), {
         uniforms: {  uvTrans : { value: new THREE.Vector4(1,1,0,0) } },
