@@ -18,6 +18,9 @@ const MapInterface = function(map) {
     this.config = map.config;
 };
 
+MapInterface.prototype.getRaw = function() {
+    return this.map
+};
 
 MapInterface.prototype.setPosition = function(position) {
     this.map.setPosition(position);

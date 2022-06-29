@@ -1466,7 +1466,7 @@ Map.prototype.update = function(manualRender) {
 
     const rect = renderer.div.getBoundingClientRect();
 
-    if (renderer.curSize[0] != rect.width || renderer.curSize[1] != rect.height) {
+    if (renderer.curSize[0] != Math.floor(rect.width) || renderer.curSize[1] != Math.floor(rect.height)) {
         renderer.onResize();
         this.dirty = true;
     }

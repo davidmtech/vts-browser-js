@@ -527,7 +527,7 @@ Core.prototype.setConfigParam = function(key, value, solveStorage) {
     case 'authorization':
         this.config.authorization = ((typeof value === 'string') || (typeof value === 'function')) ? value : null;
         break;
-   case 'manualTick':
+     case 'manualTick':
        this.config.manualTick = utils.validateBool(value, false); break
        break;
     default:

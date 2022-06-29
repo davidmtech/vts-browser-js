@@ -62,6 +62,9 @@ CoreInterface.prototype.destroyMap = function() {
     return this.core.destroyMap();
 };
 
+CoreInterface.prototype.getRaw = function() {
+    return this.core
+};
 
 /*CoreInterface.prototype.getMap = function() {
     if (!this.core) { return null; }
