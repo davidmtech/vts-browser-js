@@ -570,6 +570,8 @@ MapDraw.prototype.drawToTexture = function(texture) {
 
 MapDraw.prototype.drawHitmap = function() {
     this.drawChannel = 1;
+    const t1 = this.map.config.mapManualRender;
+    this.map.config.mapManualRender = false; 
     this.renderer.switchToFramebuffer('depth');
     this.map.renderSlots.processRenderSlots();
     this.renderer.switchToFramebuffer('base');
@@ -577,6 +579,8 @@ MapDraw.prototype.drawHitmap = function() {
     if (this.renderer.hitmapMode > 2) {
         this.renderer.copyHitmap();
     }
+
+    this.map.config.mapManualRender = t1;
 
     this.drawChannel = 0;
     this.map.hitMapDirty = false;
