@@ -45,6 +45,7 @@ const ThreeDevice = function(renderer, div, size, keepFrameBuffer, antialias, an
         }).bind(this),
 
         drawBall : (function(){}),
+        drawImage : (function(){}),
 
         drawGpuJobs : (function(){}),
 

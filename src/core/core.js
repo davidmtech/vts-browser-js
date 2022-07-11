@@ -458,7 +458,7 @@ Core.prototype.onUpdate = function(manualTick) {
             this.callListener('map-loaded', { 'browserOptions':this.map.browserOptions});
         }
 
-        this.map.update(this.config.manualRender);
+        this.map.update(this.config.mapManualRender);
     }
 
     //TODO: detect view change
